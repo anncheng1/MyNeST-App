@@ -1,0 +1,1502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<title>Simulation — MyNeST</title>
+<!-- iPhone home-screen app -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="MyNeST">
+<meta name="application-name" content="MyNeST">
+<meta name="format-detection" content="telephone=no">
+<meta name="theme-color" content="#0a1628">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="167x167" href="apple-touch-icon-167.png">
+<link rel="apple-touch-icon" sizes="152x152" href="apple-touch-icon-152.png">
+<link rel="apple-touch-startup-image" media="screen and (device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="splash-1290x2796.png">
+<link rel="apple-touch-startup-image" media="screen and (device-width: 440px) and (device-height: 956px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="splash-1320x2868.png">
+<link rel="apple-touch-startup-image" media="screen and (device-width: 402px) and (device-height: 874px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="splash-1206x2622.png">
+<link rel="apple-touch-startup-image" media="screen and (device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="splash-1179x2556.png">
+<link rel="apple-touch-startup-image" media="screen and (device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="splash-1284x2778.png">
+<link rel="apple-touch-startup-image" media="screen and (device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="splash-1170x2532.png">
+<link rel="apple-touch-startup-image" media="screen and (device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="splash-1125x2436.png">
+<link rel="apple-touch-startup-image" media="screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="splash-1242x2688.png">
+<link rel="apple-touch-startup-image" media="screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="splash-828x1792.png">
+<link rel="apple-touch-startup-image" media="screen and (device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="splash-750x1334.png">
+<style>
+:root {
+  --bg: #0a1628;
+  --surface: #111e35;
+  --surface2: #172340;
+  --border: #1e3050;
+  --navy: #1B3A6B;
+  --teal: #1a7a8a;
+  --amber: #c07a00;
+  --amber-bg: #2a1f00;
+  --amber-light: #ffd580;
+  --green: #1a7a4a;
+  --green-bg: #0d2018;
+  --purple: #6b3fa0;
+  --purple-bg: #1a0d2a;
+  --red: #b02020;
+  --text: #e8edf5;
+  --text2: #8a9bb8;
+  --text3: #5a6f8a;
+  --gold: #f0c040;
+  --radius: 12px;
+  --radius-sm: 8px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 15px; min-height: 100dvh; padding-bottom: env(safe-area-inset-bottom); }
+
+/* ── Header ── */
+.header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 12px 16px; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 100; }
+.back-btn { background: var(--surface2); border: 1px solid var(--border); color: var(--text2); padding: 6px 12px; border-radius: 20px; font-size: 14px; text-decoration: none; white-space: nowrap; }
+.header h1 { font-size: 16px; font-weight: 700; color: var(--text); }
+.header .sub { font-size: 12px; color: var(--text2); }
+
+/* ── Case Grid ── */
+.case-grid { padding: 16px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; max-width: 600px; margin: 0 auto; }
+.session-label { grid-column: 1/-1; font-size: 11px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: 0.08em; padding: 4px 0 2px; }
+.case-btn { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px; cursor: pointer; text-align: left; transition: border-color .15s, background .15s; }
+.case-btn:active { background: var(--surface2); }
+.case-btn.full { grid-column: 1/-1; }
+.case-id { font-size: 11px; font-weight: 700; letter-spacing: 0.06em; margin-bottom: 4px; }
+.case-title { font-size: 13px; font-weight: 600; color: var(--text); line-height: 1.3; }
+.case-tag { font-size: 11px; color: var(--text2); margin-top: 3px; }
+.c-navy .case-id { color: #6a9fd8; }
+.c-navy { border-color: #1B3A6B; }
+.c-teal .case-id { color: #40c0c8; }
+.c-teal { border-color: #1a7a8a; }
+.c-amber .case-id { color: var(--amber-light); }
+.c-amber { border-color: #7a5000; }
+.c-green .case-id { color: #40c080; }
+.c-green { border-color: #1a7a4a; }
+.c-purple .case-id { color: #b090d0; }
+.c-purple { border-color: #6b3fa0; }
+.c-red .case-id { color: #e07070; }
+.c-red { border-color: #b02020; }
+
+/* ── Case View ── */
+.case-view { display: none; padding: 0 0 80px; max-width: 700px; margin: 0 auto; }
+.case-view.active { display: block; }
+
+.case-header { padding: 16px; background: linear-gradient(135deg, #1a1000, #2a1a00); border-bottom: 2px solid var(--amber); margin-bottom: 0; }
+.case-header .case-id-lg { font-size: 12px; font-weight: 700; color: var(--amber-light); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 4px; }
+.case-header h2 { font-size: 18px; font-weight: 800; color: var(--gold); line-height: 1.3; }
+
+.vitals-bar { background: var(--surface); border-bottom: 1px solid var(--border); padding: 12px 16px; }
+.vitals-bar h3 { font-size: 11px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 8px; }
+.vitals-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 6px; }
+.vital-item { background: var(--surface2); border-radius: 6px; padding: 7px 10px; }
+.vital-label { font-size: 10px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 2px; }
+.vital-val { font-size: 14px; font-weight: 700; color: var(--text); }
+
+/* Live Vitals Panel */
+.live-panel { background: #000d18; border: 1px solid var(--teal); border-radius: var(--radius); margin: 16px; padding: 14px; }
+.live-panel-title { font-size: 11px; color: var(--teal); font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+.live-panel-title::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: var(--teal); box-shadow: 0 0 6px var(--teal); animation: pulse 1.5s infinite; }
+@keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .4; } }
+.live-vitals { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+.live-vital { background: var(--surface); border-radius: 8px; padding: 10px 8px; text-align: center; border: 1px solid var(--border); }
+.lv-label { font-size: 10px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
+.lv-value { font-size: 22px; font-weight: 800; font-variant-numeric: tabular-nums; }
+.lv-value.hr { color: #ff6060; }
+.lv-value.spo2 { color: #40c8ff; }
+.lv-value.fio2 { color: #80d080; }
+.lv-unit { font-size: 11px; color: var(--text3); margin-top: 2px; }
+
+.phase-btns { display: flex; gap: 6px; flex-wrap: wrap; }
+.phase-btn { background: var(--surface2); border: 1px solid var(--border); color: var(--text2); padding: 6px 10px; border-radius: 6px; font-size: 12px; cursor: pointer; transition: all .15s; }
+.phase-btn:active { background: var(--teal); border-color: var(--teal); color: #fff; }
+.phase-btn.active { background: var(--teal); border-color: var(--teal); color: #fff; font-weight: 700; }
+
+/* Sections */
+.section { margin: 0 16px 14px; }
+.section-head { font-size: 11px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 8px; padding-bottom: 4px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 6px; }
+.section-head .icon { font-size: 13px; }
+
+/* Presentation */
+.presentation { background: var(--surface); border-radius: var(--radius-sm); padding: 13px; border-left: 3px solid var(--teal); font-size: 14px; line-height: 1.65; color: var(--text); }
+.presentation + .presentation { margin-top: 6px; }
+
+/* Think-Through-It */
+.think-list { list-style: none; display: flex; flex-direction: column; gap: 6px; }
+.think-item { background: #0d1e35; border: 1px solid #1a3a5a; border-radius: var(--radius-sm); padding: 10px 12px; display: flex; gap: 10px; font-size: 13px; line-height: 1.5; }
+.think-num { font-weight: 800; color: var(--teal); flex-shrink: 0; font-size: 14px; }
+.think-text { color: #b8d0e8; font-style: italic; }
+
+/* Discussion Table */
+.disc-table { background: var(--surface); border-radius: var(--radius-sm); overflow: hidden; border: 1px solid var(--border); }
+.disc-table-head { display: grid; grid-template-columns: 1fr 2fr; background: #1a2e4a; }
+.disc-th { font-size: 11px; font-weight: 700; color: var(--teal); text-transform: uppercase; letter-spacing: 0.06em; padding: 9px 12px; }
+.disc-row { display: grid; grid-template-columns: 1fr 2fr; border-top: 1px solid var(--border); }
+.disc-row:nth-child(even) { background: #0e1a2e; }
+.disc-aspect { padding: 10px 12px; font-size: 12px; font-weight: 700; color: #7ab8e0; line-height: 1.4; }
+.disc-points { padding: 10px 12px; font-size: 13px; color: var(--text); line-height: 1.6; }
+.disc-points .kp { display: block; margin-bottom: 4px; }
+.disc-points .kp:last-child { margin-bottom: 0; }
+
+/* Debrief Table */
+.debrief-table { background: var(--purple-bg); border-radius: var(--radius-sm); overflow: hidden; border: 1px solid #3a1f60; }
+.debrief-table-head { display: grid; grid-template-columns: 1fr 2fr; background: #2a1050; }
+.debrief-th { font-size: 11px; font-weight: 700; color: #b090d0; text-transform: uppercase; letter-spacing: 0.06em; padding: 9px 12px; }
+.debrief-row { display: grid; grid-template-columns: 1fr 2fr; border-top: 1px solid #2a1050; }
+.debrief-row:nth-child(even) { background: #15082a; }
+.debrief-topic { padding: 10px 12px; font-size: 12px; font-weight: 700; color: #c0a0e0; line-height: 1.4; }
+.debrief-prompt { padding: 10px 12px; font-size: 13px; color: #d0c0e8; line-height: 1.6; font-style: italic; }
+
+/* Leads-Into */
+.leads-into { background: var(--surface2); border-radius: var(--radius-sm); padding: 10px 13px; font-size: 12px; color: var(--text2); border-left: 3px solid var(--border); }
+.leads-into strong { color: var(--text); }
+
+/* Info Box */
+.info-box { border-radius: var(--radius-sm); padding: 12px 14px; font-size: 13px; line-height: 1.65; margin-bottom: 10px; }
+.info-box.green { background: var(--green-bg); border: 1px solid #1a7a4a; border-left: 3px solid #40c080; }
+.info-box.amber { background: var(--amber-bg); border: 1px solid #7a5000; border-left: 3px solid var(--amber-light); }
+.info-box.navy { background: #0a1628; border: 1px solid var(--navy); border-left: 3px solid #6a9fd8; }
+.info-box-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px; }
+.info-box.green .info-box-title { color: #40c080; }
+.info-box.amber .info-box-title { color: var(--amber-light); }
+.info-box.navy .info-box-title { color: #6a9fd8; }
+.info-box ul { padding-left: 16px; }
+.info-box li { margin-bottom: 4px; }
+
+/* Sim pathway */
+.pathway { background: #001810; border: 1px solid var(--green); border-radius: var(--radius-sm); padding: 12px 14px; }
+.pathway-title { font-size: 11px; font-weight: 700; color: #40c080; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 8px; }
+.pathway-step { display: flex; gap: 8px; margin-bottom: 6px; align-items: flex-start; font-size: 13px; line-height: 1.5; color: #b0e0c0; }
+.pathway-step .arrow { color: #40c080; flex-shrink: 0; margin-top: 1px; }
+
+/* Nav */
+.case-nav { position: fixed; bottom: 0; left: 0; right: 0; background: var(--surface); border-top: 1px solid var(--border); padding: 10px 16px calc(10px + env(safe-area-inset-bottom)); display: flex; gap: 8px; max-width: 700px; margin: 0 auto; }
+.nav-btn { flex: 1; background: var(--surface2); border: 1px solid var(--border); color: var(--text2); padding: 10px; border-radius: var(--radius-sm); font-size: 13px; cursor: pointer; }
+.nav-btn.primary { background: var(--navy); border-color: var(--navy); color: #fff; font-weight: 700; }
+.nav-btn:disabled { opacity: .3; cursor: default; }
+
+.mt8 { margin-top: 8px; }
+.mt12 { margin-top: 12px; }
+
+/* ── Timer Engine (Integrative Cases) ── */
+.timer-panel { background: #000d18; border: 1px solid var(--teal); border-radius: var(--radius); margin: 16px; padding: 14px; }
+.timer-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.timer-title { font-size: 11px; color: var(--teal); font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; }
+.timer-clock { font-size: 34px; font-weight: 800; font-variant-numeric: tabular-nums; color: #fff; text-align: center; letter-spacing: 0.02em; }
+.timer-stage { text-align: center; font-size: 12px; color: var(--gold); font-weight: 700; margin-bottom: 6px; min-height: 16px; }
+.timer-sub { text-align: center; font-size: 11px; color: var(--text2); margin-bottom: 10px; }
+.timer-controls { display: flex; gap: 8px; margin-bottom: 4px; }
+.timer-btn { flex: 1; background: var(--teal); border: none; color: #001018; font-weight: 700; padding: 10px; border-radius: 8px; font-size: 13px; cursor: pointer; }
+.timer-btn.secondary { background: var(--surface2); color: var(--text2); border: 1px solid var(--border); }
+.timer-btn:disabled { opacity: .35; }
+.prep-bars { display: flex; flex-direction: column; gap: 6px; margin-top: 10px; }
+.prep-bar-row { display: flex; align-items: center; gap: 8px; font-size: 12px; }
+.prep-bar-label { width: 100px; flex-shrink: 0; color: var(--text2); }
+.prep-bar-track { flex: 1; height: 8px; background: var(--surface2); border-radius: 4px; overflow: hidden; }
+.prep-bar-fill { height: 100%; background: var(--teal); width: 0%; transition: width .3s linear; }
+.prep-bar-fill.over { background: var(--red); }
+.prep-bar-time { width: 46px; text-align: right; color: var(--text3); font-variant-numeric: tabular-nums; }
+
+.alert-banner { display: none; background: var(--amber-bg); border: 1px solid var(--amber); border-radius: var(--radius-sm); padding: 10px 14px; margin: 0 16px 12px; font-size: 13px; color: var(--amber-light); font-weight: 700; }
+.alert-banner.show { display: block; animation: alertFlash 1s ease-in-out 2; }
+@keyframes alertFlash { 0%,100% { opacity: 1; } 50% { opacity: .55; } }
+
+.live-vitals3 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 10px 0; }
+.checkpoint-list { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
+.checkpoint { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 10px 12px; }
+.checkpoint.due { border-color: var(--amber); }
+.checkpoint.resolved { opacity: .55; }
+.cp-time { font-size: 10px; color: var(--text3); font-weight: 700; text-transform: uppercase; }
+.cp-label { font-size: 13px; color: var(--text); margin: 3px 0 8px; line-height: 1.4; }
+.cp-actions { display: flex; gap: 8px; }
+.cp-btn { flex: 1; padding: 8px; border-radius: 6px; font-size: 12px; font-weight: 700; cursor: pointer; border: 1px solid; }
+.cp-btn.correct { background: var(--green-bg); border-color: var(--green); color: #6adba0; }
+.cp-btn.correct.picked { background: var(--green); color: #002010; }
+.cp-btn.incorrect { background: var(--amber-bg); border-color: var(--amber); color: var(--amber-light); }
+.cp-btn.incorrect.picked { background: var(--amber); color: #2a1a00; }
+.cp-note { font-size: 12px; margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border); color: var(--text2); font-style: italic; }
+
+.role-panel { background: #000d18; border: 1px solid var(--teal); border-radius: var(--radius); margin: 16px; padding: 16px; }
+.role-panel h3 { color: var(--teal); font-size: 14px; margin-bottom: 10px; }
+.flow-chain { display: flex; flex-direction: column; align-items: center; gap: 2px; margin-bottom: 16px; font-size: 12px; }
+.flow-step { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 6px 14px; text-align: center; width: 100%; max-width: 320px; }
+.flow-step.highlight { background: var(--teal); color: #001812; font-weight: 700; border-color: var(--teal); }
+.flow-arrow { color: var(--text3); font-size: 13px; }
+.role-table { width: 100%; border-collapse: collapse; font-size: 11.5px; margin-top: 8px; }
+.role-table th, .role-table td { border: 1px solid var(--border); padding: 6px 8px; text-align: left; vertical-align: top; }
+.role-table th { background: var(--surface2); color: var(--teal); font-size: 10.5px; text-transform: uppercase; }
+.role-table td.block-cell { font-weight: 700; color: var(--gold); white-space: nowrap; }
+.role-legend { font-size: 11px; color: var(--text3); margin-top: 8px; }
+
+.opening-seq { background: var(--surface); border: 1px solid var(--teal); border-radius: var(--radius); margin-bottom: 16px; padding: 14px; }
+.opening-seq h3 { color: var(--teal); font-size: 13px; margin-bottom: 8px; }
+.os-step { border-top: 1px solid var(--border); padding-top: 10px; margin-top: 10px; }
+.os-step:first-child { border-top: none; margin-top: 0; padding-top: 0; }
+.os-step-title { font-size: 12px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+.os-clock { font-size: 22px; font-weight: 800; font-variant-numeric: tabular-nums; color: var(--gold); }
+.os-clock.done { color: var(--green); }
+.os-btn { background: var(--teal); color: #001812; border: none; font-weight: 700; padding: 8px 14px; border-radius: 8px; cursor: pointer; font-size: 12px; }
+.os-btn:disabled { opacity: .4; }
+.os-timer-hint { font-size: 10px; color: var(--text2); text-align: center; margin-top: 5px; opacity: .7; }
+.os-checklist { display: flex; flex-direction: column; gap: 4px; margin-top: 6px; }
+.os-check-item { display: flex; align-items: center; gap: 8px; font-size: 12px; padding: 5px 8px; background: var(--surface2); border-radius: 6px; cursor: pointer; }
+.os-check-item.ticked { background: var(--green-bg); color: #6ee7b7; }
+.os-check-item input { accent-color: var(--teal); }
+.os-qa-btns { display: flex; gap: 8px; margin-top: 6px; }
+.os-qa-btn { flex: 1; background: var(--surface2); border: 1px solid var(--border); color: var(--text2); padding: 8px; border-radius: 8px; cursor: pointer; font-size: 12px; font-weight: 700; }
+.os-qa-btn.picked { background: var(--teal); color: #001812; border-color: var(--teal); }
+.os-dcc-result { font-size: 12px; color: var(--text2); margin-top: 6px; font-style: italic; }
+.debrief-final { border: 2px solid var(--gold); border-radius: var(--radius); background: rgba(240,192,64,0.06); }
+.debrief-final .section-head { color: var(--gold); }
+</style>
+<link rel="stylesheet" href="ios.css">
+<script src="pwa.js" defer></script>
+</head>
+<body>
+
+<div id="gridView">
+  <div class="header">
+    <a href="index.html" class="back-btn">← Home</a>
+    <div>
+      <div class="header h1">Simulation Mode</div>
+      <div class="sub">All Cases · Structured Discussion</div>
+    </div>
+    <button class="back-btn" style="margin-left:auto" onclick="toggleRolePanel()">📋 Team Roles &amp; Flow</button>
+  </div>
+
+  <div id="rolePanel" style="display:none"></div>
+
+  <div class="case-grid" id="caseGrid"></div>
+</div>
+
+<div id="caseView" style="display:none">
+  <div class="header">
+    <button class="back-btn" onclick="showGrid()">← Cases</button>
+    <div>
+      <div class="header h1" id="cvTitle">Case</div>
+      <div class="sub" id="cvSub"></div>
+    </div>
+  </div>
+  <div class="case-view active" id="cvContent"></div>
+  <nav class="case-nav" id="caseNav">
+    <button class="nav-btn" id="prevBtn" onclick="navCase(-1)">◀ Prev</button>
+    <button class="nav-btn primary" onclick="showGrid()">All Cases</button>
+    <button class="nav-btn" id="nextBtn" onclick="navCase(1)">Next ▶</button>
+  </nav>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════════════════════════
+// CASE DATA
+// ══════════════════════════════════════════════════════════════════════════
+const CASES = [
+
+// ── SESSION 1 ─────────────────────────────────────────────────────────────
+{
+  id: 'A1', title: 'The Vigorous Baby — Does She Need Resuscitation?',
+  color: 'c-teal', session: 'Block A (Airway) · Receiving the Baby & Initial Steps',
+  tag: 'DCC · Receiving technique · Initial assessment',
+  presentation: [
+    'A 39-week baby girl is delivered by spontaneous vaginal delivery. The midwife receives her and places her on the mother\'s abdomen. She cries loudly immediately, moves all four limbs actively, and has good central colour.',
+    'The junior doctor asks: "Should we cut the cord now? What do we do next?"',
+  ],
+  vitals: [
+    { label: 'Gestation', val: '39 weeks' },
+    { label: 'Cry', val: 'Strong, immediate' },
+    { label: 'Tone', val: 'Active, all limbs' },
+    { label: 'Colour', val: 'Pink centrally' },
+    { label: 'Cord', val: 'Pulsating' },
+  ],
+  timeline: {
+    baselineHR: 140, baselineSpO2: 65, baselineNote: 'Vigorous at birth — proceed with DCC and observation',
+    checkpoints: [
+      { t: 0, label: 'Assess three criteria: term, tone, cry', correct: { hr:145, spo2:70, note:'All three criteria met — proceed with DCC' }, incorrect: { hr:140, spo2:65, note:'Unnecessary intervention — no change needed, this baby is well' } },
+      { t: 60, label: 'During DCC — continue observation', correct: { hr:145, spo2:78, note:'Continued good colour, tone, and breathing throughout DCC' }, incorrect: { hr:140, spo2:70, note:'DCC interrupted unnecessarily — reassess indication to abandon' } },
+      { t: 180, label: 'T+3:00 — DCC duration check', correct: { hr:148, spo2:88, note:'DCC ≥60 sec completed — proceed to skin-to-skin and breastfeeding' }, incorrect: { hr:145, spo2:80, note:'DCC prolonged without reassessment — check for contraindications' } },
+    ],
+  },
+  think: [
+    'Does this baby require resuscitation?',
+    'Should the cord be clamped immediately? How should DCC be performed?',
+    'Describe how to receive a baby at delivery — hand placement, finger position.',
+    'What observations should continue during DCC?',
+    'When should DCC be abandoned?',
+  ],
+  discussion: [
+    { aspect: 'Initial Assessment', points: ['Term (39 weeks) ✓, good tone (active limbs) ✓, breathing/crying (loud cry) ✓. No resuscitation needed — proceed with routine care.'] },
+    { aspect: 'Delayed Cord Clamping', points: ['DCC is standard of care if no contraindications: wait at least 60 seconds. DCC increases neonatal blood volume by ~20–30%, improves iron stores, haemodynamic stability and reduces transfusion requirement in preterm infants.'] },
+    { aspect: 'Receiving Technique', points: ['Dominant hand spread under shoulder blades, thumb and little finger encircling the neck (not compressing); non-dominant hand under buttocks with fingers encircling one thigh. Keep baby horizontal.'] },
+    { aspect: 'During DCC', points: ['Dry with warm towels on the mother\'s chest, remove wet linen, use the corner of a clean towel to wipe secretions from the mouth, apply a hat, and observe transition — colour, breathing effort, tone.'] },
+    { aspect: 'Abandon DCC When', points: ['Baby is not vigorous despite stimulation; maternal haemodynamic instability; cord avulsion; monochorionic twins (individualised); urgent placental delivery needed.'] },
+  ],
+  debrief: [
+    { topic: 'Physiology of Transition', prompt: 'Common mistake: clamping the cord immediately out of habit even when the baby is vigorous, missing the haemodynamic benefits of DCC.' },
+    { topic: 'DCC Benefits', prompt: 'Common mistake: losing track of temperature during DCC — attention on the cord can mean heat loss goes unnoticed.' },
+    { topic: 'Cord Management', prompt: 'Common mistake: not documenting DCC duration in the record, or clamping too early/too late because timing wasn\'t tracked.' },
+  ],
+  leadsInto: 'Station 2 — Receiving technique, initial assessment, and delayed cord clamping.',
+},
+
+{
+  id: 'A2', title: 'Apneic Baby at the Warmer',
+  color: 'c-teal', session: 'Block A (Airway) · Receiving the Baby & Initial Steps',
+  tag: 'Initial steps · Sniffing position · Suction · MSAF',
+  presentation: [
+    'A term baby boy is born by vaginal delivery through thick meconium-stained liquor. He is noted to be floppy, not crying, and has weak respiratory effort despite stimulation. The cord is clamped and the baby is transferred to the resuscitation warmer.',
+    'The nurse starts drying the baby while the attending MO begins initial assessment.',
+  ],
+  vitals: [
+    { label: 'Gestation', val: '38 weeks' },
+    { label: 'Liquor', val: 'Thick meconium-stained' },
+    { label: 'Tone', val: 'Limp' },
+    { label: 'Cry', val: 'None' },
+    { label: 'Effort', val: 'Weak breathing' },
+    { label: 'HR', val: '110 bpm' },
+    { label: 'Colour', val: 'Centrally cyanosed' },
+  ],
+  timeline: {
+    baselineHR: 110, baselineSpO2: 55, baselineNote: 'Floppy, apnoeic at warmer — initial steps beginning',
+    checkpoints: [
+      { t: 0, label: 'Initial steps — warm, dry, stimulate, position', correct: { hr:115, spo2:60, note:'Stimulation effective — some respiratory effort appearing' }, incorrect: { hr:100, spo2:45, note:'Inadequate stimulation — remains apnoeic' } },
+      { t: 30, label: 'Reassess breathing after initial steps', correct: { hr:120, spo2:68, note:'Breathing improving — continue observation, consider SpO₂/CPAP' }, incorrect: { hr:92, spo2:50, note:'Still apnoeic or gasping — proceed to PPV' } },
+      { t: 60, label: 'T+1:00 — HR and breathing check', correct: { hr:130, spo2:78, note:'Adequate breathing established — continue routine care' }, incorrect: { hr:85, spo2:55, note:'HR <100 — PPV indicated now' } },
+    ],
+  },
+  think: [
+    'What are the initial steps and in what order?',
+    'How do you position the airway?',
+    'When is suction indicated? How should suctioning be performed safely?',
+    'Amniotic fluid is meconium-stained and the baby has weak effort. Is tracheal suctioning needed?',
+    'Baby has laboured breathing after initial steps. What is your next step?',
+  ],
+  discussion: [
+    { aspect: 'Initial Steps Order', points: ['(1) Keep warm — under pre-heated warmer; (2) Dry and stimulate — rub back and soles of feet briskly; remove wet linen; (3) Position — sniffing position; (4) Clear airway — only if visibly obstructed.'] },
+    { aspect: 'Sniffing Position', points: ['Ear tragus aligned with anterior axillary line when viewed from side. Small shoulder roll (folded towel) helps achieve this in term infants. Avoid hyperextension (narrows subglottic airway) and flexion (closes hypopharynx).'] },
+    { aspect: 'Suction Technique', points: ['Measure catheter from corner of mouth to angle of mandible. Insert to that depth. Suction mouth first (buccal mucosa), then nose (nasal floor). Keep gentle and brief — deep pharyngeal suction causes vagal bradycardia.'] },
+    { aspect: 'MSAF Guidance', points: ['Routine tracheal suctioning is NOT recommended, even in non-vigorous infants. Consider only if airway obstruction from meconium is suspected and the procedure can be performed without delaying ventilation.'] },
+    { aspect: 'Post-Initial Step Assessment', points: ['Laboured breathing → Apply pre-ductal pulse oximeter and consider CPAP support if oxygenation or respiratory effort remains inadequate.'] },
+  ],
+  debrief: [
+    { topic: 'Positioning', prompt: 'Common mistake: over- or under-extending the neck instead of the neutral sniffing position, narrowing the airway.' },
+    { topic: 'Suction Safety', prompt: 'Common mistake: suctioning too deep or too vigorously (risking vagal bradycardia), or suctioning nose before mouth.' },
+    { topic: 'MSAF Decision', prompt: 'Common mistake: performing routine tracheal suctioning in a non-vigorous MSL baby without suspected obstruction, delaying PPV unnecessarily.' },
+  ],
+  leadsInto: 'Station 2 — Initial steps, sniffing position, suction technique, MSAF guidance.',
+},
+
+// ── STATION 3 ─────────────────────────────────────────────────────────────
+{
+  id: 'B1', title: 'Gasping Baby — Starting PPV',
+  color: 'c-green', session: 'Block B (Breathing) · PPV, MASK & Intubation',
+  tag: 'PPV indications · T-piece setup · Mask selection · MASK steps',
+  presentation: [
+    'Continuing from Case 2C: Following 30 seconds of initial steps, the baby has weak gasping respirations and HR remains 80 bpm. He has been dried, wet linen removed, and is in sniffing position. SpO₂ probe is on the right wrist — signal acquiring.',
+    'You decide to start PPV with the T-piece. Your assistant connects the flow meter at 10 L/min and sets the blender to 21%.',
+  ],
+  vitals: [
+    { label: 'HR', val: '80 bpm' },
+    { label: 'Effort', val: 'Weak gasping' },
+    { label: 'SpO₂', val: '60% at 2 min' },
+    { label: 'SpO₂ target', val: '65–70% at 2 min' },
+    { label: 'FiO₂', val: '21%' },
+  ],
+  timeline: {
+    baselineHR: 80, baselineSpO2: 60, baselineNote: 'PPV started, weak gasping — no chest rise yet',
+    checkpoints: [
+      { t: 0, label: 'No chest rise — apply MASK: M (Mask adjustment)', correct: { hr:90, spo2:72, note:'Mask reseated, seal corrected — HR rising' }, incorrect: { hr:78, spo2:60, note:'Mask not corrected — no improvement' } },
+      { t: 30, label: 'MASK: A (Airway) — reposition and suction', correct: { hr:96, spo2:78, note:'Airway repositioned, suctioned if needed — chest rising' }, incorrect: { hr:80, spo2:62, note:'Airway not repositioned — no improvement' } },
+      { t: 60, label: 'MASK: S (Step up pressure)', correct: { hr:108, spo2:86, note:'PIP increased appropriately — HR >100' }, incorrect: { hr:83, spo2:65, note:'Pressure not increased — escalate to K (alternative airway)' } },
+    ],
+  },
+  think: [
+    'When should PPV be started?',
+    'Which device do you prefer — T-piece or BVM? How do you set it up?',
+    'How do you choose the correct mask size? What is the correct seal position on the face?',
+    'After 15 seconds of PPV: HR is not rising and chest is not rising. What is your response?',
+    'When do you insert an orogastric tube, and why?',
+  ],
+  discussion: [
+    { aspect: 'PPV Indications', points: ['Apnea, gasping respirations OR HR <100 bpm despite initial steps. Any criterion alone is sufficient to start immediate PPV.'] },
+    { aspect: 'Device Selection', points: ['T-piece preferred: delivers precise, consistent PIP and PEEP with one hand. Set PIP 20–25 cmH₂O (term), PEEP 5 cmH₂O, flow 10 L/min. BVM available as backup but tidal volume is less consistent.'] },
+    { aspect: 'Mask Selection', points: ['Correct mask covers chin, mouth, and nose — NOT the eyes. Apply chin-first then seal over nose. Size 1 for term baby. Ensure no split in the rim cushion.'] },
+    { aspect: 'MASK Corrective Steps', points: ['M — Mask: recheck seal, press thenar eminence, lift chin.', 'A — Airway: reposition in sniffing position, suction and open mouth.', 'S — Step up pressure: increase PIP by 5 cmH₂O.', 'K — Key alternative: consider LMA or intubation.'] },
+    { aspect: 'OG Tube', points: ['Insert 5F or 6F OG tube if PPV continues beyond 2 minutes. Air entering the stomach during mask ventilation splints the diaphragm and raises aspiration risk.'] },
+  ],
+  debrief: [
+    { topic: 'PPV Indications', prompt: 'Common mistake: waiting for the baby to deteriorate further before starting PPV, instead of acting on the first criterion met (apnoea, gasping, OR HR <100).' },
+    { topic: 'Equipment Familiarity', prompt: 'Common mistake: not checking T-piece pressure settings before use, or using an incorrect mask size that leaks at the seal.' },
+    { topic: 'MASK Application', prompt: 'Common mistake: jumping straight to increasing pressure (S) or escalating to intubation (K) without first checking mask seal (M) and airway position (A).' },
+  ],
+  leadsInto: 'Station 3 — PPV device selection, mask sizing, MASK corrective steps, OG tube.',
+},
+
+{
+  id: 'B2', title: 'PPV Failure — Moving to Intubation',
+  color: 'c-green', session: 'Block B (Breathing) · PPV, MASK & Intubation',
+  tag: 'K step · ETT sizing · Laryngoscopy · Confirmation',
+  presentation: [
+    'Continuing from Case 3A: MASK has been fully applied — mask reseated, head repositioned, PIP increased to 35 cmH₂O — still no chest rise. HR has dropped to 68 bpm at 3.5 minutes of age. SpO₂ reads 61%.',
+    'The Advanced MO takes over: "We need to intubate. Get me the laryngoscope. Blade 1. ETT 3.5."',
+  ],
+  vitals: [
+    { label: 'HR', val: '68 bpm' },
+    { label: 'SpO₂', val: '61%' },
+    { label: 'FiO₂', val: '40%' },
+    { label: 'PPV duration', val: '~3.5 min' },
+    { label: 'MASK result', val: 'No chest rise' },
+  ],
+  timeline: {
+    baselineHR: 68, baselineSpO2: 61, baselineNote: 'PPV ineffective despite MASK — intubation indicated',
+    checkpoints: [
+      { t: 0, label: 'Intubation attempt — 30 sec limit', correct: { hr:70, spo2:62, note:'Attempt timed correctly, team roles clear, laryngoscopy technique correct' }, incorrect: { hr:55, spo2:50, note:'Attempt exceeds 30 sec without calling time, or technique incorrect' } },
+      { t: 30, label: 'ETT placement confirmation', correct: { hr:80, spo2:68, note:'Confirmed via CO₂ detector + bilateral auscultation — HR rising' }, incorrect: { hr:58, spo2:52, note:'Confirmation inadequate — possible oesophageal or right-mainstem placement' } },
+      { t: 60, label: 'T+1:00 post-intubation reassessment', correct: { hr:100, spo2:80, note:'HR >100 — effective ventilation established' }, incorrect: { hr:60, spo2:55, note:'No improvement — reassess with DOPE' } },
+    ],
+  },
+  think: [
+    'What ETT size and insertion depth do you choose for a 38-week, approximately 3.2 kg baby?',
+    'How do you set up the team — who does what during intubation?',
+    'Describe the steps of laryngoscopy and ETT insertion.',
+    'List all the methods to confirm correct ETT placement.',
+    'How do you secure the ETT, and how do you anchor the OG tube alongside it?',
+  ],
+  discussion: [
+    { aspect: 'ETT Selection', points: ['3.2 kg → ETT 3.5 mm ID. Insertion depth from lip calculated using nasal-tragus length (NTL) + 1 cm.'] },
+    { aspect: 'Team Setup', points: ['Operator: laryngoscope in LEFT hand, ETT in RIGHT. Assistant 1: stabilises head, provides free-flow O₂, calls 30 seconds. Assistant 2: suction ready. All attempts limited to 30 seconds.'] },
+    { aspect: 'Laryngoscopy Technique', points: ['Insert blade along right side of tongue, sweep tongue to left. Advance to vallecula or lift epiglottis. Lift handle at 45° upward — do not pivot on gum. Visualise V-shaped glottic opening. Insert ETT to correct depth; note cm mark at lip. Hold ETT firmly against upper lip while removing laryngoscope.'] },
+    { aspect: 'Confirmation Methods', points: ['(1) Equal bilateral breath sounds in both axillae.', '(2) Silent epigastrium.', '(3) Misting in ETT.', '(4) Rising HR — most reliable.', '(5) Bilateral chest rise.', '(6) CO₂ detector: purple → yellow = tracheal.'] },
+    { aspect: 'Securing ETT', points: ['12–15 cm strip of adhesive tape, split one end, wrap around ETT, secure to philtrum and both cheeks. OG tube runs parallel, anchored over chin. Document: tube size, depth at lip, time, confirmation method.'] },
+  ],
+  debrief: [
+    { topic: 'ETT Sizing', prompt: 'Common mistake: selecting ETT size from habit rather than weight/gestation, risking a tube too large or too small.' },
+    { topic: 'Confirmation', prompt: 'Common mistake: relying on a single sign (e.g., chest rise alone) instead of multiple methods — CO₂ detector, bilateral auscultation, and rising HR together.' },
+    { topic: 'Complication Management', prompt: 'Common mistake: not recognising right-mainstem intubation when breath sounds are louder on one side, and continuing to ventilate without withdrawing the tube.' },
+  ],
+  leadsInto: 'Station 4 — Laryngoscopy technique, ETT confirmation, securing, LMA, and meconium aspirator.',
+},
+
+// ── STATION 4 ─────────────────────────────────────────────────────────────
+{
+  id: 'C1', title: 'Cord Prolapse — Progressing to Full Resuscitation',
+  color: 'c-red', session: 'Block C (Circulation) · Chest Compressions',
+  tag: 'CPR indication · Two-thumb technique · 3:1 ratio · Team roles',
+  presentation: [
+    'Emergency Caesarean section at 40+1 weeks for cord prolapse. Cord was prolapsed for approximately 25 minutes. The baby is born flat: no cry, no tone, HR 30 bpm on auscultation.',
+    'ETT placed and confirmed at 90 seconds. PPV delivered: PIP 25, PEEP 5, FiO₂ 100%. At 3 minutes: HR 38 bpm on cardiac monitor. Chest is rising with each inflation.',
+  ],
+  vitals: [
+    { label: 'HR', val: '38 bpm' },
+    { label: 'SpO₂', val: '62%' },
+    { label: 'FiO₂', val: '100%' },
+    { label: 'ETT', val: 'Confirmed' },
+    { label: 'Chest rise', val: 'Present — PPV effective' },
+  ],
+  timeline: {
+    baselineHR: 38, baselineSpO2: 62, baselineNote: 'Effective ETT-PPV confirmed — CPR indicated',
+    checkpoints: [
+      { t: 0, label: 'Start CPR — two-thumb technique, 3:1 ratio', correct: { hr:42, spo2:65, note:'Correct technique and ratio — HR beginning to rise' }, incorrect: { hr:36, spo2:60, note:'Technique or ratio incorrect — no improvement' } },
+      { t: 60, label: '1 min of CPR — reassess (CPR reassessment is every 1 min, not 30 sec)', correct: { hr:52, spo2:68, note:'HR rising — continue CPR, prepare adrenaline if still <60 at 2 min' }, incorrect: { hr:36, spo2:60, note:'No improvement — check technique, depth, recoil' } },
+      { t: 120, label: '2 min of CPR — HR check', correct: { hr:62, spo2:74, note:'HR ≥60 — stop compressions, continue PPV' }, incorrect: { hr:40, spo2:62, note:'Still <60 — prepare adrenaline, consider DOPE' } },
+    ],
+  },
+  think: [
+    'When are chest compressions indicated? What oxygen concentration should be used?',
+    'Describe the two-thumb encircling technique — placement, depth, rate, and ratio.',
+    'How do you count and coordinate compressions with ventilation?',
+    'Who does what — how is the team organised during CPR?',
+    'When do you reassess HR? What HR triggers a change in management?',
+  ],
+  discussion: [
+    { aspect: 'Indication', points: ['HR <60 after 30 seconds of EFFECTIVE ventilation producing chest movement. This baby has effective PPV (chest rising confirmed) with HR 38 at 60 seconds of ETT-PPV. Indication met — start compressions immediately.'] },
+    { aspect: 'Two-Thumb Technique', points: ['Both thumbs on lower third of sternum (below inter-nipple line), side-by-side or overlapping. Hands encircle chest; fingers support spine. Depress ⅓ of AP chest diameter. Allow FULL recoil — do not lift thumbs off chest.'] },
+    { aspect: 'Ratio and Rate', points: ['3:1 — three compressions followed by one ventilation breath. Count aloud: "one-and-two-and-three-and-Bag." Rate: 90 compressions + 30 breaths = 120 events/minute.'] },
+    { aspect: 'Team Organisation', points: ['Provider 1 (airway): delivers PPV, gives breath on "Bag", reports HR. Provider 2 (compressions): performs two-thumb technique, counts aloud. Provider 3 (medications): prepares adrenaline and UVC. Team Lead: directs team, calls HR checks, makes escalation decisions.'] },
+    { aspect: 'Reassessment', points: ['Every 60 seconds. HR ≥60 → stop compressions, continue PPV. HR ≥100 + breathing → wean PPV. HR still <60 after 60 seconds of CPR → prepare and give adrenaline.'] },
+  ],
+  debrief: [
+    { topic: 'Compression Technique', prompt: 'Common mistake: using two-finger technique when two-thumb is possible, or not allowing full chest recoil between compressions.' },
+    { topic: 'Coordination', prompt: 'Common mistake: compressing and ventilating simultaneously instead of pausing for the breath, reducing ventilation effectiveness.' },
+    { topic: 'Team Roles', prompt: 'Common mistake: no clear plan for switching the compressor when fatigued, causing a break in continuity or ratio errors.' },
+  ],
+  leadsInto: 'Station 5A — Chest compressions, technique, ratio, and team coordination.',
+},
+
+// ── STATION 5B ────────────────────────────────────────────────────────────
+{
+  id: 'D1', title: 'No Response to CPR — Escalating to Medications',
+  color: 'c-red', session: 'Block D (Drugs) · Medications & UVC',
+  tag: 'Adrenaline · UVC insertion · Volume expander · Drug dosing',
+  presentation: [
+    'Continuing from Case 5A: 60 seconds of coordinated PPV + chest compressions (3:1). HR on monitor: 32 bpm. No improvement. SpO₂ 55%.',
+    'Team Lead calls: "HR still below 60 after one minute of CPR. We need adrenaline. Provider 3 — prepare IV adrenaline now. We need UVC access." Baby weight estimated 3.5 kg.',
+  ],
+  vitals: [
+    { label: 'HR', val: '32 bpm' },
+    { label: 'SpO₂', val: '55%' },
+    { label: 'CPR duration', val: '60 sec' },
+    { label: 'ETT', val: 'Confirmed' },
+    { label: 'Weight', val: '~3.5 kg' },
+  ],
+  timeline: {
+    baselineHR: 32, baselineSpO2: 55, baselineNote: 'Indication for adrenaline met — UVC access needed',
+    checkpoints: [
+      { t: 0, label: 'Prepare and give adrenaline via UVC', correct: { hr:32, spo2:55, note:'UVC sited correctly, adrenaline dose/concentration correct, flushed' }, incorrect: { hr:30, spo2:53, note:'Delayed access or incorrect dose calculation' } },
+      { t: 60, label: 'Reassess 1 min after adrenaline', correct: { hr:58, spo2:66, note:'HR rising — correct response to adrenaline' }, incorrect: { hr:32, spo2:55, note:'No response — recheck dose/route, consider DOPE' } },
+      { t: 120, label: 'Reassess at 2 min', correct: { hr:72, spo2:75, note:'HR ≥60 — stop compressions, continue PPV' }, incorrect: { hr:35, spo2:58, note:'Persistent bradycardia — consider volume expander' } },
+    ],
+  },
+  think: [
+    'What is the formal indication for adrenaline — has it been met?',
+    'Calculate the IV adrenaline dose for 3.5 kg. How do you prepare 1:10,000 from 1:1,000 ampule?',
+    'Walk through UVC insertion: steps, depth, and confirmation before giving any drug.',
+    'If UVC cannot be inserted quickly, what is the alternative adrenaline route and dose?',
+    'When would you consider a volume expander? What signs would you look for?',
+  ],
+  discussion: [
+    { aspect: 'Indication', points: ['HR <60 after 30 seconds of effective PPV PLUS 60 seconds of coordinated CPR ≈ 90 seconds of full resuscitation. This baby has met the indication.'] },
+    { aspect: 'Adrenaline Preparation', points: ['3.5 kg: IV dose 0.01–0.03 mg/kg = 0.1–0.3 mL/kg of 1:10,000.', 'Prepare: draw 1 mL of 1:1,000 into 10 mL syringe + 9 mL of 0.9% NaCl = 10 mL of 1:10,000 (0.1 mg/mL).', 'Draw up 0.7 mL (0.02 mg/kg). Label clearly. Flush after with 3 mL NS.'] },
+    { aspect: 'UVC Insertion', points: ['Prepare sterile field, cut cord to 1–2 cm stump, identify large thin-walled vein (usually superior). Flush and prime catheter. Insert until free blood return. Secure with cord tie. Flush again before drug administration.'] },
+    { aspect: 'ETT Route', points: ['If IV not available: adrenaline 0.05–0.1 mg/kg via ETT = 0.5–1 mL/kg of 1:10,000. Follow by PPV 3 times before resuming coordinated CPR. Lower bioavailability — always follow with IV dose as soon as access is established.'] },
+    { aspect: 'Volume Expander', points: ['Indications: (a) history of blood loss, (b) signs of shock (pallor, weak pulses, CRT >3 sec), (c) failure to respond despite adequate resuscitation.', 'Dose: 0.9% NaCl 10 mL/kg (35 mL for 3.5 kg) over 5–10 minutes. Avoid rapid boluses in preterm infants.'] },
+  ],
+  debrief: [
+    { topic: 'Dose Calculation', prompt: 'Common mistake: confusing 1:1,000 and 1:10,000 concentrations, or miscalculating volume for the baby\'s weight under pressure.' },
+    { topic: 'UVC Technique', prompt: 'Common mistake: mistaking an umbilical artery for the vein, or not flushing the catheter before drug administration.' },
+    { topic: 'Volume Expander Decision', prompt: 'Common mistake: giving volume expander routinely without a clear indication, or giving it too rapidly in preterm infants.' },
+  ],
+  leadsInto: 'Station 5B — Adrenaline preparation and dosing, UVC insertion, volume expander.',
+},
+
+// ── SESSION 6 ─────────────────────────────────────────────────────────────
+{
+  id: 'E1', title: '28-Week Emergency — Golden Hour Activated',
+  color: 'c-purple', session: 'Block E (Extras) · Preterm & Special Conditions',
+  tag: 'Golden hour · Thermoregulation · CPAP · IVH prevention',
+  presentation: [
+    'A 28+4 week baby girl is delivered by emergency Caesarean section for antepartum haemorrhage at 01:15. Estimated weight 1.0 kg. Chorioamnionitis suspected (maternal fever, raised CRP). The Golden Hour team was called 20 minutes ago.',
+    'Baby delivered: weak respiratory effort, HR 94 bpm, SpO₂ probe 68% at 2 minutes of age.',
+  ],
+  vitals: [
+    { label: 'Gestation', val: '28+4 weeks' },
+    { label: 'Est. weight', val: '~1 kg' },
+    { label: 'HR', val: '94 bpm' },
+    { label: 'SpO₂', val: '68% at 2 min' },
+    { label: 'SpO₂ target', val: '65–70% at 2 min' },
+    { label: 'Effort', val: 'Weak but present' },
+  ],
+  timeline: {
+    baselineHR: 94, baselineSpO2: 68, baselineNote: 'At warmer — weak effort, Golden Hour pathway begins',
+    checkpoints: [
+      { t: 30, label: 'Thermoregulation — wrap WITHOUT drying', correct: { hr:96, spo2:72, note:'Wrapped in plastic without drying, hat on, thermal mattress activated' }, incorrect: { hr:90, spo2:65, note:'Dried before wrapping — heat loss' } },
+      { t: 60, label: 'CPAP decision', correct: { hr:98, spo2:76, note:'CPAP started PEEP 6, FiO₂ 21–30%' }, incorrect: { hr:94, spo2:68, note:'CPAP delayed or PPV started unnecessarily' } },
+      { t: 300, label: 'T+5:00 — target SpO₂ 80–85%', correct: { hr:98, spo2:83, note:'On target — continue CPAP, monitor' }, incorrect: { hr:98, spo2:97, note:'⚠ FiO₂ too high — SpO₂ >95%, reduce now' } },
+    ],
+  },
+  think: [
+    'What is the FIRST thing you do at the warmer — and why does it differ from a term baby?',
+    'What FiO₂ do you start with and why?',
+    'The baby has weak but present respiratory effort. CPAP or PPV first?',
+    'Why must you avoid rapid volume boluses and vigorous handling in this infant?',
+    'At 15 minutes of age, axillary temperature is 35.8°C. What does this mean and what to do?',
+  ],
+  discussion: [
+    { aspect: 'Thermoregulation', points: ['FIRST: wrap immediately in polyethylene plastic bag or wrap from neck down WITHOUT drying. Put on polyethylene hat. Warmer pre-heated, thermal mattress activated. Routine drying is not performed before plastic wrapping in <32-week infants.'] },
+    { aspect: 'Oxygen Targets', points: ['Start 21–30% FiO₂. Preterm infants are highly susceptible to oxidative stress and retinopathy of prematurity. Target SpO₂ at 5 minutes: 80–85%. If SpO₂ >95% → reduce FiO₂ immediately. Hyperoxia is harmful.'] },
+    { aspect: 'CPAP vs PPV', points: ['Baby has weak but present effort → trial of CPAP (PEEP 6 cmH₂O, FiO₂ 21–30%) first. If SpO₂ improves and HR stable: continue CPAP. If apnoea develops, HR falls below 100, or no improvement in 30 seconds → start PPV at lower PIP (20 cmH₂O).'] },
+    { aspect: 'IVH Prevention', points: ['Rapid volume boluses → sudden increase in cerebral blood flow → germinal matrix rupture → IVH. Vigorous handling and pain destabilise cerebral autoregulation. Handle gently, keep head midline, minimise unnecessary procedures.'] },
+    { aspect: 'Hypothermia Management', points: ['Temperature 35.8°C = hypothermia (target 36.5–37.5°C). Hypothermia at 1 hour is an independent predictor of mortality. Check: Is plastic wrap sealed? Is the room warm? Is thermal mattress available?'] },
+  ],
+  debrief: [
+    { topic: 'Thermoregulation', prompt: 'Common mistake: drying the baby before plastic wrapping in <32-week infants, losing the occlusive benefit and increasing heat loss.' },
+    { topic: 'Oxygen Toxicity', prompt: 'Common mistake: starting at high FiO₂ for preterm infants instead of 21–30%, or not reducing FiO₂ promptly when SpO₂ exceeds target.' },
+    { topic: 'IVH Prevention', prompt: 'Common mistake: rapid volume boluses or vigorous handling, increasing the risk of germinal matrix haemorrhage.' },
+  ],
+  leadsInto: 'Session 6 — Preterm Golden Hour, thermoregulation, CPAP, oxygen targets, IVH prevention.',
+},
+
+{
+  id: 'E2', title: 'Six Babies — Six Special Presentations',
+  color: 'c-purple', session: 'Block E (Extras) · Preterm & Special Conditions',
+  tag: 'Upper airway · Pneumothorax · Naloxone · CHD · Surgical',
+  presentation: [
+    'The following six babies present to you in sequence. Identify each diagnosis and outline your immediate management.',
+    'Baby A: Term, Caesarean. Micrognathia noted antenatally. At birth: severely desaturates. When placed prone → SpO₂ improves from 54% to 81%.',
+    'Baby B: Term, normal delivery. Cyclical cyanosis — deeply blue when quiet, pink when crying. A 5F suction catheter cannot be passed through either nostril.',
+    'Baby C: 38-week baby on ETT-PPV. Sudden deterioration — SpO₂ drops to 48%, HR 58. Left chest hyper-resonant. Heart sounds displaced to the right.',
+    'Baby D: Term, good HR and colour, but no respiratory effort at 4 minutes despite PPV. Mother received pethidine 2 hours before delivery.',
+    'Baby E: Term, Caesarean for foetal distress. Good HR. Adequate SpO₂ on CPAP — but cannot reach target despite FiO₂ 100%.',
+    'Baby F: Term, born with bowel loops visible outside the abdomen adjacent to the umbilicus — no covering sac.',
+  ],
+  vitals: null,
+  phases: null,
+  think: [
+    'Baby A — Diagnosis? Immediate airway intervention?',
+    'Baby B — Diagnosis? What device keeps the airway open immediately at the bedside?',
+    'Baby C — Diagnosis? Emergency procedure — describe it step by step.',
+    'Baby D — Diagnosis? What drug, what dose, and what is the critical caveat?',
+    'Baby E — Diagnosis category? What drug maintains the circulation while awaiting cardiology?',
+    'Baby F — Diagnosis? Immediate bowel protection — what do you apply and how?',
+  ],
+  discussion: [
+    { aspect: 'Baby A — Pierre Robin', points: ['Micrognathia + glossoptosis. Prone positioning immediately — gravity pulls tongue forward. If SpO₂ remains low: insert nasopharyngeal airway (nose to tragus). LMA if still compromised. Refer for surgical jaw distraction.'] },
+    { aspect: 'Baby B — Choanal Atresia', points: ['Neonate is an obligate nasal breather — blue when nasal airway obstructed, pink when crying (oral breathing). Immediate: insert Guedel oropharyngeal airway or McGovern nipple. Refer CT + ENT surgery.'] },
+    { aspect: 'Baby C — Tension Pneumothorax', points: ['Emergency needle decompression: 23G butterfly needle, 2nd intercostal space, mid-clavicular line on the affected (left) side. Aspirate air. Leave needle in situ. Insert definitive chest drain.'] },
+    { aspect: 'Baby D — Opioid Depression', points: ['Naloxone 0.1 mg/kg IM or IV. CRITICAL: ventilate first — naloxone is adjunctive. Do NOT give if mother is opioid-dependent (risk of neonatal withdrawal seizures).'] },
+    { aspect: 'Baby E — Cyanotic CHD', points: ['SpO₂ unresponsive to O₂ = cardiac not respiratory cause. Prostaglandin E1 (PGE1) to maintain ductal patency. Urgent echocardiogram + cardiology consult.'] },
+    { aspect: 'Baby F — Gastroschisis', points: ['Wrap exposed bowel immediately in saline-soaked gauze + cling wrap. Bowel bag if available. OG tube on free drainage. Right lateral decubitus. Transfer urgently to paediatric surgical centre.'] },
+  ],
+  debrief: [
+    { topic: 'Upper Airway', prompt: 'Common mistake: placing a Pierre Robin baby supine instead of prone, worsening airway obstruction from the tongue.' },
+    { topic: 'Pneumothorax', prompt: 'Common mistake: waiting for a chest X-ray to confirm tension pneumothorax before decompressing — this delays a life-saving intervention.' },
+    { topic: 'Naloxone Caveats', prompt: 'Common mistake: giving naloxone before establishing effective ventilation, or giving it to a baby of an opioid-dependent mother.' },
+    { topic: 'Congenital Heart Disease', prompt: 'Common mistake: continuing to increase FiO₂ in suspected cyanotic CHD instead of recognising oxygen alone will not correct the saturation.' },
+    { topic: 'Surgical Conditions', prompt: 'Common mistake: covering exposed bowel with dry gauze instead of saline-soaked gauze and an occlusive wrap.' },
+  ],
+  leadsInto: 'Session 6 — Special conditions: upper and lower airway, CNS, cardiovascular, surgical.',
+},
+
+// ── INTEGRATED SCENARIOS ──────────────────────────────────────────────────
+// ── INTEGRATIVE CASES (Full Team Assessment) ─────────────────────────────
+{
+  id: 'Integrative 1', title: 'Birth Asphyxia (Term Respiratory Depression)',
+  color: 'c-navy', session: 'Integrative Cases · Team Assessment',
+  tag: 'Team assessment · Full pathway · MASK · ETT · Adrenaline',
+  presentation: [
+    '38-week, 3.2 kg baby born by emergency Caesarean section for category III CTG. Not vigorous at birth — no cry, limp, HR 52 bpm on auscultation.',
+    'Referral: Category III CTG (fetal distress) — team activated before delivery. Cord management: non-vigorous birth anticipated, clamp and transfer promptly, no DCC.',
+  ],
+  vitals: [
+    { label: 'Gestation', val: '38 weeks' },
+    { label: 'Weight', val: '3.2 kg' },
+    { label: 'Presenting HR', val: '52 bpm' },
+    { label: 'Effort', val: 'None' },
+    { label: 'SpO₂ target 1 min', val: '60–65%' },
+  ],
+  timeline: {
+    baselineHR: 52, baselineSpO2: 60, baselineNote: 'At birth — non-vigorous, no effort',
+    checkpoints: [
+      { t: 60, label: 'Initial steps complete (T+1:00) — apnoea/HR <100 → start PPV', correct: { hr:78, spo2:68, note:'PPV started with T-piece — chest rising' }, incorrect: { hr:50, spo2:60, note:'PPV not started — HR remains low, no improvement' } },
+      { t: 90, label: 'Chest not rising / HR not improving → apply MASK', correct: { hr:96, spo2:76, note:'MASK corrective steps applied — HR rising' }, incorrect: { hr:52, spo2:64, note:'MASK omitted — ventilation remains ineffective' } },
+      { t: 120, label: 'Reassess at 2:00 — HR <60 despite MASK?', correct: { hr:110, spo2:90, note:'Effective PPV achieved — HR >100, stabilise' }, incorrect: { hr:48, spo2:58, note:'HR <60 — escalate to intubation and chest compressions' } },
+    ],
+  },
+  think: [],
+  discussion: [
+    { aspect: 'Expected Pathway', points: ['Initial steps (30 sec) → HR <100 + no effort → PPV (T-piece, mask 1) → SpO₂ probe right hand → HR check at 15 sec.', 'If PPV not effective: MASK — Mask adjustment, Airway repositioned, Step up PIP, Key alternative.', 'If HR <60 after 30 sec effective PPV: ETT + chest compressions (3:1).', 'If HR <60 after 60 sec CPR: adrenaline (IV 0.01–0.03 mg/kg) via UVC.', 'Endpoint: HR >100, spontaneous breathing, SpO₂ 88–92%.'] },
+    { aspect: 'Alternative Outcome', points: ['If MASK corrective steps are not applied, or PPV is not made effective: HR remains ≤52 bpm and SpO₂ fails to rise. The team must recognise ineffective PPV and progress systematically — MASK → intubation → chest compressions (3:1).'] },
+    { aspect: 'Facilitator Cues', points: ['Only advance vital signs in response to correct team actions.', 'If MASK not applied before escalating: "Have you completed all corrective steps?"', 'If FiO₂ increased without indication: "What is your SpO₂ target at this time?"'] },
+  ],
+  debrief: [
+    { topic: 'MASK Application', prompt: 'Common mistake: escalating to intubation before completing MASK corrective steps systematically.' },
+    { topic: 'Time-to-First-Breath', prompt: 'Common mistake: delays starting PPV due to slow equipment setup or hesitation after initial steps.' },
+    { topic: 'Communication', prompt: 'Common mistake: team members acting without closed-loop confirmation, leading to missed or duplicated actions.' },
+    { topic: 'Equipment', prompt: 'Common mistake: incorrect mask size, or T-piece not connected to gas flow before starting PPV.' },
+  ],
+  leadsInto: 'Debrief focus: MASK application, time-to-first-breath, closed-loop communication.',
+},
+
+{
+  id: 'Integrative 2', title: 'MAS with Obstruction (Meconium-Stained Liquor — Non-Vigorous Infant)',
+  color: 'c-amber', session: 'Integrative Cases · Team Assessment',
+  tag: 'MSL · Non-vigorous · Meconium aspirator · PPV priority',
+  presentation: [
+    'Term baby, thick meconium-stained amniotic fluid. Baby born floppy, HR 42 bpm, no respiratory effort, poor tone.',
+    'Referral: thick MSAF — team prepared for possible tracheal suctioning/intubation. Cord management: clamp promptly, non-vigorous birth anticipated.',
+  ],
+  vitals: [
+    { label: 'HR', val: '42 bpm' },
+    { label: 'Effort', val: 'None' },
+    { label: 'Tone', val: 'Limp' },
+    { label: 'MSL', val: 'Thick, viscid' },
+    { label: 'Vigour', val: 'Non-vigorous' },
+  ],
+  timeline: {
+    baselineHR: 42, baselineSpO2: 50, baselineNote: 'At birth — non-vigorous, thick MSAF',
+    checkpoints: [
+      { t: 30, label: 'Assess vigour and airway obstruction risk', correct: { hr:44, spo2:52, note:'Vigour correctly assessed as non-vigorous — proceed to airway' }, incorrect: { hr:40, spo2:48, note:'Assessment delayed — no action taken' } },
+      { t: 60, label: 'Airway decision (T+1:00) — suction vs. ventilate', correct: { hr:68, spo2:64, note:'Brief tracheal suction if obstruction suspected, then PPV without delay' }, incorrect: { hr:38, spo2:45, note:'Repeated/prolonged suctioning — PPV delayed, HR falling' } },
+      { t: 90, label: 'Reassess after PPV established', correct: { hr:102, spo2:86, note:'HR >100 — effective ventilation achieved' }, incorrect: { hr:36, spo2:42, note:'Ventilation still delayed — team must prioritise PPV over suctioning' } },
+    ],
+  },
+  think: [],
+  discussion: [
+    { aspect: 'Expected Pathway', points: ['Non-vigorous + thick MSL: intubation and direct tracheal suctioning indicated if airway obstruction is suspected.', 'Attach meconium aspirator to ETT. Apply suction while slowly withdrawing ETT.', 'Do NOT delay PPV. Start PPV via mask — ventilation takes priority over suctioning.', 'After airway clear: assess HR. If HR <100: continue PPV. Escalate as per algorithm.'] },
+    { aspect: 'Alternative Outcome', points: ['If ventilation is delayed by repeated or prolonged suctioning attempts: HR remains <60 bpm and SpO₂ does not improve. The team must recognise that ventilation — not further suctioning — is the priority.'] },
+    { aspect: 'Facilitator Cues', points: ['If repeated suctioning attempts delay PPV: "What is the priority here?"', 'If tracheal suction not performed when obstruction suspected: "Is there any evidence of airway obstruction?"'] },
+  ],
+  debrief: [
+    { topic: 'MSL Decision', prompt: 'Common mistake: assuming every meconium-stained baby needs tracheal suctioning regardless of vigour.' },
+    { topic: 'Tracheal Suction Technique', prompt: 'Common mistake: prolonged suctioning attempts that delay PPV.' },
+    { topic: 'PPV Priority', prompt: 'Common mistake: treating suctioning as more urgent than establishing ventilation.' },
+    { topic: 'Team Communication', prompt: 'Common mistake: the decision to suction made unilaterally without confirming with the team leader.' },
+  ],
+  leadsInto: 'Debrief focus: MSL decision (vigorous vs non-vigorous), tracheal suctioning technique, PPV prioritisation.',
+},
+
+{
+  id: 'Integrative 3', title: 'Hypovolaemia from Abruptio (Prolonged Resuscitation — Medication Required)',
+  color: 'c-red', session: 'Integrative Cases · Team Assessment',
+  tag: 'Adrenaline · UVC · Volume expander · DOPE · Team coordination',
+  presentation: [
+    'Emergency Caesarean section for placental abruption with significant antepartum haemorrhage. Term baby, pale, HR 30 bpm despite 30 sec effective ETT-PPV AND 60 sec coordinated PPV + chest compressions.',
+    'Team Leader calls: "We need adrenaline. Get UVC access. Baby weight approximately 3 kg."',
+  ],
+  vitals: [
+    { label: 'HR', val: '30 bpm' },
+    { label: 'SpO₂', val: '54%' },
+    { label: 'FiO₂', val: '100%' },
+    { label: 'Colour', val: 'Pale' },
+    { label: 'Weight', val: '~3 kg' },
+  ],
+  timeline: {
+    baselineHR: 30, baselineSpO2: 54, baselineNote: 'Already on ETT-PPV + coordinated CPR — pale, suspect hypovolaemia',
+    checkpoints: [
+      { t: 0, label: 'Indication met — HR <60 after 30s effective PPV + 60s coordinated CPR', correct: { hr:32, spo2:56, note:'IV adrenaline given — correct dose, concentration, flushed' }, incorrect: { hr:30, spo2:54, note:'Adrenaline delayed, wrong dose, or UVC access not achieved' } },
+      { t: 60, label: 'Reassess 1 min after adrenaline', correct: { hr:55, spo2:68, note:'HR beginning to respond to adrenaline' }, incorrect: { hr:30, spo2:54, note:'No response — check DOPE, reconfirm dose/concentration' } },
+      { t: 120, label: 'Persistent pallor / no response — consider hypovolaemia', correct: { hr:105, spo2:90, note:'Volume expander given (NS 10 mL/kg over 5–10 min) — HR and colour improve' }, incorrect: { hr:35, spo2:58, note:'Volume expander not considered despite pallor and history of abruption' } },
+    ],
+  },
+  think: [],
+  discussion: [
+    { aspect: 'Expected Pathway', points: ['Indication met: HR <60 after 30 sec effective PPV PLUS 60 sec coordinated CPR.', 'IV adrenaline for 3 kg: 0.01–0.03 mg/kg = 0.3–0.9 mL of 1:10,000.', 'UVC: identify vein, insert, aspirate blood, flush, administer adrenaline. Flush with 3 mL NS.', 'Given history of abruption and pallor, suspect hypovolaemia: if HR/pallor persist despite adrenaline, give volume expander (NS 10 mL/kg over 5–10 min).'] },
+    { aspect: 'Alternative Outcome', points: ['If the adrenaline dose/route is incorrect, or UVC access is delayed: HR remains <60 bpm despite drug administration. The team must check DOPE, reconfirm dose and concentration, and consider a volume expander if blood loss is suspected.'] },
+    { aspect: 'Facilitator Cues', points: ['If dose is wrong: "Can you confirm the weight and recalculate?"', 'If ETT route given: "Good — now get IV access as soon as possible."', 'If pallor persists and volume not considered: "What else could explain no response to adrenaline?"'] },
+  ],
+  debrief: [
+    { topic: 'Drug Dose Accuracy', prompt: 'Common mistake: preparing adrenaline at the wrong concentration under pressure.' },
+    { topic: 'UVC Speed', prompt: 'Common mistake: taking too long to secure UVC access, delaying drug administration.' },
+    { topic: 'Hypovolaemia Recognition', prompt: 'Common mistake: repeating adrenaline doses without considering hypovolaemia as a cause of non-response.' },
+    { topic: 'DOPE Consideration', prompt: 'Common mistake: not applying DOPE before escalating medication when there is no response.' },
+  ],
+  leadsInto: 'Debrief focus: drug dose accuracy under pressure, UVC insertion speed, hypovolaemia recognition, DOPE.',
+},
+
+{
+  id: 'Integrative 4', title: 'Prematurity (28-Week Preterm — Golden Hour)',
+  color: 'c-purple', session: 'Integrative Cases · Team Assessment',
+  tag: 'Golden Hour · Thermoregulation · FiO₂ titration · CPAP vs PPV',
+  presentation: [
+    'Emergency delivery at 28+0 weeks, estimated weight 950 g, following antepartum haemorrhage. Chorioamnionitis suspected. Baby delivered: weak respiratory effort, HR 92 bpm.',
+    'Golden Hour team is at the warmer. SpO₂ probe on right hand shows 70% at 2 minutes.',
+  ],
+  vitals: [
+    { label: 'Gestation', val: '28 weeks' },
+    { label: 'Weight', val: '~950 g' },
+    { label: 'HR', val: '92 bpm' },
+    { label: 'SpO₂', val: '70% at 2 min' },
+    { label: 'Effort', val: 'Weak but present' },
+  ],
+  timeline: {
+    baselineHR: 92, baselineSpO2: 70, baselineNote: 'At warmer — weak effort, Golden Hour pathway begins',
+    checkpoints: [
+      { t: 30, label: 'Thermoregulation — wrap WITHOUT drying, CPAP trial', correct: { hr:94, spo2:73, note:'Wrapped in plastic without drying, CPAP started PEEP 6/FiO₂ 21–30%' }, incorrect: { hr:88, spo2:65, note:'Baby dried before wrapping or CPAP delayed — heat loss, SpO₂ not improving' } },
+      { t: 180, label: 'T+3:00 — check FiO₂ titration', correct: { hr:96, spo2:78, note:'FiO₂ titrated appropriately toward target' }, incorrect: { hr:96, spo2:97, note:'⚠ FiO₂ too high — SpO₂ >95%, hyperoxia risk, reduce FiO₂ now' } },
+      { t: 300, label: 'T+5:00 — target SpO₂ 80–85%', correct: { hr:96, spo2:82, note:'On target — continue CPAP, monitor' }, incorrect: { hr:96, spo2:60, note:'Off target — reassess CPAP/FiO₂ settings' } },
+      { t: 600, label: 'T+10:00 — temperature check, target 36.5–37.5°C', correct: { hr:98, spo2:90, note:'Normothermic and stable — continue Golden Hour care' }, incorrect: { hr:90, spo2:80, note:'Hypothermic — check wrap, warmer, room temperature' } },
+    ],
+  },
+  think: [],
+  discussion: [
+    { aspect: 'Expected Pathway', points: ['FIRST: wrap immediately in plastic wrap WITHOUT drying. Hat on. Warmer + thermal mattress.', 'FiO₂ 21–30%. SpO₂ probe. Start CPAP (PEEP 6 cmH₂O) — baby has weak effort. Avoid PPV unless apnoeic.', 'SpO₂ titration: adjust FiO₂ to maintain 80–85% at 5 minutes.', 'If SpO₂ >95%: reduce FiO₂ immediately.', 'Temperature check at 10 minutes. Target axillary 36.5–37.5°C.'] },
+    { aspect: 'Alternative Outcome', points: ['If FiO₂ is not titrated correctly (started too high): SpO₂ rises above 95% — reduce FiO₂ immediately to avoid hyperoxia. If CPAP is not trialled before PPV, or thermoregulation steps are omitted, flag both for the debrief.'] },
+    { aspect: 'Facilitator Cues', points: ['If baby dried before wrapping: "At what gestation is routine drying performed?"', 'If FiO₂ >40% used: "What is your target SpO₂ for a 28-weeker at 5 minutes?"'] },
+  ],
+  debrief: [
+    { topic: 'Thermoregulation', prompt: 'Common mistake: drying the baby or delaying plastic wrap application.' },
+    { topic: 'Oxygen Titration', prompt: 'Common mistake: starting FiO₂ too high, or not reducing it promptly when SpO₂ exceeds target, risking hyperoxia.' },
+    { topic: 'CPAP vs PPV Decision', prompt: 'Common mistake: starting PPV unnecessarily instead of trialling CPAP first when the baby has some respiratory effort.' },
+    { topic: 'Team Roles', prompt: 'Common mistake: Golden Hour roles not assigned before delivery, causing delays at a critical time.' },
+  ],
+  leadsInto: 'Debrief focus: thermal care first, FiO₂ titration, CPAP vs PPV decision, team role clarity.',
+},
+
+{
+  id: 'Integrative 5', title: 'Pneumothorax (Sudden Deterioration During Resuscitation)',
+  color: 'c-teal', session: 'Integrative Cases · Team Assessment',
+  tag: 'DOPE · Needle decompression · Sudden deterioration',
+  presentation: [
+    'Term baby, previously resuscitated for birth asphyxia and now stable on ETT-PPV — HR 150, SpO₂ 94%, chest rising well.',
+    'Mid-scenario, the team leader calls: "SpO₂ dropping — now 60%. HR falling to 70. Chest looks asymmetric, reduced movement on the left. He feels harder to bag."',
+  ],
+  vitals: [
+    { label: 'HR', val: '70 bpm (was 150)' },
+    { label: 'SpO₂', val: '60% (was 94%)' },
+    { label: 'Effort', val: 'On ETT-PPV, asymmetric chest' },
+  ],
+  timeline: {
+    baselineHR: 70, baselineSpO2: 60, baselineNote: 'Sudden deterioration on ETT-PPV — chest asymmetric',
+    checkpoints: [
+      { t: 0, label: 'Apply DOPE systematically', correct: { hr:68, spo2:58, note:'Working through DOPE — displaced/obstructed excluded' }, incorrect: { hr:60, spo2:52, note:'DOPE not applied systematically — cause not yet identified' } },
+      { t: 30, label: 'Needle decompression (2nd ICS MCL or 4th–5th ICS MAL, affected side)', correct: { hr:90, spo2:72, note:'Correct site and technique — air aspirated, needle left in situ' }, incorrect: { hr:55, spo2:48, note:'Decompression delayed or wrong site — continued deterioration' } },
+      { t: 60, label: 'Reassess after decompression', correct: { hr:110, spo2:88, note:'HR and SpO₂ recovering — chest movement symmetrical, arrange chest drain' }, incorrect: { hr:45, spo2:40, note:'No improvement — HR continues to fall towards arrest' } },
+    ],
+  },
+  think: [],
+  discussion: [
+    { aspect: 'Expected Pathway', points: ['Apply DOPE systematically. Displaced: check lip depth mark, auscultate bilateral axillae. Obstructed: pass suction catheter through ETT.', 'Pneumothorax: asymmetric chest, hyper-resonance, heart sounds displaced — clinical diagnosis, do NOT wait for CXR.', 'Emergency needle decompression: 23G butterfly, primary site 2nd ICS MCL; alternative 4th–5th ICS MAL.', 'Aspirate air, leave needle in situ, arrange definitive chest drain.'] },
+    { aspect: 'Alternative Outcome', points: ['If the team does not work through DOPE systematically, or delays needle decompression while awaiting a chest X-ray: HR continues to fall and SpO₂ remains critically low. Tension pneumothorax is a clinical diagnosis requiring immediate action.'] },
+    { aspect: 'Facilitator Cues', points: ['If team waits for imaging: "Do you need a chest X-ray to act on this?"', 'If wrong site chosen: "What are your two options for needle decompression site?"'] },
+  ],
+  debrief: [
+    { topic: 'DOPE Application', prompt: 'Common mistake: jumping straight to pneumothorax without excluding displaced/obstructed ETT first.' },
+    { topic: 'Decompression Technique', prompt: 'Common mistake: choosing the wrong needle site, or not leaving the needle in situ after aspiration.' },
+    { topic: 'Recognition Speed', prompt: 'Common mistake: delaying decompression while waiting for imaging confirmation.' },
+    { topic: 'Team Roles', prompt: 'Common mistake: no clear allocation of who decompresses versus who continues ventilation during the emergency.' },
+  ],
+  leadsInto: 'Debrief focus: DOPE application, needle decompression technique, recognition speed, team roles during emergency deterioration.',
+},
+{
+  id: 'E3', title: 'Sudden Deterioration During Transport',
+  color: 'c-navy', session: 'Block E (Extras) · Post-Resuscitation',
+  tag: 'DOPE · Sudden deterioration · Debrief · Stopping resuscitation',
+  presentation: [
+    'The baby from Integrative Case 1 has been stabilised and is being transported to NICU via corridor. Intubated, on transport ventilator: PIP 22, PEEP 5, FiO₂ 40%. HR 142, SpO₂ 95%.',
+    'Midway through transport: "Doctor! SpO₂ dropping rapidly — now 68%. HR 85. He looks pale. Ventilator alarming — high pressure."',
+  ],
+  vitals: [
+    { label: 'HR', val: '85 bpm ↓ (was 142)' },
+    { label: 'SpO₂', val: '68% ↓ (was 95%)' },
+    { label: 'FiO₂', val: '40%' },
+    { label: 'Ventilator', val: 'Alarming — high pressure' },
+  ],
+  timeline: {
+    baselineHR: 85, baselineSpO2: 68, baselineNote: 'Sudden deterioration during transport — ventilator alarming',
+    checkpoints: [
+      { t: 0, label: 'Apply DOPE systematically — Displaced/Obstructed', correct: { hr:82, spo2:65, note:'Lip mark checked, bilateral auscultation, suction catheter passed — excluded' }, incorrect: { hr:75, spo2:58, note:'Jumping to one cause without systematic check' } },
+      { t: 30, label: 'Pneumothorax/Equipment — decompress if needed', correct: { hr:105, spo2:85, note:'Needle decompression performed correctly if indicated — HR recovering' }, incorrect: { hr:60, spo2:48, note:'Delayed recognition — continued deterioration' } },
+      { t: 60, label: 'T+1:00 — reassess', correct: { hr:130, spo2:94, note:'Correct DOPE action taken — HR and SpO₂ recovered' }, incorrect: { hr:45, spo2:38, note:'Cause still not addressed — continued arrest risk' } },
+    ],
+  },
+  think: [
+    'What is your structured approach? Name the mnemonic.',
+    'Walk through each element of DOPE for this scenario.',
+    'After arriving at NICU — who should be in the debrief? What structure do you use?',
+    'This baby was born after cord prolapse. Should the team have discussed the possibility of poor outcome before delivery?',
+    'After 20 minutes of complete, well-executed resuscitation with no detectable heart rate — what guides the decision to stop?',
+  ],
+  discussion: [
+    { aspect: 'D — Displaced ETT', points: ['Check lip depth mark. Auscultate bilateral axillae. High pressure + reduced air entry = displacement. Withdraw 0.5–1 cm if right mainstem. Re-intubate if extubated.'] },
+    { aspect: 'O — Obstructed ETT', points: ['Pass suction catheter through ETT. Resistance or blockage = secretion plug or kinked tube. Suction; replace ETT if cannot clear.'] },
+    { aspect: 'P — Pneumothorax', points: ['Asymmetric chest, hyper-resonance, displaced apex → transilluminate. Tension: needle decompression 2nd ICS MCL immediately. Insert definitive chest drain.'] },
+    { aspect: 'E — Equipment Failure', points: ['Check all ventilator circuit connections, gas supply, flow meter, PEEP valve integrity, oxygen blender. Replace faulty components.'] },
+    { aspect: 'Debrief Structure', points: ['All personnel present. Team Lead facilitates. Timeline reconstruction → what went well → what to improve → action plan. Document attendance and key points.'] },
+    { aspect: 'Stopping Resuscitation', points: ['If the heart rate remains undetectable after 20 minutes, and all steps of resuscitation have been completed and performed correctly (effective PPV, intubation, chest compressions, adrenaline, volume expander, DOPE excluded) — this is a reasonable point to discuss redirection or discontinuation of care with the clinical team and family. Consider gestational age, underlying diagnosis, any response at any point, and family wishes. Document clearly.'] },
+  ],
+  debrief: [
+    { topic: 'DOPE Application', prompt: 'Common mistake: fixating on one cause (e.g., assuming displacement) without systematically working through all four DOPE elements.' },
+    { topic: 'Debrief Process', prompt: 'Common mistake: debriefs that focus only on what went wrong without acknowledging what the team did well, reducing psychological safety.' },
+    { topic: 'Ethical Decision-Making', prompt: 'Common mistake: continuing resuscitation indefinitely without a clear team discussion point, or deciding to stop without involving the whole team and family.' },
+  ],
+  leadsInto: 'Post-resuscitation — DOPE, structured debrief, and ethical decision-making.',
+},
+
+]; // end CASES
+
+// ══════════════════════════════════════════════════════════════════════════
+// SESSIONS for grid grouping
+// ══════════════════════════════════════════════════════════════════════════
+const SESSIONS = [
+  { label: 'Block A (Airway) · Receiving the Baby & Initial Steps', ids: ['A1','A2'] },
+  { label: 'Block B (Breathing) · PPV, MASK & Intubation', ids: ['B1','B2'] },
+  { label: 'Block C (Circulation) · Chest Compressions', ids: ['C1'] },
+  { label: 'Block D (Drugs) · Medications & UVC', ids: ['D1'] },
+  { label: 'Block E (Extras) · Preterm & Special Conditions', ids: ['E1','E2'] },
+  { label: 'Integrative Cases · Team Assessment', ids: ['Integrative 1','Integrative 2','Integrative 3','Integrative 4','Integrative 5'] },
+  { label: 'Block E (Extras) · Post-Resuscitation', ids: ['E3'] },
+];
+
+let currentIdx = 0;
+
+// ── Progressive Role Expansion & Standard Opening Flow ──────────────────────
+const FLOW_STEPS = [
+  'Receive referral', 'Ask 4 pre-birth questions', 'Identify risk', 'Need more help?',
+  'Cord management plan', 'Equipment preparation', 'Team briefing', 'Baby delivered',
+  '3 assessment questions', 'Cord management', 'Initial steps', "Continue to today's learning objective",
+];
+
+const ROLE_PROGRESSION = [
+  { block: 'Block A', team: '3 (Leader + 1 Assistant)',
+    leader: 'Airway, assessment, decision-making, delegation',
+    a1: 'Turn on Apgar timer; assist stabilisation of head',
+    a2: 'Dry and remove wet linen',
+    a3: '—' },
+  { block: 'Block B', team: '3–4',
+    leader: 'Airway, assessment, decision-making, delegation',
+    a1: 'Apgar timer; apply pulse oximeter; assist head stabilisation; give free-flow oxygen',
+    a2: 'Dry/remove wet linen; auscultate HR; prepare suction for intubation; check air entry to confirm ETT position',
+    a3: 'Optional — scribe and timekeeper' },
+  { block: 'Block C', team: '4 (recommended)',
+    leader: 'Airway, assessment, decision-making, delegation',
+    a1: 'All Block B actions, plus chest compressions',
+    a2: 'All Block B actions, plus prepare medication and umbilical line',
+    a3: 'Scribe and timekeeper — now guiding the scenario timer' },
+  { block: 'Block D', team: '4 (recommended)',
+    leader: 'Airway, assessment, decision-making, delegation',
+    a1: 'All Block C actions (compressions when indicated)',
+    a2: 'All Block C actions, plus medication administration and UVC assistance',
+    a3: 'Scribe and timekeeper' },
+  { block: 'Block E', team: '4 (recommended)',
+    leader: 'Full team coordination — airway, assessment, decision-making, delegation across special situations',
+    a1: 'Full role: Apgar timer, SpO₂, head stabilisation, free-flow O₂, chest compressions',
+    a2: 'Full role: drying, auscultation, suction, ETT confirmation, medication, umbilical line',
+    a3: 'Scribe and timekeeper — full documentation and timing' },
+];
+
+function toggleRolePanel() {
+  const panel = document.getElementById('rolePanel');
+  if (panel.style.display === 'none') {
+    panel.innerHTML = buildRolePanelHTML();
+    panel.style.display = 'block';
+  } else {
+    panel.style.display = 'none';
+  }
+}
+
+function buildRolePanelHTML() {
+  let html = '<div class="role-panel">';
+  html += '<h3>Standard Opening — Every Simulation Begins Identically</h3>';
+  html += '<div class="flow-chain">';
+  FLOW_STEPS.forEach((step, i) => {
+    html += `<div class="flow-step${i===FLOW_STEPS.length-1 ? ' highlight' : ''}">${step}</div>`;
+    if (i < FLOW_STEPS.length-1) html += '<div class="flow-arrow">↓</div>';
+  });
+  html += '</div>';
+
+  html += '<h3>Progressive Role Expansion — Rotate Who Holds Each Role</h3>';
+  html += '<table class="role-table"><tr><th>Block</th><th>Team Leader</th><th>Assistant 1</th><th>Assistant 2</th><th>Assistant 3</th></tr>';
+  ROLE_PROGRESSION.forEach(r => {
+    html += `<tr><td class="block-cell">${r.block}<br><span style="font-weight:400;color:var(--text3)">(${r.team})</span></td><td>${r.leader}</td><td>${r.a1}</td><td>${r.a2}</td><td>${r.a3}</td></tr>`;
+  });
+  html += '</table>';
+  html += '<div class="role-legend">Assistant 3 (scribe/timekeeper) joins once the team has grown to 4 — optional but recommended from Block B onward. Rotate roles after every case so everyone leads.</div>';
+  html += '</div>';
+  return html;
+}
+
+// ── Standard Opening Sequence (every case begins identically) ───────────────
+const EQUIP_CHECKLIST = [
+  'WARM — warmer pre-heated, warm towels, hat ready',
+  'CLEAR — suction catheter correct size, wall suction 80–100 mmHg',
+  'VENTILATE — T-piece/BVM ready, correct mask size, PIP 20/PEEP 5 set',
+  'OXYGENATE — blender connected, FiO₂ set per gestation',
+  'INTUBATE — laryngoscope tested, correct ETT size, tape ready',
+  'MEDICATE — adrenaline drawn up, UVC tray ready (if anticipated)',
+];
+
+let OS = null; // opening-sequence state, one per open case
+
+function initOpeningSequence(c) {
+  if (OS) { clearInterval(OS.equipInterval); clearInterval(OS.briefInterval); clearInterval(OS.initialInterval); }
+  OS = {
+    equipInterval: null, equipElapsed: 0, equipDone: false,
+    briefInterval: null, briefElapsed: 0, briefDone: false,
+    initialInterval: null, initialElapsed: 0, initialDone: false,
+    checklist: EQUIP_CHECKLIST.map(() => false),
+    assistantsCalled: false,
+    assessAnswers: { term: null, tone: null, breathing: null },
+    dccDecision: null,
+  };
+}
+
+function osToggleInitial() {
+  if (OS.initialInterval) {
+    clearInterval(OS.initialInterval);
+    OS.initialInterval = null;
+  } else {
+    OS.initialInterval = setInterval(() => {
+      OS.initialElapsed += 1;
+      if (OS.initialElapsed >= 60) { OS.initialDone = true; clearInterval(OS.initialInterval); OS.initialInterval = null; }
+      renderOpeningSequence();
+    }, 1000);
+  }
+  renderOpeningSequence();
+}
+
+function osResetInitial() {
+  clearInterval(OS.initialInterval);
+  OS.initialInterval = null;
+  OS.initialElapsed = 0;
+  OS.initialDone = false;
+  renderOpeningSequence();
+}
+
+function osFmtClock(sec) {
+  sec = Math.max(0, Math.round(sec));
+  const m = Math.floor(sec/60), s = sec%60;
+  return `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+}
+
+function osCallAssistants() {
+  OS.assistantsCalled = true;
+  renderOpeningSequence();
+}
+
+function osToggleCheck(i) {
+  OS.checklist[i] = !OS.checklist[i];
+  renderOpeningSequence();
+}
+
+function osToggleEquip() {
+  if (OS.equipInterval) {
+    clearInterval(OS.equipInterval);
+    OS.equipInterval = null;
+  } else {
+    OS.equipInterval = setInterval(() => {
+      OS.equipElapsed += 1;
+      if (OS.equipElapsed >= 300) { OS.equipDone = true; clearInterval(OS.equipInterval); OS.equipInterval = null; }
+      renderOpeningSequence();
+    }, 1000);
+  }
+  renderOpeningSequence();
+}
+
+function osResetEquip() {
+  clearInterval(OS.equipInterval);
+  OS.equipInterval = null;
+  OS.equipElapsed = 0;
+  OS.equipDone = false;
+  renderOpeningSequence();
+}
+
+function osToggleBrief() {
+  if (OS.briefInterval) {
+    clearInterval(OS.briefInterval);
+    OS.briefInterval = null;
+  } else {
+    OS.briefInterval = setInterval(() => {
+      OS.briefElapsed += 1;
+      if (OS.briefElapsed >= 180) { OS.briefDone = true; clearInterval(OS.briefInterval); OS.briefInterval = null; }
+      renderOpeningSequence();
+    }, 1000);
+  }
+  renderOpeningSequence();
+}
+
+function osResetBrief() {
+  clearInterval(OS.briefInterval);
+  OS.briefInterval = null;
+  OS.briefElapsed = 0;
+  OS.briefDone = false;
+  renderOpeningSequence();
+}
+
+function osAnswer(q, val) {
+  OS.assessAnswers[q] = val;
+  renderOpeningSequence();
+}
+
+function osDecideDCC() {
+  const a = OS.assessAnswers;
+  if (a.term === null || a.tone === null || a.breathing === null) return;
+  OS.dccDecision = (a.term === 'Yes' && a.tone === 'Good' && a.breathing === 'Yes') ? 'dcc' : 'initial';
+  renderOpeningSequence();
+}
+
+function buildOpeningSequenceHTML(c) {
+  const blockLetter = c.id.match(/^([A-E])/) ? c.id.match(/^([A-E])/)[1] : null;
+  const blockIdx = {A:0,B:1,C:2,D:3,E:4}[blockLetter];
+  const r = blockIdx !== undefined ? ROLE_PROGRESSION[blockIdx] : null;
+
+  let html = '<div class="opening-seq">';
+  html += '<h3>Standard Opening Sequence</h3>';
+
+  // Step 1: Pre-birth questions (from case presentation) + risk + call for assistants
+  html += `<div class="os-step">
+    <div class="os-step-title">1 · Four Pre-Birth Questions &amp; Risk Identification</div>
+    <div style="font-size:12px;color:var(--text2);line-height:1.5">${c.presentation ? c.presentation[0] : ''}</div>
+    <button class="os-btn" style="margin-top:8px" onclick="osCallAssistants()" ${OS.assistantsCalled?'disabled':''}>${OS.assistantsCalled ? '✓ Assistants Called' : 'Risk Identified — Call for Assistants'}</button>
+  </div>`;
+
+  // Step 2: Equipment prep (5 min + checklist)
+  html += `<div class="os-step">
+    <div class="os-step-title">2 · Equipment Preparation (target 5 min)</div>
+    <div class="os-clock${OS.equipDone?' done':''}">${osFmtClock(OS.equipElapsed)}</div>
+    <button class="os-btn" onclick="osToggleEquip()" ondblclick="osResetEquip()">${OS.equipInterval ? '⏸ Pause Equipment Timer' : (OS.equipDone ? '✓ Complete — tap to resume · double-tap to reset' : (OS.equipElapsed>0 ? '▶ Resume Equipment Timer' : '▶ Start Equipment Timer'))}</button>
+    <div class="os-timer-hint">Tap to start/stop · double-tap to reset</div>
+    <div class="os-checklist">
+      ${EQUIP_CHECKLIST.map((item,i) => `<div class="os-check-item${OS.checklist[i]?' ticked':''}" onclick="osToggleCheck(${i})"><input type="checkbox" ${OS.checklist[i]?'checked':''} readonly> ${item}</div>`).join('')}
+    </div>
+  </div>`;
+
+  // Step 3: Team briefing (3 min + progressive instructions)
+  html += `<div class="os-step">
+    <div class="os-step-title">3 · Team Briefing (target 3 min)</div>
+    <div class="os-clock${OS.briefDone?' done':''}">${osFmtClock(OS.briefElapsed)}</div>
+    <button class="os-btn" onclick="osToggleBrief()" ondblclick="osResetBrief()">${OS.briefInterval ? '⏸ Pause Briefing Timer' : (OS.briefDone ? '✓ Complete — tap to resume · double-tap to reset' : (OS.briefElapsed>0 ? '▶ Resume Briefing Timer' : '▶ Start Briefing Timer'))}</button>
+    <div class="os-timer-hint">Tap to start/stop · double-tap to reset</div>
+    ${r ? `<div style="font-size:12px;color:var(--text2);margin-top:8px;line-height:1.5">
+      <strong>Instructions so far (${r.block} and everything before it):</strong><br>
+      Team Leader: ${r.leader}<br>Assistant 1: ${r.a1}<br>Assistant 2: ${r.a2}<br>Assistant 3: ${r.a3}
+    </div>` : ''}
+  </div>`;
+
+  // Step 4: Receiving baby - 3 assessment questions -> DCC
+  html += `<div class="os-step">
+    <div class="os-step-title">4 · Receiving the Baby — 3 Assessment Questions</div>
+    <div style="font-size:12px;margin-top:4px">Term?</div>
+    <div class="os-qa-btns">${['Yes','No'].map(v=>`<button class="os-qa-btn${OS.assessAnswers.term===v?' picked':''}" onclick="osAnswer('term','${v}')">${v}</button>`).join('')}</div>
+    <div style="font-size:12px;margin-top:8px">Good tone?</div>
+    <div class="os-qa-btns">${['Good','Poor'].map(v=>`<button class="os-qa-btn${OS.assessAnswers.tone===v?' picked':''}" onclick="osAnswer('tone','${v}')">${v}</button>`).join('')}</div>
+    <div style="font-size:12px;margin-top:8px">Breathing or crying?</div>
+    <div class="os-qa-btns">${['Yes','No'].map(v=>`<button class="os-qa-btn${OS.assessAnswers.breathing===v?' picked':''}" onclick="osAnswer('breathing','${v}')">${v}</button>`).join('')}</div>
+    <button class="os-btn" style="margin-top:8px" onclick="osDecideDCC()">Decide: DCC or Initial Steps?</button>
+    ${OS.dccDecision ? `<div class="os-dcc-result">${OS.dccDecision==='dcc' ? '→ All criteria met: proceed with Delayed Cord Clamping and routine care.' : '→ Criteria not met: clamp cord, transfer to warmer, begin Initial Steps (target 1 min).'}</div>` : ''}
+  </div>`;
+
+  // Step 5: Initial steps (1 min timer)
+  html += `<div class="os-step">
+    <div class="os-step-title">5 · Initial Steps of Resuscitation (target 1 min)</div>
+    <div class="os-clock${OS.initialDone?' done':''}">${osFmtClock(OS.initialElapsed)}</div>
+    <button class="os-btn" onclick="osToggleInitial()" ondblclick="osResetInitial()">${OS.initialInterval ? '⏸ Pause Initial Steps Timer' : (OS.initialDone ? '✓ Complete — see vitals below · double-tap to reset' : (OS.initialElapsed>0 ? '▶ Resume Initial Steps Timer' : '▶ Start Initial Steps Timer'))}</button>
+    <div class="os-timer-hint">Tap to start/stop · double-tap to reset</div>
+  </div>`;
+
+  html += '</div>';
+  return html;
+}
+
+function renderOpeningSequence() {
+  const root = document.getElementById('openingSeqRoot');
+  if (!root || !OS) return;
+  root.innerHTML = buildOpeningSequenceHTML(root._case);
+}
+
+// ── Build grid ─────────────────────────────────────────────────────────────
+function buildGrid() {
+  const grid = document.getElementById('caseGrid');
+  SESSIONS.forEach(s => {
+    const label = document.createElement('div');
+    label.className = 'session-label';
+    label.textContent = s.label;
+    grid.appendChild(label);
+    s.ids.forEach(id => {
+      const c = CASES.find(x => x.id === id);
+      if (!c) return;
+      const isFullWidth = s.ids.length === 1 || id.startsWith('Integrative') || id === 'E3';
+      const btn = document.createElement('button');
+      btn.className = `case-btn ${c.color}${isFullWidth ? ' full' : ''}`;
+      btn.onclick = () => openCase(CASES.indexOf(c));
+      btn.innerHTML = `<div class="case-id">${c.id}</div><div class="case-title">${c.title}</div><div class="case-tag">${c.tag}</div>`;
+      grid.appendChild(btn);
+    });
+  });
+}
+
+// ── Build case content ─────────────────────────────────────────────────────
+function buildCaseHTML(c) {
+  let html = '';
+
+  // Case header
+  html += `<div class="case-header"><div class="case-id-lg">CASE ${c.id}</div><h2>${c.title}</h2></div>`;
+
+  // Active team roles for this block (skip for Integrative cases which use full team already)
+  const blockLetter = c.id.match(/^([A-E])/) ? c.id.match(/^([A-E])/)[1] : null;
+  const blockIdx = {A:0,B:1,C:2,D:3,E:4}[blockLetter];
+  if (blockIdx !== undefined) {
+    const r = ROLE_PROGRESSION[blockIdx];
+    html += `<div class="role-panel" style="margin:0 0 16px">
+      <h3 style="margin-bottom:6px">Active Team Roles — ${r.block} (${r.team})</h3>
+      <table class="role-table">
+        <tr><th>Team Leader</th><th>Assistant 1</th><th>Assistant 2</th><th>Assistant 3</th></tr>
+        <tr><td>${r.leader}</td><td>${r.a1}</td><td>${r.a2}</td><td>${r.a3}</td></tr>
+      </table>
+    </div>`;
+  }
+
+  // Standard Opening Sequence (every case begins identically)
+  html += `<div id="openingSeqRoot"></div>`;
+
+  // At-presentation vitals
+  if (c.vitals && c.vitals.length) {
+    html += `<div class="vitals-bar"><h3>At Presentation</h3><div class="vitals-grid">`;
+    c.vitals.forEach(v => {
+      html += `<div class="vital-item"><div class="vital-label">${v.label}</div><div class="vital-val">${v.val}</div></div>`;
+    });
+    html += `</div></div>`;
+  }
+
+  // Timer + auto-vitals engine (Integrative Cases)
+  if (c.timeline) {
+    html += `<div class="timer-panel">
+      <div class="timer-head"><div class="timer-title">⏱ Scenario Timer &amp; Live Vitals</div></div>
+      <div id="alertBanner" class="alert-banner"></div>
+      <div id="timerRoot"></div>
+    </div>`;
+  }
+
+  // Live vitals panel (if phases defined)
+  if (c.phases && c.phases.length) {
+    html += `<div class="live-panel">
+      <div class="live-panel-title">Live Vital Signs</div>
+      <div class="live-vitals">
+        <div class="live-vital"><div class="lv-label">HR</div><div class="lv-value hr" id="lv-hr">${c.phases[0].hr}</div><div class="lv-unit">bpm</div></div>
+        <div class="live-vital"><div class="lv-label">SpO₂</div><div class="lv-value spo2" id="lv-spo2">${c.phases[0].spo2}</div><div class="lv-unit">%</div></div>
+        <div class="live-vital"><div class="lv-label">FiO₂</div><div class="lv-value fio2" id="lv-fio2">${c.phases[0].fio2}</div><div class="lv-unit">%</div></div>
+      </div>
+      <div id="lv-note" style="font-size:12px;color:var(--teal);margin-bottom:10px;min-height:16px">${c.phases[0].note}</div>
+      <div class="phase-btns">`;
+    c.phases.forEach((ph, i) => {
+      html += `<button class="phase-btn${i===0?' active':''}" onclick="setPhase(${JSON.stringify(c.phases).replace(/"/g,"'")},${i},this)">${ph.label}</button>`;
+    });
+    html += `</div></div>`;
+  }
+
+  // Clinical Presentation
+  html += `<div class="section"><div class="section-head"><span class="icon">📋</span>Clinical Presentation</div>`;
+  c.presentation.forEach(p => { html += `<div class="presentation">${p}</div>`; });
+  html += `</div>`;
+
+  // Think Through It
+  if (c.think && c.think.length) {
+    html += `<div class="section"><div class="section-head"><span class="icon">💭</span>Think Through It</div><ul class="think-list">`;
+    c.think.forEach((q, i) => {
+      html += `<li class="think-item"><span class="think-num">${i+1}</span><span class="think-text">${q}</span></li>`;
+    });
+    html += `</ul></div>`;
+  }
+
+  // Discussion Table
+  if (c.discussion && c.discussion.length) {
+    html += `<div class="section"><div class="section-head"><span class="icon">📖</span>Discussion</div>
+    <div class="disc-table">
+      <div class="disc-table-head"><div class="disc-th">Aspect</div><div class="disc-th">Key Points</div></div>`;
+    c.discussion.forEach(row => {
+      const pts = Array.isArray(row.points) ? row.points : [row.points];
+      html += `<div class="disc-row">
+        <div class="disc-aspect">${row.aspect}</div>
+        <div class="disc-points">${pts.map(p => `<span class="kp">${p}</span>`).join('')}</div>
+      </div>`;
+    });
+    html += `</div></div>`;
+  }
+
+  // Debrief Table
+  if (c.debrief && c.debrief.length) {
+    html += `<div class="section debrief-final"><div class="section-head"><span class="icon">🎓</span>6 · Debrief (End of Scenario)</div>
+    <div class="debrief-table">
+      <div class="debrief-table-head"><div class="debrief-th">Topic</div><div class="debrief-th">Discussion Prompts</div></div>`;
+    c.debrief.forEach(row => {
+      html += `<div class="debrief-row">
+        <div class="debrief-topic">${row.topic}</div>
+        <div class="debrief-prompt">${row.prompt}</div>
+      </div>`;
+    });
+    html += `</div></div>`;
+  }
+
+  // Leads into
+  if (c.leadsInto) {
+    html += `<div class="section"><div class="leads-into"><strong>This case leads into:</strong> ${c.leadsInto}</div></div>`;
+  }
+
+  return html;
+}
+
+// ── Phase switching ─────────────────────────────────────────────────────────
+function setPhase(phases, idx, el) {
+  const ph = phases[idx];
+  document.getElementById('lv-hr').textContent = ph.hr;
+  document.getElementById('lv-spo2').textContent = ph.spo2;
+  document.getElementById('lv-fio2').textContent = ph.fio2;
+  document.getElementById('lv-note').textContent = ph.note;
+  document.querySelectorAll('.phase-btn').forEach((b, i) => b.classList.toggle('active', i === idx));
+}
+
+// ── Open / close case ──────────────────────────────────────────────────────
+function openCase(idx) {
+  if (TM) { clearInterval(TM.interval); TM = null; }
+  currentIdx = idx;
+  const c = CASES[idx];
+  document.getElementById('cvTitle').textContent = `Case ${c.id}`;
+  document.getElementById('cvSub').textContent = c.session;
+  document.getElementById('cvContent').innerHTML = buildCaseHTML(c);
+  document.getElementById('prevBtn').disabled = idx === 0;
+  document.getElementById('nextBtn').disabled = idx === CASES.length - 1;
+  document.getElementById('gridView').style.display = 'none';
+  document.getElementById('caseView').style.display = 'block';
+  window.scrollTo(0, 0);
+  initOpeningSequence(c);
+  const osRoot = document.getElementById('openingSeqRoot');
+  if (osRoot) { osRoot._case = c; renderOpeningSequence(); }
+  if (c.timeline) initTimerUI(c);
+}
+
+function navCase(dir) {
+  const next = currentIdx + dir;
+  if (next >= 0 && next < CASES.length) openCase(next);
+}
+
+function showGrid() {
+  if (TM) { clearInterval(TM.interval); TM = null; }
+  if (OS) { clearInterval(OS.equipInterval); clearInterval(OS.briefInterval); clearInterval(OS.initialInterval); OS = null; }
+  document.getElementById('caseView').style.display = 'none';
+  document.getElementById('gridView').style.display = 'block';
+  window.scrollTo(0, 0);
+}
+
+
+// ══════════════════════════════════════════════════════════════════════════
+// TIMER ENGINE — Integrative Cases (Pre-Birth Prep + Time-of-Life + Vitals)
+// ══════════════════════════════════════════════════════════════════════════
+const SPO2_TARGETS = { 180:'70–75%', 300:'80–85%', 600:'85–95%', 900:'≥90% (settling)' };
+let TM = null; // active timer state
+
+function fmtClock(sec) {
+  sec = Math.max(0, Math.round(sec));
+  const m = Math.floor(sec/60), s = sec%60;
+  return `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+}
+
+function initTimerUI(c) {
+  TM = {
+    case: c,
+    stage: 'prep',        // 'prep' | 'life'
+    prepElapsed: 0,       // seconds since prep start
+    lifeElapsed: 0,       // seconds since birth
+    running: false,
+    interval: null,
+    resolved: {},         // checkpoint index -> 'correct'|'incorrect'
+    alertsFired: {},
+  };
+  renderTimer();
+}
+
+function timerStart() {
+  if (!TM || TM.running) return;
+  TM.running = true;
+  TM.interval = setInterval(timerTick, 1000);
+  renderTimer();
+}
+
+function timerTick() {
+  if (!TM || !TM.running) return;
+  if (TM.stage === 'prep') {
+    TM.prepElapsed += 1;
+  } else {
+    TM.lifeElapsed += 1;
+    [180,300,600,900].forEach(mark => {
+      if (TM.lifeElapsed >= mark && !TM.alertsFired[mark]) {
+        TM.alertsFired[mark] = true;
+        fireAlert(mark);
+      }
+    });
+  }
+  renderTimer();
+}
+
+function fireAlert(mark) {
+  const el = document.getElementById('alertBanner');
+  if (!el) return;
+  const mins = mark/60;
+  el.textContent = `⏰ ${mins} min mark — target SpO₂ ${SPO2_TARGETS[mark] || ''}. Check HR & SpO₂, confirm team status.`;
+  el.classList.add('show');
+  setTimeout(()=> el.classList.remove('show'), 4000);
+}
+
+function deliverBaby() {
+  if (!TM) return;
+  TM.stage = 'life';
+  TM.lifeElapsed = 0;
+  renderTimer();
+}
+
+function resolveCheckpoint(idx, outcome) {
+  if (!TM) return;
+  TM.resolved[idx] = outcome;
+  renderTimer();
+}
+
+function resetTimerCase() {
+  if (!TM) return;
+  clearInterval(TM.interval);
+  initTimerUI(TM.case);
+}
+
+function currentVitals() {
+  const c = TM.case;
+  let hr = c.timeline.baselineHR, spo2 = c.timeline.baselineSpO2, note = c.timeline.baselineNote || 'Baseline';
+  c.timeline.checkpoints.forEach((cp, i) => {
+    if (TM.lifeElapsed >= cp.t && TM.resolved[i]) {
+      const branch = TM.resolved[i] === 'correct' ? cp.correct : cp.incorrect;
+      hr = branch.hr; spo2 = branch.spo2; note = branch.note;
+    }
+  });
+  return { hr, spo2, note };
+}
+
+function renderTimer() {
+  const root = document.getElementById('timerRoot');
+  if (!root || !TM) return;
+  const c = TM.case;
+  const EQUIP = 300, BRIEF = 180; // 5 min, 3 min
+
+  if (TM.stage === 'prep') {
+    const eqPct = Math.min(100, TM.prepElapsed/EQUIP*100);
+    const brElapsed = Math.max(0, TM.prepElapsed - EQUIP);
+    const brPct = Math.min(100, brElapsed/BRIEF*100);
+    root.innerHTML = `
+      <div class="timer-stage">PRE-BIRTH PREPARATION</div>
+      <div class="timer-clock">${fmtClock(TM.prepElapsed)}</div>
+      <div class="timer-sub">Prep timer — counts up from referral received</div>
+      <div class="prep-bars">
+        <div class="prep-bar-row"><span class="prep-bar-label">Equipment (5m)</span><div class="prep-bar-track"><div class="prep-bar-fill${TM.prepElapsed>EQUIP?' over':''}" style="width:${eqPct}%"></div></div><span class="prep-bar-time">${fmtClock(Math.min(TM.prepElapsed,EQUIP))}</span></div>
+        <div class="prep-bar-row"><span class="prep-bar-label">Briefing (3m)</span><div class="prep-bar-track"><div class="prep-bar-fill${brElapsed>BRIEF?' over':''}" style="width:${brPct}%"></div></div><span class="prep-bar-time">${fmtClock(Math.min(brElapsed,BRIEF))}</span></div>
+      </div>
+      <div class="timer-controls mt12">
+        <button class="timer-btn secondary" onclick="${TM.running?'timerPause()':'timerStart()'}" ondblclick="resetTimerCase()">${TM.running?'⏸ Pause Prep Timer':(TM.prepElapsed>0?'▶ Resume Prep Timer':'▶ Start Prep Timer')}</button>
+        <button class="timer-btn" onclick="deliverBaby()">👶 Baby Delivered — Start Time of Life</button>
+      </div>
+      <div class="os-timer-hint">Tap to start/stop · double-tap to reset scenario</div>`;
+    return;
+  }
+
+  // stage === 'life'
+  const v = currentVitals();
+  const initialStepsDue = TM.lifeElapsed >= 60;
+  let cpHtml = '';
+  c.timeline.checkpoints.forEach((cp, i) => {
+    const due = TM.lifeElapsed >= cp.t;
+    const resolved = TM.resolved[i];
+    cpHtml += `<div class="checkpoint${due && !resolved ? ' due' : ''}${resolved ? ' resolved' : ''}">
+      <div class="cp-time">T+${fmtClock(cp.t)}</div>
+      <div class="cp-label">${cp.label}</div>
+      <div class="cp-actions">
+        <button class="cp-btn correct${resolved==='correct'?' picked':''}" onclick="resolveCheckpoint(${i},'correct')">✓ Done correctly</button>
+        <button class="cp-btn incorrect${resolved==='incorrect'?' picked':''}" onclick="resolveCheckpoint(${i},'incorrect')">✗ Not done / incorrect</button>
+      </div>
+      ${resolved ? `<div class="cp-note">${resolved==='correct'?cp.correct.note:cp.incorrect.note}</div>` : ''}
+    </div>`;
+  });
+
+  root.innerHTML = `
+    <div class="timer-stage">TIME OF LIFE${TM.running?'':' (paused)'}</div>
+    <div class="timer-clock">${fmtClock(TM.lifeElapsed)}</div>
+    <div class="timer-sub">${initialStepsDue ? 'Initial steps window closed — proceed per checkpoints below' : 'Initial steps of resuscitation — target: complete by 1:00'}</div>
+    <div class="live-vitals3">
+      <div class="live-vital"><div class="lv-label">HR</div><div class="lv-value hr">${v.hr}</div><div class="lv-unit">bpm</div></div>
+      <div class="live-vital"><div class="lv-label">SpO₂</div><div class="lv-value spo2">${v.spo2}</div><div class="lv-unit">%</div></div>
+    </div>
+    <div style="font-size:12px;color:var(--teal);margin-bottom:6px">${v.note}</div>
+    <div class="timer-controls">
+      <button class="timer-btn secondary" onclick="${TM.running?'timerPause()':'timerStart()'}" ondblclick="resetTimerCase()">${TM.running?'⏸ Pause':'▶ Resume'}</button>
+      <button class="timer-btn secondary" onclick="resetTimerCase()">↺ Reset Scenario</button>
+    </div>
+    <div class="os-timer-hint">Tap to start/stop · double-tap the timer button or use Reset Scenario</div>
+    <div class="checkpoint-list">${cpHtml}</div>`;
+}
+
+function timerPause() {
+  if (!TM) return;
+  TM.running = false;
+  clearInterval(TM.interval);
+  renderTimer();
+}
+
+buildGrid();
+</script>
+</body>
+</html>
