@@ -1,0 +1,2010 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
+<title>Live Resuscitation Record — MyNeST</title>
+<style>
+:root {
+  --navy: #0a1628;
+  --navy-mid: #122040;
+  --navy-card: #1a2d50;
+  --navy-card2: #223a68;
+  --blue: #3b9eff;
+  --blue-bright: #5db0ff;
+  --teal: #00d4b4;
+  --red: #ff4d6a;
+  --red-bg: #2a0f18;
+  --amber: #ffb340;
+  --amber-bg: #2a1f00;
+  --green: #34d399;
+  --green-bg: #0d2018;
+  --text: #e8f0fe;
+  --text-dim: #8da4c4;
+  --text-dim2: #5a6f8a;
+  --border: #243860;
+  --radius: 16px;
+  --radius-sm: 10px;
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-top: env(safe-area-inset-top, 0px);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html, body { background: var(--navy); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 15px; min-height: 100dvh; overscroll-behavior-y: none; }
+body { padding-bottom: calc(64px + var(--safe-bottom)); }
+button { font-family: inherit; }
+
+/* ── Header ─────────────────────────────────────────────────────────── */
+.header { background: var(--navy-mid); border-bottom: 1px solid var(--border); padding: calc(10px + var(--safe-top)) 14px 10px; display: flex; align-items: center; gap: 10px; position: sticky; top: 0; z-index: 200; }
+.header h1 { font-size: 15px; font-weight: 700; line-height: 1.2; }
+.header .sub { font-size: 11px; color: var(--text-dim); }
+.mode-toggle { margin-left: auto; display: flex; background: var(--navy-card); border: 1px solid var(--border); border-radius: 20px; padding: 2px; flex-shrink: 0; }
+.mode-toggle button { border: none; background: transparent; color: var(--text-dim); font-size: 11px; font-weight: 700; padding: 6px 10px; border-radius: 18px; cursor: pointer; white-space: nowrap; }
+.mode-toggle button.active { background: var(--teal); color: #001812; }
+.new-patient-btn { background: var(--red); color: #fff; border: none; font-weight: 700; font-size: 11px; padding: 8px 10px; border-radius: 16px; cursor: pointer; white-space: nowrap; flex-shrink: 0; }
+
+/* ── Tab bar (bottom nav) ───────────────────────────────────────────── */
+.tab-bar { position: fixed; bottom: 0; left: 0; right: 0; display: flex; background: var(--navy-mid); border-top: 1px solid var(--border); padding-bottom: var(--safe-bottom); z-index: 200; }
+.tab-btn { flex: 1; background: none; border: none; color: var(--text-dim2); font-size: 10px; font-weight: 700; padding: 8px 2px 7px; display: flex; flex-direction: column; align-items: center; gap: 3px; cursor: pointer; }
+.tab-btn .tab-icon { font-size: 18px; line-height: 1; }
+.tab-btn.active { color: var(--teal); }
+.tab-btn .tab-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--red); position: absolute; margin-top: -22px; margin-left: 14px; display: none; }
+.tab-btn.alert .tab-dot { display: block; }
+
+.screen { display: none; padding: 14px 14px calc(20px); max-width: 720px; margin: 0 auto; }
+.screen.visible { display: block; }
+
+/* ── Cards / fields (shared) ────────────────────────────────────────── */
+.card { background: var(--navy-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; margin-bottom: 12px; }
+.card-title { font-size: 12px; font-weight: 700; color: var(--blue-bright); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; gap: 6px; cursor: pointer; user-select: none; }
+.card-title .chevron { font-size: 10px; color: var(--text-dim2); transition: transform .2s ease; flex-shrink: 0; }
+.card.collapsed .card-title { margin-bottom: 0; }
+.card.collapsed .chevron { transform: rotate(-90deg); }
+.card.collapsed .card-body { display: none; }
+.card-note { font-size: 11.5px; color: var(--text-dim2); margin: -6px 0 12px; font-style: italic; }
+
+.field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.field { display: flex; flex-direction: column; gap: 4px; }
+.field.full { grid-column: 1/-1; }
+.field label { font-size: 11px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.05em; }
+.field input, .field select, .field textarea {
+  background: var(--navy); border: 1px solid var(--border); border-radius: 8px; color: var(--text);
+  padding: 9px 10px; font-size: 15px; font-family: inherit; width: 100%;
+}
+.field input:focus, .field select:focus, .field textarea:focus { outline: none; border-color: var(--blue); }
+
+.chip-group { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { background: var(--navy); border: 1px solid var(--border); color: var(--text-dim); padding: 8px 12px; border-radius: 18px; font-size: 13px; cursor: pointer; user-select: none; }
+.chip.on { background: var(--blue); border-color: var(--blue); color: #fff; font-weight: 700; }
+.chip.on.red { background: var(--red); border-color: var(--red); }
+.checkbox-row { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text); padding: 6px 0; cursor: pointer; }
+.checkbox-row input { width: 18px; height: 18px; accent-color: var(--teal); }
+
+.btn { background: var(--navy-card2); border: 1px solid var(--border); color: var(--text); font-weight: 700; font-size: 13px; padding: 11px 14px; border-radius: 10px; cursor: pointer; width: 100%; text-align: center; }
+.btn.primary { background: var(--teal); color: #001812; border-color: var(--teal); }
+.btn.danger { background: var(--red); color: #fff; border-color: var(--red); }
+.btn.secondary { background: transparent; color: var(--text-dim); }
+.btn:active { opacity: .8; }
+.btn-row { display: flex; gap: 8px; }
+.btn-row .btn { flex: 1; }
+
+/* ── Live screen: top status bar ────────────────────────────────────── */
+.status-bar { background: linear-gradient(180deg, var(--navy-card), var(--navy-card2)); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; margin-bottom: 12px; text-align: center; }
+.status-bar .birth-row { font-size: 11px; color: var(--text-dim); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 2px; }
+.status-bar .birth-time { font-size: 13px; color: var(--text-dim); font-variant-numeric: tabular-nums; margin-bottom: 10px; }
+.status-bar .res-label { font-size: 11px; color: var(--teal); text-transform: uppercase; letter-spacing: .08em; font-weight: 700; }
+.status-bar .res-clock { font-size: 46px; font-weight: 800; font-variant-numeric: tabular-nums; letter-spacing: .02em; color: #fff; }
+.status-bar .res-clock.paused { color: var(--text-dim2); }
+.status-bar.cpr { background: linear-gradient(180deg, var(--red-bg), var(--navy-card)); border-color: var(--red); }
+.status-bar.cpr .res-label { color: var(--red); }
+
+.vitals-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+.vital-box { background: var(--navy-card); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 10px 6px; text-align: center; cursor: pointer; }
+.vital-box .vb-label { font-size: 10px; color: var(--text-dim); text-transform: uppercase; letter-spacing: .05em; }
+.vital-box .vb-value { font-size: 26px; font-weight: 800; font-variant-numeric: tabular-nums; margin: 2px 0; }
+.vital-box.hr .vb-value { color: var(--red); }
+.vital-box.spo2 .vb-value { color: var(--blue-bright); }
+.vital-box.fio2 .vb-value { color: var(--amber); }
+.vital-box .vb-hint { font-size: 9px; color: var(--text-dim2); }
+.vital-box.needs-fio2 { border-color: var(--red); animation: cprPulse 1.4s infinite; }
+.btn.needs-attention { border: 2px solid var(--red); animation: cprPulse 1.4s infinite; }
+
+/* ── Dynamic SpO2 target box ─────────────────────────────────────────── */
+.spo2-target-box { background: var(--navy-card); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 10px 12px; margin-bottom: 12px; display: flex; align-items: center; gap: 10px; }
+.stb-col { flex: 1; text-align: center; }
+.stb-label { font-size: 10px; color: var(--text-dim); text-transform: uppercase; letter-spacing: .05em; }
+.stb-value { font-size: 19px; font-weight: 800; font-variant-numeric: tabular-nums; margin-top: 1px; }
+.stb-status { flex-shrink: 0; font-size: 10.5px; font-weight: 700; padding: 7px 9px; border-radius: 12px; white-space: nowrap; text-align: center; }
+.stb-status.below { background: var(--red-bg); color: var(--red); border: 1px solid var(--red); }
+.stb-status.within { background: var(--green-bg); color: var(--green); border: 1px solid var(--green); }
+.stb-status.above { background: var(--amber-bg); color: var(--amber); border: 1px solid var(--amber); }
+.stb-status.unknown { background: var(--navy); color: var(--text-dim2); border: 1px solid var(--border); }
+
+/* ── Assessment mini-table (Live screen) ─────────────────────────────── */
+.assess-table { width: 100%; border-collapse: collapse; font-size: 11.5px; }
+.assess-table th, .assess-table td { border: 1px solid var(--border); padding: 5px; text-align: center; }
+.assess-table th { background: var(--navy); color: var(--text-dim); font-size: 10px; text-transform: uppercase; }
+.assess-table td.time-col { font-weight: 700; color: var(--teal); }
+.assess-empty { text-align: center; color: var(--text-dim2); font-size: 12px; padding: 14px 0; }
+
+/* ── Intervention grid ──────────────────────────────────────────────── */
+.grid-title { font-size: 11px; font-weight: 700; color: var(--text-dim); text-transform: uppercase; letter-spacing: .06em; margin: 4px 0 6px; }
+.intervention-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; margin-bottom: 10px; }
+.ibtn { position: relative; aspect-ratio: 1 / 0.62; border-radius: 12px; border: 1px solid var(--border); background: var(--navy-card); color: var(--text); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; cursor: pointer; font-weight: 700; font-size: 10.5px; letter-spacing: .02em; }
+.ibtn .ibtn-icon { font-size: 18px; }
+.ibtn.active-toggle { background: var(--green-bg); border-color: var(--green); color: var(--green); }
+.ibtn.active-toggle::after { content: '●'; position: absolute; top: 5px; right: 7px; font-size: 8px; color: var(--green); }
+.ibtn.cat-resp { border-top: 3px solid var(--teal); }
+.ibtn.cat-airway { border-top: 3px solid var(--blue); }
+.ibtn.cat-circ { border-top: 3px solid var(--amber); }
+.ibtn.cat-drug { border-top: 3px solid var(--red); }
+.ibtn.emergency { background: var(--red-bg); border-color: var(--red); color: #ffd9de; }
+.ibtn:active { opacity: .8; }
+
+.ref-strip { font-size: 10.5px; color: var(--text-dim2); text-align: center; margin: -4px 0 12px; line-height: 1.5; }
+
+/* ── Timeline ───────────────────────────────────────────────────────── */
+.timeline-list { display: flex; flex-direction: column; gap: 0; }
+.tl-item { display: flex; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border); cursor: pointer; }
+.tl-item:last-child { border-bottom: none; }
+.tl-time { flex-shrink: 0; width: 52px; font-size: 13px; font-weight: 800; color: var(--teal); font-variant-numeric: tabular-nums; padding-top: 1px; }
+.tl-body { flex: 1; }
+.tl-label { font-size: 13.5px; font-weight: 700; }
+.tl-detail { font-size: 12px; color: var(--text-dim); margin-top: 2px; line-height: 1.4; }
+.tl-flag { display: inline-block; font-size: 10px; color: var(--amber); border: 1px solid var(--amber); border-radius: 8px; padding: 1px 6px; margin-top: 4px; }
+.tl-item.type-cpr .tl-time { color: var(--red); }
+.tl-item.type-drug .tl-time { color: var(--red); }
+.tl-empty { text-align: center; color: var(--text-dim2); font-size: 13px; padding: 30px 0; }
+
+/* ── Vital trend (SVG chart) ────────────────────────────────────────── */
+.chart-wrap { background: var(--navy-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px; margin-bottom: 12px; }
+.chart-wrap .chart-title { font-size: 11px; font-weight: 700; color: var(--text-dim); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 8px; }
+.chart-legend { display: flex; gap: 14px; font-size: 11px; color: var(--text-dim); margin-top: 6px; flex-wrap: wrap; }
+.chart-legend span { display: inline-flex; align-items: center; gap: 5px; }
+.chart-legend i { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+
+/* ── Apgar ──────────────────────────────────────────────────────────── */
+.apgar-table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+.apgar-table th, .apgar-table td { border: 1px solid var(--border); text-align: center; padding: 6px 3px; }
+.apgar-table th { background: var(--navy); color: var(--text-dim); font-size: 10.5px; text-transform: uppercase; }
+.apgar-table td.row-label { text-align: left; font-weight: 700; font-size: 12px; padding-left: 8px; }
+.apgar-score-btn { display: inline-block; width: 26px; height: 26px; line-height: 26px; border-radius: 6px; background: var(--navy); border: 1px solid var(--border); color: var(--text-dim); font-size: 12px; font-weight: 700; cursor: pointer; margin: 1px; }
+.apgar-score-btn.picked { background: var(--teal); border-color: var(--teal); color: #001812; }
+.apgar-total-row td { font-weight: 800; color: var(--teal); background: var(--navy); }
+
+/* ── Modal overlays ─────────────────────────────────────────────────── */
+.modal-overlay { position: fixed; inset: 0; background: rgba(5,10,20,.72); z-index: 500; display: flex; align-items: flex-end; justify-content: center; }
+.modal-overlay.centered { align-items: center; }
+#detailModalOverlay, #quickEntryOverlay { z-index: 600; } /* must stack above the CPR overlay (500) */
+.modal-sheet { background: var(--navy-mid); border: 1px solid var(--border); border-radius: 20px 20px 0 0; width: 100%; max-width: 720px; max-height: 88vh; overflow-y: auto; padding: 16px 16px calc(20px + var(--safe-bottom)); }
+.modal-overlay.centered .modal-sheet { border-radius: 18px; max-width: 380px; margin: 0 16px; }
+.modal-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
+.modal-head h3 { font-size: 16px; font-weight: 800; }
+.modal-close { background: var(--navy-card); border: none; color: var(--text-dim); width: 30px; height: 30px; border-radius: 50%; font-size: 15px; cursor: pointer; }
+.modal-time { font-size: 12px; color: var(--text-dim); margin-bottom: 14px; }
+.modal-time b { color: var(--teal); }
+
+/* ── CPR overlay ────────────────────────────────────────────────────── */
+.cpr-overlay { background: var(--red-bg); }
+.cpr-sheet { background: #150a0d; border-radius: 0; max-height: 100vh; height: 100%; width: 100%; max-width: none; padding: calc(16px + var(--safe-top)) 16px calc(20px + var(--safe-bottom)); display: flex; flex-direction: column; }
+.cpr-banner { text-align: center; font-size: 13px; font-weight: 800; letter-spacing: .08em; color: var(--red); border: 2px solid var(--red); border-radius: 12px; padding: 8px; margin-bottom: 14px; animation: cprPulse 1.4s infinite; }
+@keyframes cprPulse { 0%,100% { opacity: 1; } 50% { opacity: .55; } }
+.cpr-time-label { text-align: center; font-size: 11px; color: var(--text-dim); text-transform: uppercase; letter-spacing: .08em; }
+.cpr-time { text-align: center; font-size: 52px; font-weight: 800; color: #fff; font-variant-numeric: tabular-nums; margin: 2px 0 16px; }
+.cpr-log-title { font-size: 10px; font-weight: 700; color: var(--text-dim); text-transform: uppercase; letter-spacing: .05em; margin: 4px 0 6px; }
+.cpr-log { flex: 1; overflow-y: auto; background: rgba(0,0,0,.28); border: 1px solid var(--border); border-radius: 10px; padding: 8px 10px; margin-bottom: 10px; font-size: 11.5px; line-height: 1.5; min-height: 56px; }
+.cpr-log-item { padding: 3px 0; border-bottom: 1px solid rgba(255,255,255,.06); }
+.cpr-log-item:last-child { border-bottom: none; }
+.cpr-log-item b { color: var(--teal); font-variant-numeric: tabular-nums; }
+.cpr-log-empty { color: var(--text-dim2); text-align: center; padding: 10px 0; font-size: 11.5px; }
+
+/* ── Quick entry numeric pad ────────────────────────────────────────── */
+.qe-display { text-align: center; font-size: 44px; font-weight: 800; font-variant-numeric: tabular-nums; margin: 6px 0 16px; color: var(--teal); min-height: 54px; }
+.qe-pad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 14px; }
+.qe-pad button { background: var(--navy-card); border: 1px solid var(--border); color: var(--text); font-size: 20px; font-weight: 700; padding: 16px 0; border-radius: 12px; }
+.qe-pad button:active { background: var(--navy-card2); }
+
+/* ── Toast ──────────────────────────────────────────────────────────── */
+.toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(74px + var(--safe-bottom)); background: var(--teal); color: #001812; font-weight: 700; font-size: 13px; padding: 9px 16px; border-radius: 20px; z-index: 600; opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s; box-shadow: 0 4px 18px rgba(0,0,0,.35); }
+.toast.show { opacity: 1; }
+.toast.warn { background: var(--amber); }
+.toast.danger { background: var(--red); color: #fff; }
+
+.alert-banner { background: var(--red-bg); border: 1px solid var(--red); border-radius: 10px; padding: 10px 12px; font-size: 12.5px; line-height: 1.5; color: #ffd9de; margin-bottom: 12px; display: none; }
+.alert-banner.show { display: block; }
+
+.no-events { color: var(--text-dim2); }
+
+/* ── Team Leader mode: glanceable, minimal ─────────────────────────────── */
+body.leader-mode #initialAssessCard,
+body.leader-mode #interventionGrid,
+body.leader-mode .grid-title,
+body.leader-mode .ref-strip { display: none; }
+body.leader-mode .status-bar .res-clock { font-size: 64px; }
+body.leader-mode .vital-box .vb-value { font-size: 34px; }
+body.leader-mode .vital-box .vb-hint { visibility: hidden; }
+
+/* ── Print (white, structured, clinical-record layout) ─────────────────── */
+#printView { display: none; }
+.print-doc { background: #fff; color: #000; font-family: Georgia, 'Times New Roman', serif; max-width: 800px; margin: 0 auto; padding: 24px; }
+.print-doc h1 { font-size: 19px; margin-bottom: 2px; }
+.print-doc .print-sub { font-size: 11px; color: #444; margin-bottom: 18px; font-family: -apple-system, sans-serif; }
+.print-doc h2 { font-size: 12.5px; text-transform: uppercase; letter-spacing: .05em; border-bottom: 2px solid #000; padding-bottom: 3px; margin: 18px 0 8px; font-family: -apple-system, sans-serif; page-break-after: avoid; }
+.print-doc table { width: 100%; border-collapse: collapse; margin-bottom: 10px; font-size: 10.5px; font-family: -apple-system, sans-serif; }
+.print-doc th, .print-doc td { border: 1px solid #999; padding: 4px 6px; text-align: left; vertical-align: top; }
+.print-doc th { background: #eee; }
+.print-doc .kv-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 3px 20px; font-size: 11.5px; margin-bottom: 4px; font-family: -apple-system, sans-serif; }
+.print-doc .kv-grid.single { grid-template-columns: 1fr; }
+.print-doc .kv-grid b { font-weight: 700; }
+.print-doc .no-break { page-break-inside: avoid; }
+.print-doc .print-footer { font-size: 9.5px; color: #666; margin-top: 20px; font-family: -apple-system, sans-serif; }
+
+@media print {
+  html, body { background: #fff !important; }
+  .header, .tab-bar, .modal-overlay, .screen { display: none !important; }
+  #printView { display: block !important; }
+  #printView, #printView * { color: #000 !important; box-shadow: none !important; }
+  .print-doc table, .print-doc tr, .print-doc .no-break { page-break-inside: avoid; }
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <h1>Live Resuscitation Record</h1>
+    <div class="sub" id="headerSub">Not started · MyNeST</div>
+  </div>
+  <div class="mode-toggle">
+    <button id="modeLeaderBtn" onclick="setMode('leader')">👤 Leader</button>
+    <button id="modeScribeBtn" onclick="setMode('scribe')" class="active">📝 Scribe</button>
+  </div>
+  <button class="new-patient-btn" onclick="confirmNewPatient()">🆕 New</button>
+</div>
+
+<!-- ══════════════════ SCREEN: PREP ══════════════════ -->
+<div class="screen visible" id="screen-prep">
+
+  <div class="card" id="prepCard">
+    <div class="card-title">Baby &amp; Delivery Details<span class="chevron">▾</span></div>
+    <div class="card-body">
+      <div class="field-grid">
+        <div class="field full"><label>Baby ID</label><input id="babyId" type="text" placeholder="e.g. mother's name / MRN"></div>
+        <div class="field"><label>Date</label><input id="birthDate" type="date"></div>
+        <div class="field"><label>Sex</label>
+          <div class="chip-group" data-field="sex"><span class="chip" onclick="chipPick('sex',this)">M</span><span class="chip" onclick="chipPick('sex',this)">F</span><span class="chip" onclick="chipPick('sex',this)">Ambiguous</span></div>
+        </div>
+        <div class="field"><label>Gestational age (weeks)</label><input id="gaWeeks" type="number" step="1" placeholder="e.g. 34"></div>
+        <div class="field"><label>Birth weight (g)</label><input id="bwGrams" type="number" step="1" placeholder="e.g. 2100"></div>
+        <div class="field full"><label>Singleton / multiple</label><input id="multiplicity" type="text" placeholder="e.g. Singleton, or Twin 1 of 2"></div>
+        <div class="field full"><label>Mode of delivery</label>
+          <div class="chip-group" data-field="delivery"><span class="chip" onclick="chipPick('delivery',this)">SVD</span><span class="chip" onclick="chipPick('delivery',this)">LSCS</span><span class="chip" onclick="chipPick('delivery',this)">Instrumental</span></div>
+        </div>
+        <div class="field full"><label>Indication (if LSCS / instrumental)</label><input id="deliveryIndication" type="text"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" id="riskCard">
+    <div class="card-title">Anticipated Risk<span class="chevron">▾</span></div>
+    <div class="card-body">
+      <label class="checkbox-row"><input type="checkbox" data-risk="Prematurity"> Prematurity</label>
+      <label class="checkbox-row"><input type="checkbox" data-risk="MAS"> Meconium aspiration risk (MAS)</label>
+      <label class="checkbox-row"><input type="checkbox" data-risk="HIE risk"> HIE risk</label>
+      <label class="checkbox-row"><input type="checkbox" data-risk="Congenital anomaly"> Congenital anomaly</label>
+      <label class="checkbox-row"><input type="checkbox" data-risk="Maternal condition"> Maternal condition</label>
+      <label class="checkbox-row"><input type="checkbox" data-risk="Other"> Other</label>
+      <div class="field full" style="margin-top:8px"><label>Other / notes</label><input id="riskOtherNote" type="text"></div>
+    </div>
+  </div>
+
+  <div class="card" id="cordCard">
+    <div class="card-title">Cord Management<span class="chevron">▾</span></div>
+    <div class="card-body">
+      <div class="card-note">Current guidance recommends deferred cord clamping ≥60 sec in newborns not requiring immediate resuscitation.</div>
+      <div class="chip-group" data-field="cord">
+        <span class="chip" onclick="chipPick('cord',this)">DCC ≥60 s</span>
+        <span class="chip" onclick="chipPick('cord',this)">Immediate clamping</span>
+        <span class="chip" onclick="chipPick('cord',this)">Cord milking</span>
+      </div>
+    </div>
+  </div>
+
+  <button class="btn primary" style="padding:16px;font-size:15px;margin-top:6px" onclick="recordBirth()">👶 BIRTH — Start Resuscitation Timer</button>
+</div>
+
+<!-- ══════════════════ SCREEN: LIVE ══════════════════ -->
+<div class="screen" id="screen-live">
+
+  <div class="status-bar" id="statusBar">
+    <div class="birth-row">Birth</div>
+    <div class="birth-time" id="birthTimeDisplay">--:--:--</div>
+    <div class="res-label">Resuscitation Time</div>
+    <div class="res-clock" id="resClock">00:00</div>
+  </div>
+
+  <div id="alertBanner" class="alert-banner"></div>
+  <div id="pendingCheckRow"></div>
+
+  <div class="spo2-target-box" id="spo2TargetBox"></div>
+
+  <div class="card" id="assessmentCard">
+    <div class="card-title">Assessment<span class="chevron">▾</span></div>
+    <div class="card-body">
+      <div id="assessmentTableWrap"><div class="assess-empty">No assessments logged yet.</div></div>
+      <button class="btn primary" style="margin-top:10px" onclick="openAssessmentModal()">＋ ASSESSMENT</button>
+    </div>
+  </div>
+
+  <div class="grid-title">Interventions — tap to log time · opens detail</div>
+  <div class="intervention-grid" id="interventionGrid"></div>
+  <div id="ppvEffectiveRow"></div>
+  <div id="ppvIntubationRow"></div>
+
+  <div class="card" id="liveLogCard" style="margin-top:12px">
+    <div class="card-title">Live Log — assessments &amp; interventions<span class="chevron">▾</span></div>
+    <div class="card-body">
+      <div class="cpr-log" id="liveLogWrap" style="max-height:220px"></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══════════════════ SCREEN: TIMELINE ══════════════════ -->
+<div class="screen" id="screen-timeline">
+  <div class="card">
+    <div class="card-title">Resuscitation Timeline</div>
+    <div class="card-note">Tap any entry to add or edit details.</div>
+    <div class="timeline-list" id="timelineList"></div>
+  </div>
+</div>
+
+<!-- ══════════════════ SCREEN: TREND ══════════════════ -->
+<div class="screen" id="screen-trend">
+  <div class="chart-wrap">
+    <div class="chart-title">Heart Rate (bpm)</div>
+    <div id="hrChart"></div>
+    <div class="chart-legend"><span><i style="background:var(--red)"></i>HR</span></div>
+  </div>
+  <div class="chart-wrap">
+    <div class="chart-title">SpO₂ &amp; FiO₂ (%)</div>
+    <div id="spo2Chart"></div>
+    <div class="chart-legend"><span><i style="background:var(--blue-bright)"></i>SpO₂</span><span><i style="background:var(--amber)"></i>FiO₂</span></div>
+  </div>
+  <div class="card-note" style="padding:0 4px">↑ markers show PPV / ETT / CPR / Adrenaline events.</div>
+</div>
+
+<!-- ══════════════════ SCREEN: APGAR ══════════════════ -->
+<div class="screen" id="screen-apgar">
+  <div class="card">
+    <div class="card-title">Apgar Score</div>
+    <div id="apgarTableWrap"></div>
+    <div class="field full" style="margin-top:12px"><label>Assigned by</label><input id="apgarAssignedBy" type="text"></div>
+  </div>
+</div>
+
+<!-- ══════════════════ SCREEN: END ══════════════════ -->
+<div class="screen" id="screen-end">
+  <div class="card">
+    <div class="card-title">End of Resuscitation</div>
+    <div class="field-grid">
+      <div class="field full"><label>Time</label><div class="btn-row"><input id="endTime" type="time"><button class="btn secondary" style="width:auto;flex-shrink:0;padding:9px 12px" onclick="stampNow('endTime')">Now</button></div></div>
+      <div class="field full"><label>Condition</label>
+        <div class="chip-group" data-field="endCondition"><span class="chip" onclick="chipPick('endCondition',this)">Stable</span><span class="chip" onclick="chipPick('endCondition',this)">Respiratory support</span><span class="chip" onclick="chipPick('endCondition',this)">Intubated</span><span class="chip" onclick="chipPick('endCondition',this)">Ongoing resuscitation</span><span class="chip" onclick="chipPick('endCondition',this)">Death</span></div>
+      </div>
+      <div class="field full"><label>Respiratory support</label>
+        <div class="chip-group" data-field="respSupport"><span class="chip" onclick="chipPick('respSupport',this)">Room air</span><span class="chip" onclick="chipPick('respSupport',this)">Supplementary oxygen</span><span class="chip" onclick="chipPick('respSupport',this)">CPAP</span><span class="chip" onclick="chipPick('respSupport',this)">NIPPV</span><span class="chip" onclick="chipPick('respSupport',this)">HFNC</span><span class="chip" onclick="chipPick('respSupport',this)">ETT ventilation</span></div>
+      </div>
+      <div class="field"><label>FiO₂ (%)</label><input id="endFio2" type="number"></div>
+      <div class="field full"><label>Destination</label>
+        <div class="chip-group" data-field="destination"><span class="chip" onclick="chipPick('destination',this)">Labour ward</span><span class="chip" onclick="chipPick('destination',this)">Nursery</span><span class="chip" onclick="chipPick('destination',this)">SCN</span><span class="chip" onclick="chipPick('destination',this)">NICU</span><span class="chip" onclick="chipPick('destination',this)">Operating theatre</span><span class="chip" onclick="chipPick('destination',this)">Transfer hospital</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Post-Resuscitation</div>
+    <div class="field-grid">
+      <div class="field"><label>Temperature (°C)</label><input id="postTemp" type="number" step="0.1"></div>
+      <div class="field"><label>Glucose (mmol/L)</label><input id="postGlucose" type="number" step="0.1"></div>
+      <div class="field full"><label class="checkbox-row" style="padding:2px 0"><input type="checkbox" id="bloodGasDone"> Blood gas done</label></div>
+      <div class="field full"><label class="checkbox-row" style="padding:2px 0"><input type="checkbox" id="hieDone"> HIE assessment done</label></div>
+      <div class="field full"><label>Therapeutic hypothermia</label>
+        <div class="chip-group" data-field="hypothermia"><span class="chip" onclick="chipPick('hypothermia',this)">No</span><span class="chip" onclick="chipPick('hypothermia',this)">Yes</span><span class="chip" onclick="chipPick('hypothermia',this)">Assessment ongoing</span></div>
+      </div>
+    </div>
+  </div>
+
+  <button class="btn primary" style="padding:16px;font-size:15px" onclick="completeRecord()">✓ COMPLETE RECORD</button>
+</div>
+
+<!-- ══════════════════ SCREEN: SUMMARY ══════════════════ -->
+<div class="screen" id="screen-summary">
+  <div class="card" id="summaryContent"></div>
+  <div class="btn-row" style="margin-bottom:10px">
+    <button class="btn" onclick="downloadRecordTxt()">⬇ .txt</button>
+    <button class="btn" onclick="downloadRecordWord()">⬇ Word</button>
+  </div>
+  <button class="btn primary" onclick="printSummary()">🖨 Print / PDF</button>
+</div>
+
+<div class="tab-bar" id="tabBar"></div>
+
+<!-- ══════════════════ MODALS ══════════════════ -->
+<div class="modal-overlay" id="detailModalOverlay" style="display:none" onclick="if(event.target===this) closeDetailModal()">
+  <div class="modal-sheet" id="detailModalSheet"></div>
+</div>
+
+<div class="modal-overlay centered" id="quickEntryOverlay" style="display:none" onclick="if(event.target===this) closeQuickEntry()">
+  <div class="modal-sheet" id="quickEntrySheet"></div>
+</div>
+
+<div class="modal-overlay cpr-overlay" id="cprOverlay" style="display:none">
+  <div class="modal-sheet cpr-sheet" id="cprSheet"></div>
+</div>
+
+<div id="toast" class="toast"></div>
+<div id="printView" style="display:none"></div>
+
+<script>
+// ══════════════════════════════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════════════════════════════
+var RES = {
+  babyId:'', birthDateStr:'', ga:'', bw:null, multiplicity:'', deliveryIndication:'',
+  risks: [], riskOtherNote:'',
+  fields: {}, // generic single-select chip values: sex, delivery, cord, iaResp, iaHR, iaTone, cprVent, endCondition, respSupport, destination, hypothermia
+  birthTime: null,
+  mainInterval: null,
+  elapsedSec: 0,
+  paused: false,
+  mode: 'scribe',
+  iaTemp: '',
+  vitals: { hr:null, spo2:null, fio2:21 },
+  vitalsLog: [],
+  events: [],
+  nextEventId: 1,
+  activeToggles: { ppv:false, cpap:false, oxygen:false },
+  cprInterval: null,
+  cprElapsedSec: 0,
+  cprEscalation: { lastMinute: null, needsAdrenaline: false, needsUVC: false },
+  pausedRespAlerts: [],
+  ppvMaskCycles: 0,
+  ppvEffectiveTimeout: null,
+  ppvEffectiveMarkedThisSession: false,
+  pendingChecks: new Set(), // periodic checks deferred because a detail entry was already open
+  ppvCheckSlowed: false, // true once PPV check has stepped down to 1-min interval
+  pausedForEndTab: [], // PPV/CPAP checks paused while the End tab is open
+  periodicPausedByEndTab: false,
+  adrenalineCount: 0,
+  apgar: {1:{},5:{},10:{},15:{},20:{}},
+  apgarExtended: false,
+  end: { time:'', fio2:'' },
+  post: { temp:'', glucose:'', bloodGasDone:false, hieDone:false },
+  completed: false,
+  alertsFired: {},
+  tabAlerts: {},
+};
+
+var INTERVENTIONS = [
+  {key:'ppv', label:'PPV', icon:'💨', cat:'resp', toggle:true},
+  {key:'cpap', label:'CPAP', icon:'🫧', cat:'resp', toggle:true},
+  {key:'oxygen', label:'OXYGEN', icon:'🅾️', cat:'resp', toggle:true},
+  {key:'mask', label:'MASK', icon:'🔧', cat:'airway'},
+  {key:'ett', label:'ETT', icon:'🫁', cat:'airway'},
+  {key:'lma', label:'LMA', icon:'🌀', cat:'airway'},
+  {key:'cpr', label:'CPR', icon:'❤️', cat:'circ', special:'cpr'},
+  {key:'uvc', label:'UVC', icon:'🩸', cat:'circ'},
+  {key:'io', label:'IO', icon:'💉', cat:'circ'},
+  {key:'adrenaline', label:'ADRENALINE', icon:'💊', cat:'drug', special:'adrenaline'},
+  {key:'volume', label:'VOLUME', icon:'🧴', cat:'drug'},
+  {key:'other', label:'OTHER', icon:'➕', cat:'drug'},
+];
+var LABELS = { ppv:'PPV', cpap:'CPAP', oxygen:'Oxygen', mask:'MASK', ett:'ETT', lma:'LMA', uvc:'UVC', io:'IO access', volume:'Volume bolus', other:'Other intervention' };
+
+var DETAIL_FIELDS = {
+  ppv: [
+    {id:'interface', label:'Interface', type:'chip', options:['Mask','ETT','LMA','Other']},
+    {id:'device', label:'Device', type:'chip', options:['T-piece','Self-inflating bag']},
+    {id:'flow', label:'Gas flow (L/min)', type:'number', value:10},
+    {id:'fio2', label:'FiO₂ (%)', type:'number'},
+  ],
+  cpap: [
+    {id:'interface', label:'Interface', type:'chip', options:['Mask','Prongs']},
+    {id:'peep', label:'PEEP (cmH₂O)', type:'number', value:5},
+    {id:'fio2', label:'FiO₂ (%)', type:'number'},
+  ],
+  oxygen: [
+    {id:'method', label:'Method', type:'chip', options:['Free-flow','T-piece']},
+    {id:'fio2', label:'FiO₂ (%)', type:'number'},
+  ],
+  mask: [
+    {id:'m', label:'M — Mask adjustment', type:'toggle'},
+    {id:'a', label:'A — Airway clearance', type:'toggle'},
+    {id:'s', label:'S — Step up Pressure', type:'toggle'},
+    {id:'k', label:'K — Key Alternative airway', type:'toggle', onCheck:'tickAlternativeAirway'},
+  ],
+  ett: [
+    {id:'size', label:'ETT size', type:'chip', options:['2.0','2.5','3.0','3.5']},
+    {id:'depth', label:'Depth from lips (cm)', type:'number', step:'0.1'},
+    {id:'route', label:'Route', type:'chip', options:['Oral','Nasal']},
+    {id:'attempts', label:'Attempts', type:'number'},
+    {id:'confirmation', label:'Confirmation', type:'multi', options:['Chest movement','HR response','ETCO₂','Other']},
+  ],
+  lma: [ {id:'size', label:'LMA size', type:'text'} ],
+  uvc: [
+    {id:'size', label:'Catheter size', type:'chip', options:['3.5F','5F']},
+    {id:'confirmed', label:'Position confirmed', type:'chip', options:['Yes','No']},
+  ],
+  io: [ {id:'site', label:'Site', type:'text'} ],
+  volume: [
+    {id:'fluid', label:'Fluid', type:'chip', options:['Normal saline 0.9%','O-negative blood']},
+    {id:'volume', label:'Volume (mL)', type:'number'},
+  ],
+  other: [ {id:'note', label:'Description', type:'text'} ],
+};
+
+var APGAR_ROWS = [
+  {key:'hr', label:'Heart rate', opts:[['Absent',0],['<100',1],['≥100',2]]},
+  {key:'resp', label:'Resp. effort', opts:[['Absent',0],['Weak',1],['Crying',2]]},
+  {key:'tone', label:'Tone', opts:[['Limp',0],['Some',1],['Active',2]]},
+  {key:'reflex', label:'Reflex', opts:[['None',0],['Grimace',1],['Cry',2]]},
+  {key:'colour', label:'Colour', opts:[['Blue',0],['Body pink',1],['All pink',2]]},
+];
+
+var TABS = [
+  {id:'prep', icon:'🩺', label:'Prep'},
+  {id:'live', icon:'⏱️', label:'Live'},
+  {id:'timeline', icon:'📜', label:'Timeline'},
+  {id:'trend', icon:'📈', label:'Trend'},
+  {id:'apgar', icon:'🅰️', label:'Apgar'},
+  {id:'end', icon:'🏁', label:'End'},
+  {id:'summary', icon:'🧾', label:'Summary'},
+];
+var currentTab = 'prep';
+
+// ══════════════════════════════════════════════════════════════════════
+// UTILITIES
+// ══════════════════════════════════════════════════════════════════════
+function pad(n) { return String(n).padStart(2,'0'); }
+function fmtClock(sec) { sec = Math.max(0, Math.round(sec)); return `${pad(Math.floor(sec/60))}:${pad(sec%60)}`; }
+function toTimeValue(d) { return `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`; }
+function stampNow(id) { const el = document.getElementById(id); if (el) el.value = `${pad(new Date().getHours())}:${pad(new Date().getMinutes())}`; }
+function fieldValue(field) { return RES.fields[field]; }
+
+var toastTimeout = null;
+function showToast(msg, kind) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'toast show' + (kind === 'warn' ? ' warn' : kind === 'danger' ? ' danger' : '');
+  clearTimeout(toastTimeout);
+  toastTimeout = setTimeout(() => el.classList.remove('show'), 2600);
+}
+
+// ══════════════════════════════════════════════════════════════════════
+// GENERIC CHIP PICKER (single or multi-select, scoped to its own group)
+// ══════════════════════════════════════════════════════════════════════
+function chipPick(field, el, multi) {
+  if (multi) {
+    el.classList.toggle('on');
+    RES.fields[field] = [...el.parentElement.children].filter(c => c.classList.contains('on')).map(c => c.textContent);
+  } else {
+    [...el.parentElement.children].forEach(c => c.classList.remove('on'));
+    el.classList.add('on');
+    RES.fields[field] = el.textContent;
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════════
+// COLLAPSIBLE CARDS (delegated)
+// ══════════════════════════════════════════════════════════════════════
+document.addEventListener('click', function(e) {
+  const title = e.target.closest('.card-title');
+  if (title) title.closest('.card').classList.toggle('collapsed');
+});
+
+// ══════════════════════════════════════════════════════════════════════
+// TAB NAVIGATION
+// ══════════════════════════════════════════════════════════════════════
+function renderTabBar() {
+  document.getElementById('tabBar').innerHTML = TABS.map(t => `
+    <button class="tab-btn${currentTab===t.id?' active':''}${RES.tabAlerts[t.id]?' alert':''}" onclick="switchTab('${t.id}')">
+      <span class="tab-icon">${t.icon}</span>${t.label}<span class="tab-dot"></span>
+    </button>`).join('');
+}
+function switchTab(id) {
+  currentTab = id;
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('visible'));
+  document.getElementById('screen-' + id).classList.add('visible');
+  RES.tabAlerts[id] = false;
+  renderTabBar();
+  if (id === 'timeline') renderTimeline();
+  if (id === 'trend') renderTrend();
+  if (id === 'apgar') renderApgarTable();
+  if (id === 'summary') renderSummaryScreen();
+  handleEndTabPeriodicChecks(id);
+  window.scrollTo(0,0);
+}
+// Entering the End tab pauses PPV/CPAP periodic checks so they don't pop
+// up mid-documentation. They resume only if you go back to the Live tab —
+// visiting Timeline/Apgar/etc. in between does not resume them.
+function handleEndTabPeriodicChecks(id) {
+  if (id === 'end' && !RES.periodicPausedByEndTab) {
+    RES.periodicPausedByEndTab = true;
+    RES.pausedForEndTab = PERIODIC_CHECK_KEYS.filter(k => respAlertIntervals[k] !== null);
+    if (RES.pausedForEndTab.length) {
+      RES.pausedForEndTab.forEach(k => stopRespiratorySupportAlerts(k));
+      showToast('PPV/CPAP checks paused while completing End of Resuscitation');
+    }
+  } else if (id === 'live' && RES.periodicPausedByEndTab) {
+    RES.periodicPausedByEndTab = false;
+    (RES.pausedForEndTab || []).forEach(k => {
+      if (RES.activeToggles[k]) startRespiratorySupportAlerts(k, (k === 'ppv' && RES.ppvCheckSlowed) ? 60000 : 30000);
+    });
+    RES.pausedForEndTab = [];
+  }
+}
+function flagTab(id) { RES.tabAlerts[id] = true; renderTabBar(); }
+
+function setMode(mode) {
+  RES.mode = mode;
+  document.getElementById('modeLeaderBtn').classList.toggle('active', mode === 'leader');
+  document.getElementById('modeScribeBtn').classList.toggle('active', mode === 'scribe');
+  document.body.classList.toggle('leader-mode', mode === 'leader');
+}
+
+function confirmNewPatient() {
+  if (RES.birthTime && !confirm('Start a new patient record? This clears all current data.')) return;
+  location.reload();
+}
+
+// ══════════════════════════════════════════════════════════════════════
+// BIRTH / MAIN TIMER (Utstein: elapsed since birth; PPV/CPR onset logged
+// separately via their own timestamped events)
+// ══════════════════════════════════════════════════════════════════════
+function recordBirth() {
+  RES.babyId = document.getElementById('babyId').value;
+  RES.birthDateStr = document.getElementById('birthDate').value;
+  RES.ga = document.getElementById('gaWeeks').value;
+  RES.bw = parseFloat(document.getElementById('bwGrams').value) || null;
+  RES.multiplicity = document.getElementById('multiplicity').value;
+  RES.deliveryIndication = document.getElementById('deliveryIndication').value;
+  RES.risks = [...document.querySelectorAll('[data-risk]')].filter(c => c.checked).map(c => c.dataset.risk);
+  RES.riskOtherNote = document.getElementById('riskOtherNote').value;
+
+  RES.birthTime = new Date();
+  document.getElementById('birthTimeDisplay').textContent = toTimeValue(RES.birthTime) + ' (24-hr)';
+  document.getElementById('headerSub').textContent = `Birth ${toTimeValue(RES.birthTime)} · Timer running`;
+  logEvent('birth', 'Birth', {cord: fieldValue('cord') || ''});
+  startMainTimer();
+  switchTab('live');
+  showToast('👶 Birth recorded — timer started');
+}
+
+function startMainTimer() {
+  clearInterval(RES.mainInterval);
+  RES.paused = false;
+  const clockEl = document.getElementById('resClock');
+  if (clockEl) clockEl.classList.remove('paused');
+  RES.mainInterval = setInterval(mainTick, 1000);
+  mainTick();
+}
+function pauseMainTimer() {
+  RES.paused = true;
+  clearInterval(RES.mainInterval);
+  const clockEl = document.getElementById('resClock');
+  if (clockEl) clockEl.classList.add('paused');
+}
+function mainTick() {
+  if (!RES.birthTime || RES.paused) return;
+  RES.elapsedSec = Math.floor((Date.now() - RES.birthTime.getTime()) / 1000);
+  const clockEl = document.getElementById('resClock');
+  if (clockEl) clockEl.textContent = fmtClock(RES.elapsedSec);
+  renderSpo2TargetBox();
+  checkPPVStabilization();
+  checkTimeAlerts();
+}
+// Once HR>100 and SpO2>90% are sustained at 10+ minutes of life, the PPV
+// check steps down from every 30s to every 1 min.
+function checkPPVStabilization() {
+  if (!RES.activeToggles.ppv || RES.ppvCheckSlowed) return;
+  if (RES.elapsedSec < 600) return;
+  if (RES.vitals.hr == null || RES.vitals.hr <= 100) return;
+  if (RES.vitals.spo2 == null || RES.vitals.spo2 <= 90) return;
+  RES.ppvCheckSlowed = true;
+  if (respAlertIntervals.ppv) startRespiratorySupportAlerts('ppv', 60000);
+  showToast('✓ HR>100 & SpO₂>90% sustained at 10 min — PPV check now every 1 min');
+}
+function checkTimeAlerts() {
+  [60,300,600].forEach(mark => {
+    const key = 'apgar' + mark;
+    if (RES.elapsedSec >= mark && !RES.alertsFired[key]) {
+      RES.alertsFired[key] = true;
+      showToast(`⏰ ${mark/60} min mark — score Apgar`, 'warn');
+      flagTab('apgar');
+    }
+  });
+  if (RES.apgarExtended) {
+    if (RES.elapsedSec >= 900 && !RES.alertsFired['apgar15']) { RES.alertsFired['apgar15'] = true; showToast('⏰ 15 min — score Apgar','warn'); flagTab('apgar'); }
+    if (RES.elapsedSec >= 1200 && !RES.alertsFired['apgar20']) { RES.alertsFired['apgar20'] = true; showToast('⏰ 20 min — score Apgar','warn'); flagTab('apgar'); }
+  }
+  if (RES.elapsedSec >= 1200 && !RES.alertsFired['ethics20']) {
+    RES.alertsFired['ethics20'] = true;
+    showEthicsAlert();
+  }
+}
+function showEthicsAlert() {
+  const el = document.getElementById('alertBanner');
+  el.innerHTML = '⚠ 20 minutes of continuous resuscitation reached. If there is still no detectable heart rate or only minimal response, this is a reasonable point to discuss redirection or discontinuation of care with the clinical team and family.';
+  el.classList.add('show');
+  if (navigator.vibrate) navigator.vibrate([300,150,300,150,300]);
+  switchTab('live');
+}
+
+// ══════════════════════════════════════════════════════════════════════
+// EVENT LOG (single source of truth — feeds Timeline, Trend, Summary)
+// ══════════════════════════════════════════════════════════════════════
+function logEvent(type, label, detail) {
+  const id = RES.nextEventId++;
+  const ev = { id, tSec: RES.elapsedSec, wallTime: new Date(), type, label, detail: detail || null, needsDetail: !detail };
+  RES.events.push(ev);
+  if (currentTab === 'timeline') renderTimeline();
+  if (currentTab === 'trend') renderTrend();
+  renderLiveLog();
+  return id;
+}
+var DETAIL_KEY_LABELS = { hr:'HR', spo2:'SpO₂', fio2:'FiO₂', resp:'Resp', support:'Support', route:'Route', volume:'Volume', doseMg:'Dose', duration:'Duration', size:'Size', depth:'Depth', attempts:'Attempts', confirmation:'Confirmation', interface:'Interface', device:'Device', flow:'Flow', pip:'PIP', peep:'PEEP', condition:'Condition', destination:'Destination', method:'Method', fluid:'Fluid', site:'Site', confirmed:'Confirmed', rosc:'ROSC' };
+function summarizeDetail(ev) {
+  if (!ev.detail) return '';
+  const d = ev.detail;
+  const keys = Object.keys(d).filter(k => d[k] !== '' && d[k] != null && !(Array.isArray(d[k]) && d[k].length === 0));
+  if (keys.length === 1 && (keys[0] === 'summary' || keys[0] === 'cord')) return d[keys[0]];
+  return keys.map(k => {
+    let v = d[k];
+    if (Array.isArray(v)) v = v.join(', ');
+    return `${DETAIL_KEY_LABELS[k] || k}: ${v}`;
+  }).join(' · ');
+}
+
+// ══════════════════════════════════════════════════════════════════════
+// ASSESSMENT — one entry captures HR, SpO2 and FiO2 together so they can
+// be correlated (birth, periodic PPV/CPAP checks, and ad-hoc "+ Assessment")
+// ══════════════════════════════════════════════════════════════════════
+function openAssessmentModal(context) {
+  MODAL_STATE = {
+    hr: RES.vitals.hr ?? '',
+    spo2: RES.vitals.spo2 ?? '',
+    fio2: RES.vitals.fio2 ?? '',
+  };
+  currentModalEventId = null;
+  currentModalType = 'assessment';
+  renderAssessmentModal(context);
+  document.getElementById('detailModalOverlay').style.display = 'flex';
+  if (context) {
+    if (navigator.vibrate) navigator.vibrate([150,80,150]);
+    showToast(`⏰ 30s ${LABELS[context]} check due`, 'warn');
+  }
+}
+function renderAssessmentModal(context) {
+  let html = `<div class="modal-head"><h3>${context ? '⏰ ' + LABELS[context] + ' Check' : '＋ Assessment'}</h3><button class="modal-close" onclick="closeDetailModal()">✕</button></div>`;
+  html += `<div class="modal-time">Time: <b>${fmtClock(RES.elapsedSec)}</b> (auto)</div>`;
+  html += `<div class="field full"><label>Heart Rate (bpm)</label><input type="number" value="${MODAL_STATE.hr}" oninput="MODAL_STATE.hr=this.value"></div>`;
+  html += `<div class="field full" style="margin-top:10px"><label>SpO₂ (%)</label><input type="number" value="${MODAL_STATE.spo2}" oninput="MODAL_STATE.spo2=this.value; updateAssessmentTitrationHint();"></div>`;
+  html += `<div id="assessTitrationHint" class="card-note" style="margin:6px 0 0"></div>`;
+  html += `<div class="field full" style="margin-top:10px"><label>FiO₂ (%)</label><input type="number" value="${MODAL_STATE.fio2}" oninput="MODAL_STATE.fio2=this.value"></div>`;
+  html += `<div class="field full" style="margin-top:10px"><label>Respiratory status</label><div class="chip-group">` +
+    ['Apnoea','Gasping','Spontaneous breathing'].map(o => `<span class="chip${MODAL_STATE.resp===o?' on':''}" onclick="modalChipPick('resp',this,false)">${o}</span>`).join('') +
+    `</div></div>`;
+  html += `<div class="btn-row" style="margin-top:14px"><button class="btn secondary" onclick="closeDetailModal()">Skip</button><button class="btn primary" onclick="saveAssessment()">✓ Save</button></div>`;
+  document.getElementById('detailModalSheet').innerHTML = html;
+  updateAssessmentTitrationHint();
+}
+// Which respiratory support is active right now — read from the
+// intervention toggles rather than asked again in the Assessment form.
+function currentSupportLabel() {
+  if (RES.activeToggles.ppv) return 'PPV';
+  if (RES.activeToggles.cpap) return 'CPAP';
+  if (RES.activeToggles.oxygen) return 'Oxygen';
+  return 'Room air';
+}
+function updateAssessmentTitrationHint() {
+  const hint = document.getElementById('assessTitrationHint');
+  if (!hint) return;
+  const spo2 = parseFloat(MODAL_STATE.spo2);
+  hint.textContent = isNaN(spo2) ? '' : titrationSuggestion(spo2, RES.elapsedSec);
+}
+function saveAssessment() {
+  const hr = parseFloat(MODAL_STATE.hr);
+  const spo2 = parseFloat(MODAL_STATE.spo2);
+  const fio2 = parseFloat(MODAL_STATE.fio2);
+
+  const priorSpo2Entries = RES.vitalsLog.filter(v => v.type === 'spo2');
+  const priorSpo2 = priorSpo2Entries.length ? priorSpo2Entries[priorSpo2Entries.length - 1].value : null;
+
+  if (!isNaN(hr)) { RES.vitals.hr = hr; RES.vitalsLog.push({tSec: RES.elapsedSec, type:'hr', value:hr}); }
+  if (!isNaN(spo2)) { RES.vitals.spo2 = spo2; RES.vitalsLog.push({tSec: RES.elapsedSec, type:'spo2', value:spo2}); }
+  if (!isNaN(fio2)) { RES.vitals.fio2 = fio2; RES.vitalsLog.push({tSec: RES.elapsedSec, type:'fio2', value:fio2}); }
+  updateVitalsDisplay();
+  renderSpo2TargetBox();
+
+  let titration = '', escalation = '';
+  if (!isNaN(spo2)) {
+    titration = titrationSuggestion(spo2, RES.elapsedSec);
+    const t = spo2TargetForElapsed(RES.elapsedSec);
+    if (spo2 < t.lo && priorSpo2 !== null && spo2 <= priorSpo2) {
+      escalation = `⚠ SpO₂ remains below target (${t.lo}–${t.hi}%) and has not improved since last check (${priorSpo2}% → ${spo2}%). Consider escalating respiratory support / reviewing airway.`;
+    }
+  }
+
+  logEvent('assessment', 'Assessment', {
+    hr: !isNaN(hr) ? hr : '',
+    spo2: !isNaN(spo2) ? spo2 + '%' : '',
+    fio2: !isNaN(fio2) ? fio2 + '%' : '',
+    resp: MODAL_STATE.resp || '',
+    support: currentSupportLabel(),
+  });
+  renderAssessmentTable();
+  renderLiveLog();
+  closeDetailModal();
+  renderTrend();
+
+  if (escalation) {
+    const el = document.getElementById('alertBanner');
+    el.innerHTML = escalation;
+    el.classList.add('show');
+    if (navigator.vibrate) navigator.vibrate([250,120,250]);
+    showToast(escalation, 'danger');
+    switchTab('live');
+  } else {
+    showToast(titration || '✓ Assessment logged', titration.startsWith('↑') || titration.startsWith('↓') ? 'warn' : undefined);
+  }
+}
+function renderAssessmentTable() {
+  const wrap = document.getElementById('assessmentTableWrap');
+  if (!wrap) return;
+  const rows = RES.events.filter(e => e.type === 'assessment').sort((a,b) => a.tSec - b.tSec);
+  if (!rows.length) { wrap.innerHTML = '<div class="assess-empty">No assessments logged yet.</div>'; return; }
+  const recent = rows.slice(-3); // keep the Live screen compact; full history lives in the Timeline tab
+  let html = '<table class="assess-table"><tr><th>Time</th><th>HR</th><th>SpO₂</th><th>FiO₂</th></tr>';
+  recent.forEach(ev => {
+    html += `<tr><td class="time-col">${fmtClock(ev.tSec)}</td><td>${ev.detail.hr || '—'}</td><td>${ev.detail.spo2 || '—'}</td><td>${ev.detail.fio2 || '—'}</td></tr>`;
+  });
+  html += '</table>';
+  wrap.innerHTML = html;
+}
+
+// ══════════════════════════════════════════════════════════════════════
+// DYNAMIC SpO2 TARGET (updates every second against minutes-of-life)
+// ══════════════════════════════════════════════════════════════════════
+function renderSpo2TargetBox() {
+  const box = document.getElementById('spo2TargetBox');
+  if (!box) return;
+  const t = spo2TargetForElapsed(RES.elapsedSec);
+  const spo2 = RES.vitals.spo2;
+  let statusClass = 'unknown', statusText = '—';
+  if (spo2 != null) {
+    if (spo2 < t.lo) { statusClass = 'below'; statusText = '● BELOW TARGET'; }
+    else if (spo2 > t.hi) { statusClass = 'above'; statusText = '● ABOVE TARGET'; }
+    else { statusClass = 'within'; statusText = '✓ WITHIN TARGET'; }
+  }
+  box.innerHTML = `
+    <div class="stb-col"><div class="stb-label">Target SpO₂</div><div class="stb-value">${t.lo}–${t.hi}%</div></div>
+    <div class="stb-col"><div class="stb-label">Current SpO₂</div><div class="stb-value">${spo2 != null ? spo2 + '%' : '—'}</div></div>
+    <div class="stb-status ${statusClass}">${statusText}</div>
+  `;
+}
+
+// ══════════════════════════════════════════════════════════════════════
+// TIMELINE (Screen 6 — the core of the system)
+// ══════════════════════════════════════════════════════════════════════
+var ASSESSMENT_EVENT_TYPES = new Set(['assessment', 'cpr_check', 'initial_assessment']);
+var INTERVENTION_EVENT_TYPES = new Set(['ppv','cpap','oxygen','mask','ett','lma','cpr','uvc','io','adrenaline','volume','other','ppv_effective']);
+function timelineMarker(ev) {
+  if (ASSESSMENT_EVENT_TYPES.has(ev.type)) return '<span style="color:var(--blue-bright)">●</span> ';
+  if (INTERVENTION_EVENT_TYPES.has(ev.type)) return '<span style="color:var(--amber)">▲</span> ';
+  return '';
+}
+function renderTimeline() {
+  const list = document.getElementById('timelineList');
+  if (!RES.events.length) { list.innerHTML = '<div class="tl-empty">No events logged yet.</div>'; return; }
+  const sorted = [...RES.events].sort((a,b) => a.tSec - b.tSec);
+  list.innerHTML = sorted.map(ev => {
+    const detailStr = summarizeDetail(ev);
+    const flag = ev.needsDetail ? '<span class="tl-flag">tap to add detail</span>' : '';
+    const typeClass = ev.type === 'cpr' ? 'type-cpr' : (ev.type === 'adrenaline' ? 'type-drug' : '');
+    return `<div class="tl-item ${typeClass}" onclick="handleTimelineTap(${ev.id})">
+      <div class="tl-time">${fmtClock(ev.tSec)}</div>
+      <div class="tl-body"><div class="tl-label">${timelineMarker(ev)}${ev.label}</div>${detailStr?`<div class="tl-detail">${detailStr}</div>`:''}${flag}</div>
+    </div>`;
+  }).join('');
+}
+function handleTimelineTap(id) {
+  const ev = RES.events.find(e => e.id === id);
+  if (!ev) return;
+  if (ev.type === 'adrenaline') { openAdrenalineEditModal(ev); return; }
+  if (DETAIL_FIELDS[ev.type]) openDetailModal(ev.type, ev.id);
+}
+
+// ══════════════════════════════════════════════════════════════════════
+// INTERVENTION GRID (Screen 3 — the main live screen)
+// ══════════════════════════════════════════════════════════════════════
+function renderInterventionGrid() {
+  const grid = document.getElementById('interventionGrid');
+  grid.innerHTML = INTERVENTIONS.map(iv => {
+    const isActive = RES.activeToggles[iv.key];
+    const classes = ['ibtn', 'cat-' + iv.cat];
+    if (iv.special) classes.push('emergency');
+    if (isActive) classes.push('active-toggle');
+    const label = isActive ? '⏸ Stop ' + iv.label : iv.label;
+    return `<button class="${classes.join(' ')}" onclick="handleInterventionTap('${iv.key}')"><span class="ibtn-icon">${iv.icon}</span>${label}</button>`;
+  }).join('');
+  renderPPVEffectiveRow();
+  renderPPVIntubationRow();
+}
+function renderPPVEffectiveRow() {
+  const row = document.getElementById('ppvEffectiveRow');
+  if (!row) return;
+  const alreadyMarked = RES.events.some(e => e.type === 'ppv_effective');
+  row.innerHTML = (RES.activeToggles.ppv && !alreadyMarked)
+    ? `<button class="btn" style="margin-top:8px;border-color:var(--teal);color:var(--teal)" onclick="openEffectivePPVModal()">✓ Mark Effective PPV</button>`
+    : '';
+}
+function renderPPVIntubationRow() {
+  const row = document.getElementById('ppvIntubationRow');
+  if (!row) return;
+  const needsIntubation = RES.activeToggles.ppv && RES.ppvMaskCycles >= 3 && !RES.events.some(e => e.type === 'ett');
+  row.innerHTML = needsIntubation
+    ? `<button class="btn danger needs-attention" style="margin-top:8px" onclick="handleInterventionTap('ett')">⚠ 3 cycles of PPV on mask — consider intubation</button>`
+    : '';
+}
+function openEffectivePPVModal() {
+  MODAL_STATE = {};
+  currentModalEventId = null;
+  currentModalType = 'ppv_effective';
+  document.getElementById('detailModalSheet').innerHTML = `
+    <div class="modal-head"><h3>Effective PPV</h3><button class="modal-close" onclick="closeDetailModal()">✕</button></div>
+    <div class="modal-time">Time: <b>${fmtClock(RES.elapsedSec)}</b> (auto)</div>
+    <div class="field full"><label>Indicator</label><div class="chip-group">${['Rising HR','Chest rise','Both'].map(o=>`<span class="chip" onclick="modalChipPick('indicator',this,false)">${o}</span>`).join('')}</div></div>
+    <div class="btn-row" style="margin-top:14px"><button class="btn secondary" onclick="closeDetailModal()">Cancel</button><button class="btn primary" onclick="saveEffectivePPV()">✓ Confirm</button></div>
+  `;
+  document.getElementById('detailModalOverlay').style.display = 'flex';
+}
+function saveEffectivePPV() {
+  logEvent('ppv_effective', 'Effective PPV', { indicator: MODAL_STATE.indicator || '' });
+  closeDetailModal();
+  renderPPVEffectiveRow();
+  showToast('✓ Effective PPV logged');
+  if (!RES.ppvEffectiveMarkedThisSession) {
+    RES.ppvEffectiveMarkedThisSession = true;
+    clearPPVEffectiveTimeout();
+    if (RES.activeToggles.ppv) startRespiratorySupportAlerts('ppv'); // 30s PPV check now begins
+  }
+}
+// Only one respiratory support (PPV / CPAP / Oxygen) can be active at a
+// time — starting any one of them automatically stops whichever other one
+// was running (no response modal — this is an automatic transition, not
+// a manual stop).
+var RESP_SUPPORT_AUTOSTOP = { ppv: ['cpap','oxygen'], cpap: ['ppv','oxygen'], oxygen: ['ppv','cpap'] };
+function autoStopRespSupport(key, reasonLabel) {
+  if (!RES.activeToggles[key]) return;
+  RES.activeToggles[key] = false;
+  logEvent(key, `${LABELS[key]} stopped (auto — ${reasonLabel} started)`);
+  stopRespiratorySupportAlerts(key);
+  if (key === 'ppv') clearPPVEffectiveTimeout();
+}
+function clearPPVEffectiveTimeout() {
+  clearTimeout(RES.ppvEffectiveTimeout);
+  RES.ppvEffectiveTimeout = null;
+}
+// If Effective PPV hasn't been marked within 15s of starting PPV, prompt
+// the MASK corrective-steps checklist.
+function promptMaskCheck() {
+  RES.ppvEffectiveTimeout = null;
+  if (!RES.activeToggles.ppv || RES.ppvEffectiveMarkedThisSession) return;
+  showToast('⚠ No effective PPV after 15s — run MASK corrective steps', 'danger');
+  if (navigator.vibrate) navigator.vibrate([250,120,250]);
+  handleInterventionTap('mask');
+}
+
+function handleInterventionTap(key) {
+  if (!RES.birthTime) { showToast('Record birth time first', 'warn'); return; }
+  const iv = INTERVENTIONS.find(i => i.key === key);
+  if (iv.special === 'cpr') { openCPR(); return; }
+  if (iv.special === 'adrenaline') { openAdrenalineModal(); return; }
+  if (iv.toggle) {
+    if (!RES.activeToggles[key]) {
+      (RESP_SUPPORT_AUTOSTOP[key] || []).forEach(k => autoStopRespSupport(k, LABELS[key]));
+      if (key === 'ppv') {
+        RES.ppvMaskCycles = 0;
+        RES.ppvEffectiveMarkedThisSession = false;
+        RES.ppvCheckSlowed = false;
+        clearPPVEffectiveTimeout();
+        RES.ppvEffectiveTimeout = setTimeout(promptMaskCheck, 15000);
+      }
+      RES.activeToggles[key] = true;
+      const id = logEvent(key, `${LABELS[key]} started`);
+      renderInterventionGrid();
+      openDetailModal(key, id);
+      // PPV's periodic 30s check only starts once Effective PPV is first
+      // marked (see saveEffectivePPV) — CPAP's starts immediately as before.
+      if (key !== 'ppv') startRespiratorySupportAlerts(key);
+    } else {
+      RES.activeToggles[key] = false;
+      logEvent(key, `${LABELS[key]} stopped`);
+      renderInterventionGrid();
+      showToast(`${LABELS[key]} stopped — time logged`);
+      stopRespiratorySupportAlerts(key);
+      if (key === 'ppv') clearPPVEffectiveTimeout();
+      openResponseModal(key);
+    }
+    return;
+  }
+  const id = logEvent(key, LABELS[key]);
+  openDetailModal(key, id);
+}
+
+// ══════════════════════════════════════════════════════════════════════
+// RESPONSE — "what happened after the intervention", not just what was done
+// ══════════════════════════════════════════════════════════════════════
+function openResponseModal(context) {
+  MODAL_STATE = {};
+  currentModalEventId = null;
+  currentModalType = 'response';
+  document.getElementById('detailModalSheet').innerHTML = `
+    <div class="modal-head"><h3>Response — after ${LABELS[context]}</h3><button class="modal-close" onclick="closeDetailModal()">✕</button></div>
+    <div class="modal-time">Time: <b>${fmtClock(RES.elapsedSec)}</b> (auto)</div>
+    <div class="field full"><label>Heart Rate</label><div class="chip-group">${['Increased','Unchanged','Decreased'].map(o=>`<span class="chip" onclick="modalChipPick('hrTrend',this,false)">${o}</span>`).join('')}</div></div>
+    <div class="field full" style="margin-top:10px"><label>Respiration</label><div class="chip-group">${['Improved','No improvement'].map(o=>`<span class="chip" onclick="modalChipPick('respTrend',this,false)">${o}</span>`).join('')}</div></div>
+    <div class="field full" style="margin-top:10px"><label>SpO₂ (%)</label><input type="number" oninput="MODAL_STATE.spo2=this.value"></div>
+    <div class="btn-row" style="margin-top:14px"><button class="btn secondary" onclick="closeDetailModal()">Skip</button><button class="btn primary" onclick="saveResponse('${context}')">✓ Save</button></div>
+  `;
+  document.getElementById('detailModalOverlay').style.display = 'flex';
+}
+function saveResponse(context) {
+  logEvent('response', `Response after ${LABELS[context]}`, {
+    hr: MODAL_STATE.hrTrend || '',
+    resp: MODAL_STATE.respTrend || '',
+    spo2: MODAL_STATE.spo2 ? MODAL_STATE.spo2 + '%' : '',
+  });
+  closeDetailModal();
+  showToast('✓ Response logged');
+}
+
+// ══════════════════════════════════════════════════════════════════════
+// GENERIC DETAIL MODAL (Screen 4 — record event first, detail can wait)
+// ══════════════════════════════════════════════════════════════════════
+var currentModalEventId = null;
+var currentModalType = null;
+var MODAL_STATE = {};
+var MODAL_TITLES = { ppv:'PPV', cpap:'CPAP', oxygen:'Oxygen', mask:'MASK', ett:'ETT / Intubation', lma:'LMA', uvc:'UVC', io:'IO Access', volume:'Volume Bolus', other:'Other' };
+
+function openDetailModal(type, eventId) {
+  currentModalEventId = eventId;
+  currentModalType = type;
+  const ev = RES.events.find(e => e.id === eventId);
+  MODAL_STATE = Object.assign({}, ev && ev.detail ? ev.detail : {});
+  const fields = DETAIL_FIELDS[type] || [];
+  fields.forEach(f => { if (f.value !== undefined && MODAL_STATE[f.id] === undefined) MODAL_STATE[f.id] = f.value; });
+
+  if (type === 'ppv') {
+    renderPPVDetailModal(ev);
+    document.getElementById('detailModalOverlay').style.display = 'flex';
+    return;
+  }
+
+  let html = `<div class="modal-head"><h3>${MODAL_TITLES[type] || type}</h3><button class="modal-close" onclick="closeDetailModal()">✕</button></div>`;
+  html += `<div class="modal-time">Time: <b>${ev ? fmtClock(ev.tSec) : fmtClock(RES.elapsedSec)}</b> (auto)</div>`;
+  fields.forEach(f => {
+    if (f.type === 'chip') {
+      html += `<div class="field full"><label>${f.label}</label><div class="chip-group">` +
+        f.options.map(o => `<span class="chip${MODAL_STATE[f.id]===o?' on':''}" onclick="modalChipPick('${f.id}',this,false)">${o}</span>`).join('') +
+        `</div></div>`;
+    } else if (f.type === 'multi') {
+      const sel = Array.isArray(MODAL_STATE[f.id]) ? MODAL_STATE[f.id] : [];
+      html += `<div class="field full"><label>${f.label}</label><div class="chip-group">` +
+        f.options.map(o => `<span class="chip${sel.includes(o)?' on':''}" onclick="modalChipPick('${f.id}',this,true)">${o}</span>`).join('') +
+        `</div></div>`;
+    } else if (f.type === 'toggle') {
+      const handler = f.onCheck ? `${f.onCheck}(this.checked)` : `MODAL_STATE['${f.id}']=this.checked`;
+      html += `<label class="checkbox-row"><input type="checkbox" ${MODAL_STATE[f.id]?'checked':''} onchange="${handler}"> ${f.label}</label>`;
+    } else {
+      html += `<div class="field full"><label>${f.label}</label><input type="${f.type}" ${f.step?`step="${f.step}"`:''} value="${MODAL_STATE[f.id]!==undefined?MODAL_STATE[f.id]:''}" oninput="MODAL_STATE['${f.id}']=this.value"></div>`;
+    }
+  });
+  html += `<div class="btn-row" style="margin-top:14px"><button class="btn secondary" onclick="closeDetailModal()">Later</button><button class="btn primary" onclick="saveDetailModal()">✓ Save</button></div>`;
+  document.getElementById('detailModalSheet').innerHTML = html;
+  document.getElementById('detailModalOverlay').style.display = 'flex';
+}
+
+// PPV needs its own renderer: PIP/PEEP only apply to a T-piece (not a
+// self-inflating bag), so the form must react live to the Device choice
+// without losing any fields the user has already typed into MODAL_STATE.
+function renderPPVDetailModal(ev) {
+  const device = MODAL_STATE.device;
+  const showPipPeep = device === 'T-piece';
+  let html = `<div class="modal-head"><h3>PPV</h3><button class="modal-close" onclick="closeDetailModal()">✕</button></div>`;
+  html += `<div class="modal-time">Time: <b>${ev ? fmtClock(ev.tSec) : fmtClock(RES.elapsedSec)}</b> (auto)</div>`;
+  html += `<div class="field full"><label>Interface</label><div class="chip-group">` +
+    ['Mask','ETT','LMA','Other'].map(o => `<span class="chip${MODAL_STATE.interface===o?' on':''}" onclick="modalChipPick('interface',this,false)">${o}</span>`).join('') +
+    `</div></div>`;
+  html += `<div class="field full" style="margin-top:10px"><label>Device</label><div class="chip-group">` +
+    ['T-piece','Self-inflating bag'].map(o => `<span class="chip${device===o?' on':''}" onclick="ppvDevicePick('${o}')">${o}</span>`).join('') +
+    `</div></div>`;
+  html += `<div class="field full" style="margin-top:10px"><label>Gas flow (L/min)</label><input type="number" value="${MODAL_STATE.flow ?? 10}" oninput="MODAL_STATE.flow=this.value"></div>`;
+  if (showPipPeep) {
+    html += `<div class="field full" style="margin-top:10px"><label>PIP (cmH₂O)</label><input type="number" value="${MODAL_STATE.pip ?? 20}" oninput="MODAL_STATE.pip=this.value"></div>`;
+    html += `<div class="field full" style="margin-top:10px"><label>PEEP (cmH₂O)</label><input type="number" value="${MODAL_STATE.peep ?? 5}" oninput="MODAL_STATE.peep=this.value"></div>`;
+  }
+  html += `<div class="field full" style="margin-top:10px"><label>FiO₂ (%)</label><input type="number" value="${MODAL_STATE.fio2 ?? ''}" oninput="MODAL_STATE.fio2=this.value"></div>`;
+  html += `<div class="btn-row" style="margin-top:14px"><button class="btn secondary" onclick="closeDetailModal()">Later</button><button class="btn primary" onclick="saveDetailModal()">✓ Save</button></div>`;
+  document.getElementById('detailModalSheet').innerHTML = html;
+}
+function ppvDevicePick(device) {
+  MODAL_STATE.device = device;
+  if (device === 'T-piece') {
+    if (MODAL_STATE.pip === undefined) MODAL_STATE.pip = 20;
+    if (MODAL_STATE.peep === undefined) MODAL_STATE.peep = 5;
+  } else {
+    delete MODAL_STATE.pip;
+    delete MODAL_STATE.peep;
+  }
+  renderPPVDetailModal(RES.events.find(e => e.id === currentModalEventId));
+}
+
+// MASK's "K — Key Alternative airway" step means intubation is being
+// pursued: save the checklist as-is, then open the ETT flow directly.
+function tickAlternativeAirway(checked) {
+  MODAL_STATE.k = checked;
+  if (checked) {
+    saveDetailModal();
+    showToast('➡ Alternative airway indicated — opening intubation', 'warn');
+    handleInterventionTap('ett');
+  }
+}
+function modalChipPick(fieldId, el, multi) {
+  if (multi) {
+    el.classList.toggle('on');
+    MODAL_STATE[fieldId] = [...el.parentElement.children].filter(c => c.classList.contains('on')).map(c => c.textContent);
+  } else {
+    [...el.parentElement.children].forEach(c => c.classList.remove('on'));
+    el.classList.add('on');
+    MODAL_STATE[fieldId] = el.textContent;
+  }
+}
+function saveDetailModal() {
+  const ev = RES.events.find(e => e.id === currentModalEventId);
+  if (ev) { ev.detail = Object.assign({}, MODAL_STATE); ev.needsDetail = false; }
+  // Carry the FiO2 entered when starting PPV/CPAP/Oxygen forward so the
+  // periodic 30s checks default to the last entered value.
+  if (RESP_SUPPORT_KEYS.includes(currentModalType) && MODAL_STATE.fio2 !== undefined && MODAL_STATE.fio2 !== '') {
+    const fio2 = parseFloat(MODAL_STATE.fio2);
+    if (!isNaN(fio2)) {
+      RES.vitals.fio2 = fio2;
+      RES.vitalsLog.push({ tSec: ev ? ev.tSec : RES.elapsedSec, type:'fio2', value: fio2 });
+      updateVitalsDisplay();
+    }
+  }
+  closeDetailModal();
+  showToast('✓ Details saved');
+  renderTimeline();
+  renderTrend();
+  renderPPVIntubationRow();
+  // Keep the CPR sheet's "needs intubation" / UVC-highlight states fresh
+  // if this detail (e.g. ETT, UVC) was logged while CPR is on-screen.
+  if (document.getElementById('cprOverlay').style.display === 'flex') renderCPR();
+}
+function closeDetailModal() {
+  document.getElementById('detailModalOverlay').style.display = 'none';
+  currentModalEventId = null;
+  currentModalType = null;
+  MODAL_STATE = {};
+}
+
+// ══════════════════════════════════════════════════════════════════════
+// ADRENALINE (dose-counted, reachable from grid or CPR overlay)
+// ══════════════════════════════════════════════════════════════════════
+function adrenalineDoseFor(route) {
+  if (!RES.bw) return null;
+  const kg = RES.bw / 1000;
+  const isETT = route === 'ETT';
+  const mgPerKg = isETT ? 0.1 : 0.02;
+  const mlPerKg = isETT ? 1.0 : 0.2;
+  return {
+    mgPerKg, mlPerKg,
+    doseMg: Math.round(mgPerKg * kg * 10) / 10,
+    volumeML: Math.round(mlPerKg * kg * 10) / 10,
+  };
+}
+function openAdrenalineModal() {
+  const n = RES.adrenalineCount + 1;
+  MODAL_STATE = { route: 'IV' };
+  currentModalEventId = null;
+  renderAdrenalineModal(n);
+  document.getElementById('detailModalOverlay').style.display = 'flex';
+}
+function renderAdrenalineModal(n) {
+  const route = MODAL_STATE.route || 'IV';
+  const dose = adrenalineDoseFor(route);
+  if (dose && (MODAL_STATE.volume === undefined || MODAL_STATE.autoVolume !== false)) {
+    MODAL_STATE.volume = dose.volumeML;
+    MODAL_STATE.autoVolume = true;
+  }
+  const kgLabel = RES.bw ? `${(RES.bw/1000).toFixed(1)} kg` : null;
+  document.getElementById('detailModalSheet').innerHTML = `
+    <div class="modal-head"><h3>Adrenaline #${n}</h3><button class="modal-close" onclick="closeDetailModal()">✕</button></div>
+    <div class="modal-time">Time: <b>${fmtClock(RES.elapsedSec)}</b> (auto)</div>
+    <div class="field full"><label>Route</label><div class="chip-group">${['UVC','IV','IO','ETT'].map(o=>`<span class="chip${route===o?' on':''}" onclick="adrenalineRoutePick('${o}',${n})">${o}</span>`).join('')}</div></div>
+    <div class="card-note" style="margin:10px 0 0">${dose
+      ? `${dose.mgPerKg} mg/kg (${dose.mlPerKg} mL/kg of 1:10,000) for weight ${kgLabel} → suggested ${dose.doseMg} mg = ${dose.volumeML} mL`
+      : 'Enter birth weight on the Prep screen for an auto-calculated dose'}</div>
+    <div class="field full" style="margin-top:10px"><label>Volume to give (mL of 1:10,000)</label><input type="number" step="0.1" value="${MODAL_STATE.volume ?? ''}" oninput="MODAL_STATE.volume=this.value; MODAL_STATE.autoVolume=false;"></div>
+    <div class="btn-row" style="margin-top:14px"><button class="btn secondary" onclick="closeDetailModal()">Cancel</button><button class="btn danger" onclick="administerAdrenaline(${n})">✓ ADMINISTER</button></div>
+  `;
+}
+function adrenalineRoutePick(route, n) {
+  MODAL_STATE.route = route;
+  renderAdrenalineModal(n);
+}
+function administerAdrenaline(n) {
+  RES.adrenalineCount = n;
+  const dose = adrenalineDoseFor(MODAL_STATE.route || 'IV');
+  logEvent('adrenaline', `Adrenaline #${n} administered`, {
+    route: MODAL_STATE.route || '',
+    volume: (MODAL_STATE.volume !== undefined && MODAL_STATE.volume !== '') ? MODAL_STATE.volume + ' mL' : '',
+    doseMg: dose ? dose.doseMg + ' mg' : '',
+  });
+  closeDetailModal();
+  showToast(`✓ Adrenaline #${n} logged`);
+  if (RES.cprEscalation && RES.cprEscalation.needsAdrenaline) {
+    RES.cprEscalation.needsAdrenaline = false;
+    if (document.getElementById('cprOverlay').style.display === 'flex') renderCPR();
+  }
+}
+function openAdrenalineEditModal(ev) {
+  MODAL_STATE = Object.assign({}, ev.detail || {});
+  currentModalEventId = ev.id;
+  document.getElementById('detailModalSheet').innerHTML = `
+    <div class="modal-head"><h3>${ev.label}</h3><button class="modal-close" onclick="closeDetailModal()">✕</button></div>
+    <div class="modal-time">Time: <b>${fmtClock(ev.tSec)}</b></div>
+    <div class="field full"><label>Route</label><input type="text" value="${MODAL_STATE.route||''}" oninput="MODAL_STATE.route=this.value"></div>
+    <div class="field full" style="margin-top:8px"><label>Volume given (mL of 1:10,000)</label><input type="number" step="0.1" value="${(MODAL_STATE.volume||'').toString().replace(' mL','')}" oninput="MODAL_STATE.volume=this.value+' mL'"></div>
+    <div class="btn-row" style="margin-top:14px"><button class="btn secondary" onclick="closeDetailModal()">Close</button><button class="btn primary" onclick="saveDetailModal()">✓ Save</button></div>
+  `;
+  document.getElementById('detailModalOverlay').style.display = 'flex';
+}
+
+// ══════════════════════════════════════════════════════════════════════
+// CPR MODE (Screen 5 — full-screen takeover with its own timer)
+// ══════════════════════════════════════════════════════════════════════
+function openCPR() {
+  RES.cprElapsedSec = 0;
+  RES.cprEscalation = { lastMinute: null, needsAdrenaline: false, needsUVC: false };
+  logEvent('cpr', 'CPR started');
+  clearInterval(RES.cprInterval);
+  RES.cprInterval = setInterval(cprTick, 1000);
+
+  // PPV/CPAP checks pause while CPR is running — the 1-min CPR check takes
+  // over — and resume automatically once CPR stops (see stopCPR()).
+  RES.pausedRespAlerts = PERIODIC_CHECK_KEYS.filter(k => respAlertIntervals[k] !== null);
+  RES.pausedRespAlerts.forEach(k => stopRespiratorySupportAlerts(k));
+
+  renderCPR();
+  document.getElementById('cprOverlay').style.display = 'flex';
+  if (navigator.vibrate) navigator.vibrate([200,100,200]);
+  startCPRVitalsAlerts();
+  if (RES.vitals.fio2 !== 100) {
+    showToast('⚠ Increase FiO₂ to 100% for CPR', 'danger');
+  }
+  if (!RES.events.some(e => e.type === 'ett')) {
+    showToast('⚠ Consider intubation (ETT) for effective ventilation during CPR', 'warn');
+  }
+}
+function cprTick() {
+  RES.cprElapsedSec += 1;
+  const el = document.getElementById('cprTimeVal');
+  if (el) el.textContent = fmtClock(RES.cprElapsedSec);
+}
+function stopCPR() {
+  clearInterval(RES.cprInterval);
+  RES.cprInterval = null;
+  const duration = fmtClock(RES.cprElapsedSec);
+  logEvent('cpr', 'CPR stopped', {duration});
+  document.getElementById('cprOverlay').style.display = 'none';
+  renderInterventionGrid();
+  showToast(`CPR stopped — duration ${duration}`);
+  stopCPRVitalsAlerts();
+
+  // Go back to PPV/CPAP checks — resume whichever were paused, but only if
+  // that support is still active (it may have been stopped during CPR).
+  (RES.pausedRespAlerts || []).forEach(k => { if (RES.activeToggles[k]) startRespiratorySupportAlerts(k); });
+  RES.pausedRespAlerts = [];
+
+  openCPRResponseModal();
+}
+function openCPRResponseModal() {
+  MODAL_STATE = {};
+  currentModalEventId = null;
+  currentModalType = 'cpr_response';
+  document.getElementById('detailModalSheet').innerHTML = `
+    <div class="modal-head"><h3>Response to CPR</h3><button class="modal-close" onclick="closeDetailModal()">✕</button></div>
+    <div class="modal-time">Time: <b>${fmtClock(RES.elapsedSec)}</b> (auto)</div>
+    <div class="field full"><label>Heart Rate</label><div class="chip-group">${['≥60','<60'].map(o=>`<span class="chip" onclick="modalChipPick('hrLevel',this,false)">${o}</span>`).join('')}</div></div>
+    <div class="field full" style="margin-top:10px"><label>ROSC</label><div class="chip-group">${['Yes','No'].map(o=>`<span class="chip" onclick="modalChipPick('rosc',this,false)">${o}</span>`).join('')}</div></div>
+    <div class="btn-row" style="margin-top:14px"><button class="btn secondary" onclick="closeDetailModal()">Skip</button><button class="btn primary" onclick="saveCPRResponse()">✓ Save</button></div>
+  `;
+  document.getElementById('detailModalOverlay').style.display = 'flex';
+}
+function saveCPRResponse() {
+  logEvent('cpr_response', 'Response to CPR', { hr: MODAL_STATE.hrLevel || '', rosc: MODAL_STATE.rosc || '' });
+  closeDetailModal();
+  showToast('✓ CPR response logged');
+}
+function setCPRFio2To100() {
+  RES.vitals.fio2 = 100;
+  RES.vitalsLog.push({ tSec: RES.elapsedSec, type:'fio2', value:100 });
+  logEvent('vital_fio2', 'FiO₂ 100%');
+  updateVitalsDisplay();
+  renderCPR();
+  renderTrend();
+  showToast('✓ FiO₂ set to 100%');
+}
+function renderCPR() {
+  const sheet = document.getElementById('cprSheet');
+  const fio2Ready = RES.vitals.fio2 === 100;
+  const needsIntubation = !RES.events.some(e => e.type === 'ett');
+  const esc = RES.cprEscalation || {};
+  const needsUVCNow = esc.needsUVC && !RES.events.some(e => e.type === 'uvc');
+  const pendingCheckHtml = RES.pendingChecks.has('cpr') ? `
+    <div class="btn-row" style="margin-bottom:10px">
+      <button class="btn" style="border-color:var(--amber);color:var(--amber)" onclick="resumePendingCheck('cpr')">⏰ 1-min check due — tap to enter</button>
+      <button class="btn secondary" style="flex:0 0 auto;width:auto;padding:11px 14px" onclick="dismissPendingCheck('cpr')">Leave blank</button>
+    </div>` : '';
+  sheet.innerHTML = `
+    <div class="cpr-banner">⚠ CPR IN PROGRESS</div>
+    <div class="cpr-time-label">CPR Time</div>
+    <div class="cpr-time" id="cprTimeVal">00:00</div>
+    <div class="vitals-row">
+      <div class="vital-box hr" onclick="openQuickEntry('hr')"><div class="vb-label">HR</div><div class="vb-value" id="cprHR">${RES.vitals.hr ?? '—'}</div><div class="vb-hint">tap to enter</div></div>
+      <div class="vital-box spo2" onclick="openQuickEntry('spo2')"><div class="vb-label">SpO₂</div><div class="vb-value" id="cprSpO2">${RES.vitals.spo2 ?? '—'}</div><div class="vb-hint">tap to enter</div></div>
+      <div class="vital-box fio2${fio2Ready?'':' needs-fio2'}" onclick="openQuickEntry('fio2')"><div class="vb-label">FiO₂</div><div class="vb-value" id="cprFiO2">${RES.vitals.fio2 ?? 21}%</div><div class="vb-hint">tap to enter</div></div>
+    </div>
+    ${fio2Ready ? '' : `<button class="btn danger" style="margin-bottom:10px" onclick="setCPRFio2To100()">⚠ Set FiO₂ to 100% now</button>`}
+    ${needsIntubation ? `<button class="btn danger" style="margin-bottom:12px" onclick="handleInterventionTap('ett')">🫁 Intubate (ETT) — not yet done</button>` : ''}
+    ${pendingCheckHtml}
+    <div class="field full" style="margin-bottom:10px"><label>Ventilation</label>
+      <div class="chip-group">${['ETT','LMA','Mask'].map(o=>`<span class="chip${RES.fields.cprVent===o?' on':''}" onclick="chipPick('cprVent',this)">${o}</span>`).join('')}</div>
+    </div>
+    <div class="cpr-log-title">Event Log</div>
+    <div class="cpr-log">${buildEventLogHtml('cpr-log-empty')}</div>
+    <div class="btn-row" style="margin-bottom:8px">
+      <button class="btn danger${esc.needsAdrenaline?' needs-attention':''}" onclick="openAdrenalineModal()">💊 ADRENALINE</button>
+      <button class="btn${needsUVCNow?' needs-attention':''}" onclick="handleInterventionTap('uvc')">🩸 UVC</button>
+    </div>
+    <div class="btn-row" style="margin-bottom:14px">
+      <button class="btn" onclick="handleInterventionTap('volume')">🧴 VOLUME</button>
+    </div>
+    <button class="btn primary" style="background:#fff;color:var(--red)" onclick="stopCPR()">■ STOP CPR</button>
+  `;
+}
+// Live event log shown directly on the CPR screen (most recent first) so
+// the team can see what's already been done without leaving CPR mode.
+// Live event log — shared by the CPR screen and the main Live screen so
+// assessments and interventions are visible without switching tabs.
+function buildEventLogHtml(emptyClass) {
+  const sorted = [...RES.events].sort((a,b) => b.tSec - a.tSec);
+  if (!sorted.length) return `<div class="${emptyClass}">No events logged yet.</div>`;
+  return sorted.map(ev => {
+    const detailStr = summarizeDetail(ev);
+    return `<div class="cpr-log-item">${timelineMarker(ev)}<b>${fmtClock(ev.tSec)}</b> ${ev.label}${detailStr ? ' — ' + detailStr : ''}</div>`;
+  }).join('');
+}
+function renderLiveLog() {
+  const wrap = document.getElementById('liveLogWrap');
+  if (wrap) wrap.innerHTML = buildEventLogHtml('cpr-log-empty');
+}
+
+// ══════════════════════════════════════════════════════════════════════
+// PERIODIC CHECK PROMPTS
+// · PPV / CPAP — every 30s: opens the full Assessment modal (HR, SpO₂, FiO₂,
+//   respiratory status, support) so trends can be correlated
+// · OXYGEN (standalone) — no forced interval; FiO₂ changes are simply
+//   logged whenever an assessment is made, without a fixed cadence
+// · CPR — every 1 min: HR, SpO₂ only
+// ══════════════════════════════════════════════════════════════════════
+var respAlertIntervals = { ppv:null, cpap:null, oxygen:null };
+var cprAlertInterval = null;
+var RESP_SUPPORT_KEYS = ['ppv','cpap','oxygen'];
+var PERIODIC_CHECK_KEYS = ['ppv','cpap']; // oxygen deliberately excluded — see note above
+
+function startRespiratorySupportAlerts(key, intervalMs) {
+  if (!PERIODIC_CHECK_KEYS.includes(key)) return;
+  clearInterval(respAlertIntervals[key]);
+  respAlertIntervals[key] = setInterval(() => {
+    if (key === 'ppv') checkPPVMaskCycle();
+    tryOpenPeriodicCheck(key);
+  }, intervalMs || 30000);
+}
+// Each 30s periodic check while PPV is running via a mask counts as one
+// "cycle" of mask ventilation. After 3 cycles without escalation, prompt
+// to consider intubation (the button appears on the Live screen).
+function checkPPVMaskCycle() {
+  const lastPPVStart = [...RES.events].reverse().find(e => e.type === 'ppv' && /started/.test(e.label));
+  const interfaceUsed = lastPPVStart && lastPPVStart.detail ? lastPPVStart.detail.interface : null;
+  if (interfaceUsed !== 'Mask') return;
+  RES.ppvMaskCycles = (RES.ppvMaskCycles || 0) + 1;
+  if (RES.ppvMaskCycles >= 3 && !RES.events.some(e => e.type === 'ett')) {
+    const el = document.getElementById('alertBanner');
+    el.innerHTML = '⚠ 3 cycles of PPV via mask without escalation — consider intubation (ETT).';
+    el.classList.add('show');
+    if (navigator.vibrate) navigator.vibrate([250,120,250]);
+    showToast('⚠ 3 cycles of mask PPV — consider intubation', 'danger');
+    renderPPVIntubationRow();
+  }
+}
+function stopRespiratorySupportAlerts(key) {
+  if (!RESP_SUPPORT_KEYS.includes(key)) return;
+  clearInterval(respAlertIntervals[key]);
+  respAlertIntervals[key] = null;
+  RES.pendingChecks.delete(key);
+  renderPendingChecks();
+}
+function anyRespiratorySupportActive() {
+  return RESP_SUPPORT_KEYS.some(k => RES.activeToggles[k]);
+}
+function startCPRVitalsAlerts() {
+  clearInterval(cprAlertInterval);
+  cprAlertInterval = setInterval(() => tryOpenPeriodicCheck('cpr'), 60000);
+}
+function stopCPRVitalsAlerts() {
+  clearInterval(cprAlertInterval);
+  cprAlertInterval = null;
+  RES.pendingChecks.delete('cpr');
+  renderPendingChecks();
+}
+
+// A periodic check must never silently overwrite a detail entry (e.g.
+// Adrenaline/UVC/Volume) the scribe is mid-way through. If the modal is
+// already open, defer the check as a dismissible prompt instead — it can
+// be entered later or left blank, never forced.
+function tryOpenPeriodicCheck(key) {
+  if (document.getElementById('detailModalOverlay').style.display === 'flex') {
+    RES.pendingChecks.add(key);
+    showToast(`⏰ ${key === 'cpr' ? 'CPR' : LABELS[key]} check due — finish current entry first`, 'warn');
+    renderPendingChecks();
+  } else {
+    RES.pendingChecks.delete(key);
+    if (key === 'cpr') openVitalsCheckModal('cpr'); else openAssessmentModal(key);
+  }
+}
+function resumePendingCheck(key) {
+  RES.pendingChecks.delete(key);
+  renderPendingChecks();
+  if (key === 'cpr') openVitalsCheckModal('cpr'); else openAssessmentModal(key);
+}
+function dismissPendingCheck(key) {
+  RES.pendingChecks.delete(key);
+  renderPendingChecks();
+  showToast('Check left blank — will prompt again next cycle');
+}
+function renderPendingChecks() {
+  const liveRow = document.getElementById('pendingCheckRow');
+  if (liveRow) {
+    const items = [...RES.pendingChecks].filter(k => k !== 'cpr');
+    liveRow.innerHTML = items.map(k => `
+      <div class="btn-row" style="margin-top:6px">
+        <button class="btn" style="border-color:var(--amber);color:var(--amber)" onclick="resumePendingCheck('${k}')">⏰ ${LABELS[k]} check due — tap to enter</button>
+        <button class="btn secondary" style="flex:0 0 auto;width:auto;padding:11px 14px" onclick="dismissPendingCheck('${k}')">Leave blank</button>
+      </div>`).join('');
+  }
+  if (document.getElementById('cprOverlay') && document.getElementById('cprOverlay').style.display === 'flex') renderCPR();
+}
+
+// SpO₂ target by minutes of life — feeds the dynamic target box on the Live screen
+function spo2TargetForElapsed(sec) {
+  const m = sec / 60;
+  if (m < 1) return {lo:60, hi:65};
+  if (m < 2) return {lo:65, hi:70};
+  if (m < 3) return {lo:70, hi:75};
+  if (m < 4) return {lo:75, hi:80};
+  if (m < 5) return {lo:80, hi:85};
+  return {lo:85, hi:95};
+}
+function titrationSuggestion(spo2, elapsedSec) {
+  const t = spo2TargetForElapsed(elapsedSec);
+  if (spo2 < t.lo) return `↑ SpO₂ ${spo2}% is below target (${t.lo}–${t.hi}%) — consider titrating FiO₂ UP`;
+  if (spo2 > t.hi) return `↓ SpO₂ ${spo2}% is above target (${t.lo}–${t.hi}%) — consider titrating FiO₂ DOWN`;
+  return `✓ SpO₂ ${spo2}% within target (${t.lo}–${t.hi}%)`;
+}
+
+// CPR-only check: lighter than a full Assessment (just HR + SpO₂, no
+// respiratory-status/support fields — compressions are already underway)
+function openVitalsCheckModal(context) {
+  MODAL_STATE = {};
+  currentModalEventId = null;
+  currentModalType = 'cpr_check';
+  let html = `<div class="modal-head"><h3>⏰ CPR Check — every 1 min</h3><button class="modal-close" onclick="closeDetailModal()">✕</button></div>`;
+  html += `<div class="modal-time">Time: <b>${fmtClock(RES.elapsedSec)}</b> (auto)</div>`;
+  html += `<div class="field full"><label>Heart Rate (bpm)</label><input type="number" value="${RES.vitals.hr ?? ''}" oninput="MODAL_STATE.hr=this.value"></div>`;
+  html += `<div class="field full" style="margin-top:10px"><label>SpO₂ (%)</label><input type="number" value="${RES.vitals.spo2 ?? ''}" oninput="MODAL_STATE.spo2=this.value"></div>`;
+  html += `<div class="btn-row" style="margin-top:14px"><button class="btn secondary" onclick="closeDetailModal()">Skip</button><button class="btn primary" onclick="saveVitalsCheck('cpr')">✓ Save</button></div>`;
+  document.getElementById('detailModalSheet').innerHTML = html;
+  document.getElementById('detailModalOverlay').style.display = 'flex';
+  if (navigator.vibrate) navigator.vibrate([150,80,150]);
+  showToast('⏰ 1 min CPR check due', 'warn');
+}
+function saveVitalsCheck(context) {
+  const hr = parseFloat(MODAL_STATE.hr);
+  const spo2 = parseFloat(MODAL_STATE.spo2);
+  if (!isNaN(hr)) { RES.vitals.hr = hr; RES.vitalsLog.push({tSec: RES.elapsedSec, type:'hr', value:hr}); }
+  if (!isNaN(spo2)) { RES.vitals.spo2 = spo2; RES.vitalsLog.push({tSec: RES.elapsedSec, type:'spo2', value:spo2}); }
+  updateVitalsDisplay();
+  renderSpo2TargetBox();
+  logEvent(context + '_check', 'CPR vitals check', {
+    hr: !isNaN(hr) ? hr : '',
+    spo2: !isNaN(spo2) ? spo2 + '%' : '',
+  });
+  closeDetailModal();
+  renderTrend();
+
+  if (context === 'cpr' && !isNaN(hr)) {
+    handleCPREscalation(hr);
+  } else {
+    showToast('✓ Vitals logged');
+  }
+}
+
+// HR<60 at the 1-min CPR check → prompt Adrenaline. If it's still <60,
+// re-prompt UVC + Adrenaline every 3 minutes until HR recovers to ≥60.
+function handleCPREscalation(hr) {
+  const cprMinute = Math.round(RES.cprElapsedSec / 60);
+  if (hr < 60) {
+    if (RES.cprEscalation.lastMinute === null) {
+      RES.cprEscalation.lastMinute = cprMinute;
+      RES.cprEscalation.needsAdrenaline = true;
+      RES.cprEscalation.needsUVC = false;
+      renderCPR();
+      showToast('⚠ HR <60 at 1 min of CPR — give Adrenaline', 'danger');
+      if (navigator.vibrate) navigator.vibrate([250,120,250]);
+      openAdrenalineModal();
+    } else if (cprMinute - RES.cprEscalation.lastMinute >= 3) {
+      RES.cprEscalation.lastMinute = cprMinute;
+      RES.cprEscalation.needsAdrenaline = true;
+      RES.cprEscalation.needsUVC = !RES.events.some(e => e.type === 'uvc');
+      renderCPR();
+      const el = document.getElementById('alertBanner');
+      el.innerHTML = '⚠ HR remains <60 during CPR — insert UVC (if not already) and give a further Adrenaline dose.';
+      el.classList.add('show');
+      if (navigator.vibrate) navigator.vibrate([250,120,250,120,250]);
+      showToast('⚠ HR still <60 — UVC + Adrenaline due', 'danger');
+    } else {
+      showToast('✓ Vitals logged — HR <60, next escalation check due at min ' + (RES.cprEscalation.lastMinute + 3), 'warn');
+    }
+  } else {
+    RES.cprEscalation.lastMinute = null;
+    RES.cprEscalation.needsAdrenaline = false;
+    RES.cprEscalation.needsUVC = false;
+    renderCPR();
+    showToast('✓ HR ≥60 — CPR escalation cleared');
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════════
+// QUICK VITALS ENTRY (numeric keypad)
+// ══════════════════════════════════════════════════════════════════════
+var QE_TYPE = null, QE_VALUE = '';
+function openQuickEntry(type) { QE_TYPE = type; QE_VALUE = ''; renderQuickEntry(); document.getElementById('quickEntryOverlay').style.display = 'flex'; }
+function renderQuickEntry() {
+  const labels = { hr:'Heart Rate (bpm)', spo2:'SpO₂ (%)', fio2:'FiO₂ (%)' };
+  document.getElementById('quickEntrySheet').innerHTML = `
+    <div class="modal-head"><h3>${labels[QE_TYPE]}</h3><button class="modal-close" onclick="closeQuickEntry()">✕</button></div>
+    <div class="qe-display">${QE_VALUE || '—'}</div>
+    <div class="qe-pad">
+      ${[1,2,3,4,5,6,7,8,9].map(n=>`<button onclick="qePress('${n}')">${n}</button>`).join('')}
+      <button onclick="qeBackspace()">⌫</button><button onclick="qePress('0')">0</button><button onclick="qePress('.')">.</button>
+    </div>
+    <button class="btn primary" style="padding:14px" onclick="saveQuickEntry()">✓ Save</button>
+  `;
+}
+function qePress(d) { if (d === '.' && QE_VALUE.includes('.')) return; if (QE_VALUE.length >= 5) return; QE_VALUE += d; renderQuickEntry(); }
+function qeBackspace() { QE_VALUE = QE_VALUE.slice(0,-1); renderQuickEntry(); }
+function closeQuickEntry() { document.getElementById('quickEntryOverlay').style.display = 'none'; QE_TYPE = null; QE_VALUE = ''; }
+function saveQuickEntry() {
+  const val = parseFloat(QE_VALUE);
+  if (!isNaN(val)) {
+    RES.vitals[QE_TYPE] = val;
+    RES.vitalsLog.push({ tSec: RES.elapsedSec, type: QE_TYPE, value: val });
+    const labelMap = { hr: `HR ${val} bpm`, spo2: `SpO₂ ${val}%`, fio2: `FiO₂ ${val}%` };
+    logEvent('vital_' + QE_TYPE, labelMap[QE_TYPE]);
+    updateVitalsDisplay();
+    renderSpo2TargetBox();
+    renderTrend();
+  }
+  closeQuickEntry();
+}
+function updateVitalsDisplay() {
+  const hrEl = document.getElementById('vbHR'); if (hrEl) hrEl.textContent = RES.vitals.hr ?? '—';
+  const spo2El = document.getElementById('vbSpO2'); if (spo2El) spo2El.textContent = RES.vitals.spo2 != null ? RES.vitals.spo2 + '%' : '—';
+  const fio2El = document.getElementById('vbFiO2'); if (fio2El) fio2El.innerHTML = (RES.vitals.fio2 != null ? RES.vitals.fio2 : 21) + '<span style="font-size:14px">%</span>';
+  const cprHR = document.getElementById('cprHR'); if (cprHR) cprHR.textContent = RES.vitals.hr ?? '—';
+  const cprSpO2 = document.getElementById('cprSpO2'); if (cprSpO2) cprSpO2.textContent = RES.vitals.spo2 ?? '—';
+  const cprFiO2 = document.getElementById('cprFiO2'); if (cprFiO2) cprFiO2.textContent = (RES.vitals.fio2 ?? 21) + '%';
+}
+
+// ══════════════════════════════════════════════════════════════════════
+// VITAL TREND (Screen 7 — hand-rolled SVG line chart, works fully offline)
+// ══════════════════════════════════════════════════════════════════════
+function svgLineChart(width, height, padL, padT, padR, padB, maxX, series, markers) {
+  const xScale = t => padL + (Math.min(t,maxX)/maxX) * (width-padL-padR);
+  let svg = `<svg viewBox="0 0 ${width} ${height}" style="width:100%;height:${height}px;display:block">`;
+  svg += `<line x1="${padL}" y1="${height-padB}" x2="${width-padR}" y2="${height-padB}" stroke="#243860" stroke-width="1"/>`;
+  series.forEach(s => {
+    const yScale = v => padT + (1 - (v-s.min)/(s.max-s.min)) * (height-padT-padB);
+    if (s.points.length) {
+      const pts = s.points.map(p => `${xScale(p.t)},${yScale(p.v)}`).join(' ');
+      svg += `<polyline points="${pts}" fill="none" stroke="${s.color}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>`;
+      s.points.forEach(p => { svg += `<circle cx="${xScale(p.t)}" cy="${yScale(p.v)}" r="3" fill="${s.color}"/>`; });
+    }
+  });
+  (markers || []).forEach(m => {
+    const x = xScale(m.t);
+    svg += `<line x1="${x}" y1="${padT}" x2="${x}" y2="${height-padB}" stroke="#ffb340" stroke-width="1" stroke-dasharray="3,3"/>`;
+    svg += `<text x="${x}" y="${padT-1}" font-size="9" fill="#ffb340" text-anchor="middle">↑</text>`;
+  });
+  svg += `</svg>`;
+  return svg;
+}
+function renderTrend() {
+  const maxX = Math.max(RES.elapsedSec, 60);
+  const hrPoints = RES.vitalsLog.filter(v => v.type === 'hr').map(v => ({t:v.tSec, v:v.value}));
+  const spo2Points = RES.vitalsLog.filter(v => v.type === 'spo2').map(v => ({t:v.tSec, v:v.value}));
+  const fio2Points = RES.vitalsLog.filter(v => v.type === 'fio2').map(v => ({t:v.tSec, v:v.value}));
+  const markerTypes = ['ppv','ett','cpr','adrenaline'];
+  const markers = RES.events.filter(e => markerTypes.includes(e.type) && /started|administered/.test(e.label)).map(e => ({t:e.tSec}));
+
+  document.getElementById('hrChart').innerHTML = hrPoints.length
+    ? svgLineChart(320,140,30,10,10,20,maxX,[{points:hrPoints,color:'#ff4d6a',min:0,max:220}],markers)
+    : '<div class="no-events" style="padding:30px 0;text-align:center;font-size:12px">No HR readings logged yet</div>';
+
+  document.getElementById('spo2Chart').innerHTML = (spo2Points.length || fio2Points.length)
+    ? svgLineChart(320,140,30,10,10,20,maxX,[
+        {points:spo2Points,color:'#5db0ff',min:0,max:100},
+        {points:fio2Points,color:'#ffb340',min:0,max:100},
+      ],markers)
+    : '<div class="no-events" style="padding:30px 0;text-align:center;font-size:12px">No SpO₂/FiO₂ readings logged yet</div>';
+}
+
+// ══════════════════════════════════════════════════════════════════════
+// APGAR (Screen 8)
+// ══════════════════════════════════════════════════════════════════════
+function apgarMinutes() { const mins = [1,5,10]; if (RES.apgarExtended) mins.push(15,20); return mins; }
+function renderApgarTable() {
+  const mins = apgarMinutes();
+  let html = '<table class="apgar-table"><tr><th style="text-align:left">&nbsp;</th>' + mins.map(m=>`<th>${m} min</th>`).join('') + '</tr>';
+  APGAR_ROWS.forEach(row => {
+    html += `<tr><td class="row-label">${row.label}</td>`;
+    mins.forEach(m => {
+      const cur = (RES.apgar[m] || {})[row.key];
+      html += `<td>` + row.opts.map(([label,val]) => `<span class="apgar-score-btn${cur===val?' picked':''}" onclick="pickApgar(${m},'${row.key}',${val})" title="${label}">${val}</span>`).join('') + `</td>`;
+    });
+    html += `</tr>`;
+  });
+  html += `<tr class="apgar-total-row"><td class="row-label">TOTAL</td>` + mins.map(m => {
+    const scores = RES.apgar[m] || {};
+    const complete = APGAR_ROWS.every(row => scores[row.key] != null);
+    const total = APGAR_ROWS.reduce((sum,row) => sum + (scores[row.key] != null ? scores[row.key] : 0), 0);
+    return `<td>${complete ? total : '—'}</td>`;
+  }).join('') + `</tr>`;
+  html += '</table>';
+  document.getElementById('apgarTableWrap').innerHTML = html;
+}
+function pickApgar(min, key, val) {
+  if (!RES.apgar[min]) RES.apgar[min] = {};
+  RES.apgar[min][key] = val;
+  if (min === 10) {
+    const scores = RES.apgar[10];
+    const complete = APGAR_ROWS.every(row => scores[row.key] != null);
+    if (complete) {
+      const total = APGAR_ROWS.reduce((s,r) => s + scores[r.key], 0);
+      if (total < 7) RES.apgarExtended = true;
+    }
+  }
+  renderApgarTable();
+}
+
+// ══════════════════════════════════════════════════════════════════════
+// END OF RESUSCITATION (Screen 9) → COMPLETE RECORD pauses the timer
+// ══════════════════════════════════════════════════════════════════════
+function completeRecord() {
+  RES.end.time = document.getElementById('endTime').value;
+  RES.end.fio2 = document.getElementById('endFio2').value;
+  RES.post.temp = document.getElementById('postTemp').value;
+  RES.post.glucose = document.getElementById('postGlucose').value;
+  RES.post.bloodGasDone = document.getElementById('bloodGasDone').checked;
+  RES.post.hieDone = document.getElementById('hieDone').checked;
+  RES.completed = true;
+  autoEndActiveInterventions();
+  logEvent('end', 'Resuscitation ended', {condition: fieldValue('endCondition') || '', destination: fieldValue('destination') || ''});
+  pauseMainTimer();
+  showToast('✓ Record completed — interventions ended, timer paused');
+  switchTab('summary');
+}
+function autoEndActiveInterventions() {
+  RESP_SUPPORT_KEYS.forEach(key => {
+    if (RES.activeToggles[key]) {
+      RES.activeToggles[key] = false;
+      logEvent(key, `${LABELS[key]} stopped (auto — resuscitation ended)`);
+      stopRespiratorySupportAlerts(key);
+      if (key === 'ppv') clearPPVEffectiveTimeout();
+    }
+  });
+  if (RES.cprInterval) {
+    logEvent('cpr', 'CPR stopped (auto — resuscitation ended)', {duration: fmtClock(RES.cprElapsedSec)});
+    clearInterval(RES.cprInterval);
+    RES.cprInterval = null;
+    document.getElementById('cprOverlay').style.display = 'none';
+    stopCPRVitalsAlerts();
+    RES.pausedRespAlerts = [];
+  }
+  renderInterventionGrid();
+}
+
+// ══════════════════════════════════════════════════════════════════════
+// AUTOMATIC SUMMARY (Screen 10)
+// ══════════════════════════════════════════════════════════════════════
+function firstAssessment() {
+  return RES.events.filter(e => e.type === 'assessment').sort((a,b) => a.tSec - b.tSec)[0] || null;
+}
+function computeKeyTimes() {
+  const ppvEv = RES.events.find(e => e.type === 'ppv' && /started/.test(e.label));
+  const ettEv = RES.events.find(e => e.type === 'ett');
+  const cprStart = RES.events.find(e => e.type === 'cpr' && /started/.test(e.label));
+  const adrEv = RES.events.find(e => e.type === 'adrenaline');
+  const effEv = RES.events.find(e => e.type === 'ppv_effective');
+  const hr100 = RES.vitalsLog.find(v => v.type === 'hr' && v.value >= 100 && (!ppvEv || v.tSec >= ppvEv.tSec));
+  const endEv = RES.events.find(e => e.type === 'end');
+  return {
+    birth: '00:00',
+    ppv: ppvEv ? fmtClock(ppvEv.tSec) : '—',
+    effectivePPV: effEv ? fmtClock(effEv.tSec) : '—',
+    ett: ettEv ? fmtClock(ettEv.tSec) : '—',
+    hr100: hr100 ? fmtClock(hr100.tSec) : '—',
+    cpr: cprStart ? fmtClock(cprStart.tSec) : '—',
+    adrenaline: adrEv ? fmtClock(adrEv.tSec) : '—',
+    end: endEv ? fmtClock(endEv.tSec) : (RES.completed ? fmtClock(RES.elapsedSec) : '—'),
+  };
+}
+function maxFio2Reached() {
+  const vals = RES.vitalsLog.filter(v => v.type === 'fio2').map(v => v.value);
+  const eventFio2 = RES.events.map(e => e.detail && e.detail.fio2 ? parseFloat(e.detail.fio2) : null).filter(v => v != null && !isNaN(v));
+  const all = vals.concat(eventFio2);
+  return all.length ? Math.max(...all) : (RES.vitals.fio2 || 21);
+}
+function renderSummaryScreen() {
+  const kt = computeKeyTimes();
+  const cprUsed = RES.events.some(e => e.type === 'cpr');
+  const adrUsed = RES.adrenalineCount > 0;
+  const html = `
+    <div class="card-title">Resuscitation Summary${!RES.completed?' <span style="color:var(--amber);font-size:10px;font-weight:700">IN PROGRESS — PREVIEW</span>':''}</div>
+    <div style="font-size:13px;line-height:1.8">
+      <b>BABY</b><br>
+      Birth: ${RES.birthDateStr || '—'}${RES.birthTime ? ' at ' + toTimeValue(RES.birthTime) : ''}<br>
+      GA: ${RES.ga || '—'} weeks · BW: ${RES.bw ? RES.bw+' g' : '—'} · Delivery: ${fieldValue('delivery') || '—'}<br><br>
+      <b>CORD</b><br>
+      ${fieldValue('cord') || '—'}<br><br>
+      <b>INITIAL CONDITION</b><br>
+      ${(() => { const fa = firstAssessment(); return fa ? `HR ${fa.detail.hr||'—'} · SpO₂ ${fa.detail.spo2||'—'} · FiO₂ ${fa.detail.fio2||'—'}${fa.detail.resp?' · '+fa.detail.resp:''}` : '—'; })()}<br><br>
+      <b>RESUSCITATION</b><br>
+      PPV started: ${kt.ppv}<br>
+      ETT: ${kt.ett}<br>
+      CPR: ${cprUsed ? 'Yes (' + kt.cpr + ')' : 'No'}<br>
+      Adrenaline: ${adrUsed ? `Yes (${RES.adrenalineCount} dose${RES.adrenalineCount>1?'s':''}, first ${kt.adrenaline})` : 'No'}<br><br>
+      <b>MAXIMUM SUPPORT</b><br>
+      FiO₂: ${maxFio2Reached()}%<br><br>
+      <b>RESPONSE</b><br>
+      HR ≥100 achieved: ${kt.hr100}<br><br>
+      <b>END</b><br>
+      Resuscitation ${RES.completed ? 'completed' : 'ongoing'}: ${kt.end}<br>
+      Destination: ${fieldValue('destination') || '—'}
+    </div>
+    <table class="apgar-table" style="margin-top:14px">
+      <tr><th style="text-align:left">Event</th><th>Time</th></tr>
+      <tr><td class="row-label">Birth</td><td>${kt.birth}</td></tr>
+      <tr><td class="row-label">PPV</td><td>${kt.ppv}</td></tr>
+      <tr><td class="row-label">Effective PPV</td><td>${kt.effectivePPV}</td></tr>
+      <tr><td class="row-label">ETT</td><td>${kt.ett}</td></tr>
+      <tr><td class="row-label">HR ≥100</td><td>${kt.hr100}</td></tr>
+      <tr><td class="row-label">CPR</td><td>${kt.cpr}</td></tr>
+      <tr><td class="row-label">Adrenaline</td><td>${kt.adrenaline}</td></tr>
+      <tr><td class="row-label">End resuscitation</td><td>${kt.end}</td></tr>
+    </table>
+  `;
+  document.getElementById('summaryContent').innerHTML = html;
+}
+
+// ══════════════════════════════════════════════════════════════════════
+// EXPORT (txt / Word / print)
+// ══════════════════════════════════════════════════════════════════════
+function buildRecordText() {
+  const kt = computeKeyTimes();
+  let t = 'MYNEST LIVE RESUSCITATION RECORD\n================================\n\n';
+  t += `Baby ID: ${RES.babyId||'—'}   Date: ${RES.birthDateStr||'—'}\n`;
+  t += `Birth time: ${RES.birthTime?toTimeValue(RES.birthTime):'—'}\n`;
+  t += `GA: ${RES.ga||'—'} weeks   BW: ${RES.bw||'—'} g   Sex: ${fieldValue('sex')||'—'}\n`;
+  t += `Multiplicity: ${RES.multiplicity||'—'}\n`;
+  t += `Delivery: ${fieldValue('delivery')||'—'}   Indication: ${RES.deliveryIndication||'—'}\n`;
+  t += `Anticipated risk: ${RES.risks.join(', ')||'—'}${RES.riskOtherNote?' ('+RES.riskOtherNote+')':''}\n`;
+  t += `Cord management: ${fieldValue('cord')||'—'}\n\n`;
+  t += `Initial assessment — ${(() => { const fa = firstAssessment(); return fa ? `HR ${fa.detail.hr||'—'}, SpO2 ${fa.detail.spo2||'—'}, FiO2 ${fa.detail.fio2||'—'}${fa.detail.resp?', '+fa.detail.resp:''}` : 'not yet recorded'; })()}\n\n`;
+  t += 'TIMELINE\n--------\n';
+  [...RES.events].sort((a,b) => a.tSec - b.tSec).forEach(ev => {
+    t += `${fmtClock(ev.tSec)}  ${ev.label}`;
+    const d = summarizeDetail(ev);
+    if (d) t += `  (${d})`;
+    t += '\n';
+  });
+  t += '\nAPGAR\n-----\n';
+  apgarMinutes().forEach(m => {
+    const scores = RES.apgar[m] || {};
+    const total = APGAR_ROWS.reduce((s,r) => s + (scores[r.key]!=null?scores[r.key]:0), 0);
+    t += `${m} min: ${APGAR_ROWS.map(r=>`${r.label}=${scores[r.key]!=null?scores[r.key]:'-'}`).join(', ')}  TOTAL=${total}\n`;
+  });
+  t += `Assigned by: ${document.getElementById('apgarAssignedBy').value||'—'}\n\n`;
+  t += 'END OF RESUSCITATION\n---------------------\n';
+  t += `Time: ${RES.end.time||'—'}   Condition: ${fieldValue('endCondition')||'—'}\n`;
+  t += `Respiratory support: ${fieldValue('respSupport')||'—'}   FiO2: ${RES.end.fio2||'—'}%\n`;
+  t += `Destination: ${fieldValue('destination')||'—'}\n\n`;
+  t += 'POST-RESUSCITATION\n-------------------\n';
+  t += `Temp: ${RES.post.temp||'—'}°C   Glucose: ${RES.post.glucose||'—'} mmol/L\n`;
+  t += `Blood gas done: ${RES.post.bloodGasDone?'Yes':'No'}   HIE assessment done: ${RES.post.hieDone?'Yes':'No'}\n`;
+  t += `Therapeutic hypothermia: ${fieldValue('hypothermia')||'—'}\n\n`;
+  t += 'KEY TIMES\n---------\n';
+  t += `Birth ${kt.birth}\nPPV ${kt.ppv}\nEffective PPV ${kt.effectivePPV}\nETT ${kt.ett}\nHR>=100 ${kt.hr100}\nCPR ${kt.cpr}\nAdrenaline ${kt.adrenaline}\nEnd resuscitation ${kt.end}\n`;
+  return t;
+}
+function downloadRecordTxt() {
+  const text = buildRecordText();
+  const blob = new Blob([text], {type:'text/plain'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const slug = (RES.babyId || 'baby').replace(/[^a-z0-9]+/gi,'_');
+  a.href = url; a.download = `MyNeST_Live_Resus_${slug}.txt`;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+function downloadRecordWord() {
+  const text = buildRecordText();
+  const htmlBody = text.split('\n').map(l => `<p style="margin:0;font-family:Consolas,monospace;font-size:11pt;white-space:pre">${(l.replace(/</g,'&lt;'))||'&nbsp;'}</p>`).join('');
+  const html = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">
+  <head><meta charset="utf-8"><title>MyNeST Live Resuscitation Record</title></head><body>${htmlBody}</body></html>`;
+  const blob = new Blob(['\ufeff', html], {type:'application/msword'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const slug = (RES.babyId || 'baby').replace(/[^a-z0-9]+/gi,'_');
+  a.href = url; a.download = `MyNeST_Live_Resus_${slug}.doc`;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+function esc(s) { return (s == null ? '' : String(s)).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function buildPrintHTML() {
+  const kt = computeKeyTimes();
+  const cprUsed = RES.events.some(e => e.type === 'cpr');
+  const adrUsed = RES.adrenalineCount > 0;
+  const sorted = [...RES.events].sort((a,b) => a.tSec - b.tSec);
+
+  let html = `<div class="print-doc">`;
+  html += `<h1>MyNeST — Neonatal Resuscitation Record</h1>`;
+  html += `<div class="print-sub">Printed ${esc(new Date().toLocaleString())}${!RES.completed ? ' · record still in progress' : ''}</div>`;
+
+  html += `<h2>Baby &amp; Delivery</h2><div class="kv-grid no-break">
+    <div><b>Baby ID:</b> ${esc(RES.babyId) || '—'}</div>
+    <div><b>Date:</b> ${esc(RES.birthDateStr) || '—'}</div>
+    <div><b>Birth time:</b> ${RES.birthTime ? esc(toTimeValue(RES.birthTime)) : '—'}</div>
+    <div><b>Sex:</b> ${esc(fieldValue('sex')) || '—'}</div>
+    <div><b>Gestational age:</b> ${esc(RES.ga) || '—'} weeks</div>
+    <div><b>Birth weight:</b> ${RES.bw ? esc(RES.bw) + ' g' : '—'}</div>
+    <div><b>Multiplicity:</b> ${esc(RES.multiplicity) || '—'}</div>
+    <div><b>Delivery:</b> ${esc(fieldValue('delivery')) || '—'}</div>
+    <div class="single"><b>Indication:</b> ${esc(RES.deliveryIndication) || '—'}</div>
+    <div class="single"><b>Anticipated risk:</b> ${esc(RES.risks.join(', ')) || '—'}${RES.riskOtherNote ? ' (' + esc(RES.riskOtherNote) + ')' : ''}</div>
+    <div class="single"><b>Cord management:</b> ${esc(fieldValue('cord')) || '—'}</div>
+  </div>`;
+
+  html += `<h2>Initial Assessment</h2><div class="kv-grid no-break">
+    ${(() => { const fa = firstAssessment(); return fa ? `
+    <div><b>Time:</b> ${fmtClock(fa.tSec)}</div>
+    <div><b>Heart rate:</b> ${esc(fa.detail.hr) || '—'}</div>
+    <div><b>SpO₂:</b> ${esc(fa.detail.spo2) || '—'}</div>
+    <div><b>FiO₂:</b> ${esc(fa.detail.fio2) || '—'}</div>
+    <div><b>Respiratory status:</b> ${esc(fa.detail.resp) || '—'}</div>
+    <div><b>Support:</b> ${esc(fa.detail.support) || '—'}</div>` : `<div class="single">No assessment recorded yet.</div>`; })()}
+  </div>`;
+
+  html += `<h2>Timeline</h2><table><tr><th style="width:60px">Time</th><th style="width:34%">Event</th><th>Detail</th></tr>`;
+  if (sorted.length) {
+    sorted.forEach(ev => {
+      html += `<tr><td>${fmtClock(ev.tSec)}</td><td>${esc(ev.label)}</td><td>${esc(summarizeDetail(ev))}</td></tr>`;
+    });
+  } else {
+    html += `<tr><td colspan="3">No events logged.</td></tr>`;
+  }
+  html += `</table>`;
+
+  html += `<h2>Apgar Score</h2><table class="no-break"><tr><th></th>${apgarMinutes().map(m=>`<th>${m} min</th>`).join('')}</tr>`;
+  APGAR_ROWS.forEach(row => {
+    html += `<tr><td><b>${row.label}</b></td>`;
+    apgarMinutes().forEach(m => {
+      const v = (RES.apgar[m] || {})[row.key];
+      html += `<td>${v != null ? v : '—'}</td>`;
+    });
+    html += `</tr>`;
+  });
+  html += `<tr><td><b>TOTAL</b></td>`;
+  apgarMinutes().forEach(m => {
+    const scores = RES.apgar[m] || {};
+    const complete = APGAR_ROWS.every(row => scores[row.key] != null);
+    const total = APGAR_ROWS.reduce((s,r) => s + (scores[r.key] != null ? scores[r.key] : 0), 0);
+    html += `<th>${complete ? total : '—'}</th>`;
+  });
+  html += `</tr></table>`;
+  const assignedBy = document.getElementById('apgarAssignedBy').value;
+  html += `<div class="kv-grid single no-break"><div><b>Assigned by:</b> ${esc(assignedBy) || '—'}</div></div>`;
+
+  html += `<h2>End of Resuscitation</h2><div class="kv-grid no-break">
+    <div><b>Time:</b> ${esc(RES.end.time) || '—'}</div>
+    <div><b>Condition:</b> ${esc(fieldValue('endCondition')) || '—'}</div>
+    <div><b>Respiratory support:</b> ${esc(fieldValue('respSupport')) || '—'}</div>
+    <div><b>FiO₂:</b> ${esc(RES.end.fio2) || '—'}%</div>
+    <div class="single"><b>Destination:</b> ${esc(fieldValue('destination')) || '—'}</div>
+  </div>`;
+
+  html += `<h2>Post-Resuscitation</h2><div class="kv-grid no-break">
+    <div><b>Temperature:</b> ${esc(RES.post.temp) || '—'}°C</div>
+    <div><b>Glucose:</b> ${esc(RES.post.glucose) || '—'} mmol/L</div>
+    <div><b>Blood gas done:</b> ${RES.post.bloodGasDone ? 'Yes' : 'No'}</div>
+    <div><b>HIE assessment done:</b> ${RES.post.hieDone ? 'Yes' : 'No'}</div>
+    <div class="single"><b>Therapeutic hypothermia:</b> ${esc(fieldValue('hypothermia')) || '—'}</div>
+  </div>`;
+
+  html += `<h2>Summary — CPR: ${cprUsed ? 'Yes' : 'No'} · Adrenaline: ${adrUsed ? RES.adrenalineCount + ' dose' + (RES.adrenalineCount>1?'s':'') : 'No'}</h2>`;
+  html += `<table class="no-break"><tr><th>Event</th><th>Time</th></tr>
+    <tr><td>Birth</td><td>${kt.birth}</td></tr>
+    <tr><td>PPV</td><td>${kt.ppv}</td></tr>
+    <tr><td>Effective PPV</td><td>${kt.effectivePPV}</td></tr>
+    <tr><td>ETT</td><td>${kt.ett}</td></tr>
+    <tr><td>HR ≥100</td><td>${kt.hr100}</td></tr>
+    <tr><td>CPR</td><td>${kt.cpr}</td></tr>
+    <tr><td>Adrenaline</td><td>${kt.adrenaline}</td></tr>
+    <tr><td>End resuscitation</td><td>${kt.end}</td></tr>
+  </table>`;
+
+  html += `<div class="print-footer">MyNeST Live Resuscitation Record — generated automatically from the event log.</div>`;
+  html += `</div>`;
+  return html;
+}
+
+function printSummary() {
+  const pv = document.getElementById('printView');
+  pv.innerHTML = buildPrintHTML();
+  pv.style.display = 'block';
+  window.print();
+  pv.style.display = 'none';
+}
+
+// ══════════════════════════════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════════════════════════════
+function initApp() {
+  renderTabBar();
+  renderInterventionGrid();
+  renderApgarTable();
+  renderSpo2TargetBox();
+  renderAssessmentTable();
+  renderLiveLog();
+  const dateEl = document.getElementById('birthDate');
+  if (dateEl) dateEl.value = new Date().toISOString().slice(0,10);
+  switchTab('prep');
+}
+document.addEventListener('DOMContentLoaded', initApp);
+</script>
+</body>
+</html>
