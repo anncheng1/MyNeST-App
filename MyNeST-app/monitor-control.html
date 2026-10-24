@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<title>Monitor Control — MyNeST</title>
+<!-- iPhone home-screen app -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="MyNeST">
+<meta name="application-name" content="MyNeST">
+<meta name="format-detection" content="telephone=no">
+<meta name="theme-color" content="#0a1628">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="167x167" href="apple-touch-icon-167.png">
+<link rel="apple-touch-icon" sizes="152x152" href="apple-touch-icon-152.png">
+<link rel="apple-touch-startup-image" media="screen and (device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="splash-1290x2796.png">
+<link rel="apple-touch-startup-image" media="screen and (device-width: 440px) and (device-height: 956px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="splash-1320x2868.png">
+<link rel="apple-touch-startup-image" media="screen and (device-width: 402px) and (device-height: 874px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="splash-1206x2622.png">
+<link rel="apple-touch-startup-image" media="screen and (device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="splash-1179x2556.png">
+<link rel="apple-touch-startup-image" media="screen and (device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="splash-1284x2778.png">
+<link rel="apple-touch-startup-image" media="screen and (device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="splash-1170x2532.png">
+<link rel="apple-touch-startup-image" media="screen and (device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="splash-1125x2436.png">
+<link rel="apple-touch-startup-image" media="screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="splash-1242x2688.png">
+<link rel="apple-touch-startup-image" media="screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="splash-828x1792.png">
+<link rel="apple-touch-startup-image" media="screen and (device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="splash-750x1334.png">
+<style>
+:root {
+  --navy: #0a1628; --navy-mid: #122040; --navy-card: #1a2d50;
+  --blue: #3b9eff; --blue-bright: #5db0ff; --teal: #00d4b4;
+  --red: #ff4d6a; --amber: #ffb340; --green: #34d399;
+  --text: #e8f0fe; --text-dim: #8da4c4; --border: #243860;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+body { background: var(--navy); color: var(--text); font-family: -apple-system, sans-serif; padding-bottom: 40px; }
+.header { background: var(--navy-mid); padding: 12px 16px; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 10; border-bottom: 1px solid var(--border); }
+.header a { color: var(--text-dim); text-decoration: none; font-size: 14px; }
+.header h1 { font-size: 16px; font-weight: 700; }
+.status-pill { margin-left: auto; padding: 5px 10px; border-radius: 12px; font-size: 11px; font-weight: 700; }
+.status-pill.off { background: #3a0d16; color: #ff8fa3; }
+.status-pill.on { background: #0d2a18; color: var(--green); }
+
+.wrap { max-width: 480px; margin: 0 auto; padding: 16px; }
+.card { background: var(--navy-card); border: 1px solid var(--border); border-radius: 14px; padding: 16px; margin-bottom: 14px; }
+.card h3 { font-size: 12px; color: var(--blue-bright); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 10px; }
+.connect-row { display: flex; gap: 8px; }
+.connect-row input { flex: 1; background: var(--navy); border: 1px solid var(--border); border-radius: 8px; color: var(--text); padding: 10px; font-size: 20px; text-align: center; letter-spacing: 4px; }
+.connect-btn { background: var(--teal); color: #001812; border: none; font-weight: 800; padding: 0 18px; border-radius: 8px; font-size: 14px; }
+
+.vitals-toggle-btn { display: block; width: 100%; background: var(--green); color: #001812; border: none; font-weight: 800; padding: 14px; border-radius: 10px; font-size: 15px; cursor: pointer; }
+.vitals-toggle-btn.on { background: var(--red); color: #fff; }
+
+.param-row { margin-bottom: 16px; }
+.param-label { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 6px; }
+.param-label .val { font-weight: 800; font-size: 18px; }
+.param-label .val.hr { color: #4ade80; }
+.param-label .val.spo2 { color: #22d3ee; }
+.param-label .val.temp { color: var(--amber); }
+input[type=range] { width: 100%; accent-color: var(--teal); }
+.step-row { display: flex; gap: 6px; margin-top: 6px; }
+.step-btn { flex: 1; background: var(--navy); border: 1px solid var(--border); color: var(--text-dim); padding: 6px; border-radius: 6px; font-size: 12px; }
+
+.preset-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.preset-btn { background: var(--navy); border: 1px solid var(--border); color: var(--text); padding: 10px 6px; border-radius: 8px; font-size: 11.5px; text-align: left; line-height: 1.3; }
+.preset-btn b { display: block; color: var(--blue-bright); font-size: 12px; margin-bottom: 2px; }
+
+.timer-btns { display: flex; gap: 8px; }
+.timer-btns button { flex: 1; padding: 10px; border-radius: 8px; border: none; font-weight: 700; font-size: 13px; }
+.tb-start { background: var(--green); color: #001812; }
+.tb-stop { background: var(--amber); color: #2a1f00; }
+.tb-reset { background: var(--red); color: #fff; }
+
+.note-field { width: 100%; background: var(--navy); border: 1px solid var(--border); border-radius: 8px; color: var(--text); padding: 10px; font-size: 13px; margin-top: 6px; }
+</style>
+<link rel="stylesheet" href="ios.css">
+<script src="pwa.js" defer></script>
+</head>
+<body>
+
+<div class="header">
+  <a href="index.html">← Home</a>
+  <h1>Monitor Control</h1>
+  <span class="status-pill off" id="statusPill">Not connected</span>
+</div>
+
+<div class="wrap">
+
+  <div class="card">
+    <h3>Connect to Monitor</h3>
+    <div class="connect-row">
+      <input type="text" id="roomInput" placeholder="0000" maxlength="4" inputmode="numeric">
+      <button class="connect-btn" onclick="connectToRoom()">Connect</button>
+    </div>
+    <div style="font-size:11px;color:var(--text-dim);margin-top:8px">Enter the 4-digit room code shown on the monitor display device.</div>
+  <div style="font-size:11px;color:var(--amber);margin-top:4px">Both phones need an internet connection to pair (the display still runs offline once open).</div>
+  </div>
+
+  <div class="card">
+    <h3>Probes</h3>
+    <button class="vitals-toggle-btn" id="hrSpo2ToggleBtn" onclick="toggleProbe('hrspo2')">▶ Start HR &amp; SpO₂ Probe</button>
+    <button class="vitals-toggle-btn" id="tempToggleBtn" onclick="toggleProbe('temp')" style="margin-top:8px">▶ Start Temperature Probe</button>
+    <button class="vitals-toggle-btn" id="ecgToggleBtn" onclick="toggleProbe('ecg')" style="margin-top:8px">▶ Start ECG &amp; Pleth</button>
+    <div style="font-size:11px;color:var(--text-dim);margin-top:8px">Each probe shows as a dash on the monitor until switched on. While HR &amp; SpO₂ is on, both drift by a small random ±1–3 every 10 sec, mimicking real monitor averaging.</div>
+  </div>
+
+  <div class="card">
+    <h3>Case Label &amp; Note</h3>
+    <input type="text" id="caseLabelInput" class="note-field" placeholder="e.g. Case B1 — Gasping Baby" oninput="sendUpdate()">
+    <input type="text" id="noteInput" class="note-field" placeholder="Free-text note shown on monitor" oninput="sendUpdate()">
+  </div>
+
+  <div class="card">
+    <h3>Vitals</h3>
+    <div class="param-row">
+      <div class="param-label"><span>Heart Rate</span><span class="val hr" id="hrVal">140</span></div>
+      <input type="range" id="hrSlider" min="0" max="220" value="140" oninput="onHR(this.value)">
+      <div class="step-row">
+        <button class="step-btn" onclick="stepHR(-10)">−10</button>
+        <button class="step-btn" onclick="stepHR(-1)">−1</button>
+        <button class="step-btn" onclick="stepHR(1)">+1</button>
+        <button class="step-btn" onclick="stepHR(10)">+10</button>
+      </div>
+    </div>
+    <div class="param-row">
+      <div class="param-label"><span>SpO₂</span><span class="val spo2" id="spo2Val">95%</span></div>
+      <input type="range" id="spo2Slider" min="0" max="100" value="95" oninput="onSpO2(this.value)">
+      <div class="step-row">
+        <button class="step-btn" onclick="stepSpO2(-5)">−5</button>
+        <button class="step-btn" onclick="stepSpO2(-1)">−1</button>
+        <button class="step-btn" onclick="stepSpO2(1)">+1</button>
+        <button class="step-btn" onclick="stepSpO2(5)">+5</button>
+      </div>
+    </div>
+    <div class="param-row">
+      <div class="param-label"><span>Temperature</span><span class="val temp" id="tempVal">37.0°C</span></div>
+      <input type="range" id="tempSlider" min="300" max="420" value="370" oninput="onTemp(this.value)">
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Quick Presets</h3>
+    <div class="preset-grid">
+      <button class="preset-btn" onclick="applyPreset(140,95,37.0)"><b>Vigorous Term</b>HR 140 · SpO₂ 95%</button>
+      <button class="preset-btn" onclick="applyPreset(80,60,37.0)"><b>Gasping / Ineffective PPV</b>HR 80 · SpO₂ 60%</button>
+      <button class="preset-btn" onclick="applyPreset(45,50,36.8)"><b>Bradycardia &lt;60</b>HR 45 · SpO₂ 50%</button>
+      <button class="preset-btn" onclick="applyPreset(0,0,36.5)"><b>Asystole</b>HR 0 · SpO₂ undetectable</button>
+      <button class="preset-btn" onclick="applyPreset(92,70,36.2)"><b>Preterm Golden Hour</b>HR 92 · SpO₂ 70%</button>
+      <button class="preset-btn" onclick="applyPreset(150,97,37.0)"><b>Improving / Stable</b>HR 150 · SpO₂ 97%</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Time of Life Timer</h3>
+    <div class="timer-btns">
+      <button class="tb-start" onclick="sendTimer('start')">▶ Start</button>
+      <button class="tb-stop" onclick="sendTimer('stop')">⏸ Stop</button>
+      <button class="tb-reset" onclick="sendTimer('reset')">↺ Reset</button>
+    </div>
+  </div>
+
+</div>
+
+<script src="peerjs.min.js"></script>
+<script>
+let peer, conn;
+let state = { hr: 140, spo2: 95, temp: 37.0 };
+let probes = { hrspo2: false, temp: false, ecg: false };
+let jitterInterval = null;
+
+const PROBE_BTN_ID = { hrspo2: 'hrSpo2ToggleBtn', temp: 'tempToggleBtn', ecg: 'ecgToggleBtn' };
+const PROBE_LABEL = { hrspo2: 'HR &amp; SpO₂ Probe', temp: 'Temperature Probe', ecg: 'ECG &amp; Pleth' };
+
+function initPeer() {
+  peer = new Peer(undefined, { debug: 0 });
+}
+initPeer();
+
+function connectToRoom() {
+  const code = document.getElementById('roomInput').value.trim();
+  if (!code || code.length !== 4) { alert('Enter the 4-digit room code shown on the monitor.'); return; }
+  if (conn) conn.close();
+  conn = peer.connect('mynest-monitor-' + code, { reliable: true });
+  conn.on('open', () => {
+    document.getElementById('statusPill').textContent = 'Connected';
+    document.getElementById('statusPill').className = 'status-pill on';
+    // Probes stay off until explicitly started — monitor shows dashes until then.
+  });
+  conn.on('close', () => {
+    document.getElementById('statusPill').textContent = 'Not connected';
+    document.getElementById('statusPill').className = 'status-pill off';
+  });
+  conn.on('error', () => {
+    document.getElementById('statusPill').textContent = 'Connection failed';
+    document.getElementById('statusPill').className = 'status-pill off';
+  });
+}
+
+function toggleProbe(probe) {
+  probes[probe] = !probes[probe];
+  const btn = document.getElementById(PROBE_BTN_ID[probe]);
+  const on = probes[probe];
+  btn.innerHTML = (on ? '⏸ Stop ' : '▶ Start ') + PROBE_LABEL[probe];
+  btn.classList.toggle('on', on);
+
+  if (conn && conn.open) conn.send({ type: 'probeState', probe: probe, on: on });
+
+  if (probe === 'hrspo2') {
+    if (on) { sendUpdate(true); startJitter(); }
+    else { stopJitter(); }
+  } else if (on) {
+    sendUpdate(true);
+  }
+}
+
+function startJitter() {
+  stopJitter();
+  jitterInterval = setInterval(() => {
+    if (!probes.hrspo2) return;
+    const hrDelta = (Math.floor(Math.random()*3)+1) * (Math.random() < 0.5 ? -1 : 1);
+    const spo2Delta = (Math.floor(Math.random()*3)+1) * (Math.random() < 0.5 ? -1 : 1);
+    state.hr = Math.max(0, Math.min(220, state.hr + hrDelta));
+    state.spo2 = Math.max(0, Math.min(100, state.spo2 + spo2Delta));
+    document.getElementById('hrSlider').value = state.hr;
+    document.getElementById('spo2Slider').value = state.spo2;
+    document.getElementById('hrVal').textContent = state.hr;
+    document.getElementById('spo2Val').textContent = state.spo2+'%';
+    sendUpdate();
+  }, 10000);
+}
+function stopJitter() {
+  clearInterval(jitterInterval);
+  jitterInterval = null;
+}
+
+function sendUpdate(force) {
+  state.caseLabel = document.getElementById('caseLabelInput').value;
+  state.note = document.getElementById('noteInput').value;
+  if (!(probes.hrspo2 || probes.temp || probes.ecg) && !force) return; // nothing applied yet — don't push
+  if (conn && conn.open) {
+    conn.send({ type: 'update', payload: { hr: state.hr, spo2: state.spo2, temp: state.temp, caseLabel: state.caseLabel, note: state.note } });
+  }
+}
+
+function onHR(v) { state.hr = parseInt(v,10); document.getElementById('hrVal').textContent = state.hr; sendUpdate(); }
+function onSpO2(v) { state.spo2 = parseInt(v,10); document.getElementById('spo2Val').textContent = state.spo2+'%'; sendUpdate(); }
+function onTemp(v) { state.temp = parseInt(v,10)/10; document.getElementById('tempVal').textContent = state.temp.toFixed(1)+'°C'; sendUpdate(); }
+
+function stepHR(d) {
+  state.hr = Math.max(0, Math.min(220, state.hr + d));
+  document.getElementById('hrSlider').value = state.hr;
+  document.getElementById('hrVal').textContent = state.hr;
+  sendUpdate();
+}
+function stepSpO2(d) {
+  state.spo2 = Math.max(0, Math.min(100, state.spo2 + d));
+  document.getElementById('spo2Slider').value = state.spo2;
+  document.getElementById('spo2Val').textContent = state.spo2+'%';
+  sendUpdate();
+}
+
+function applyPreset(hr, spo2, temp) {
+  state.hr = hr; state.spo2 = spo2; state.temp = temp;
+  document.getElementById('hrSlider').value = hr;
+  document.getElementById('spo2Slider').value = spo2;
+  document.getElementById('tempSlider').value = Math.round(temp*10);
+  document.getElementById('hrVal').textContent = hr;
+  document.getElementById('spo2Val').textContent = spo2+'%';
+  document.getElementById('tempVal').textContent = temp.toFixed(1)+'°C';
+  sendUpdate();
+}
+
+function sendTimer(action) {
+  if (conn && conn.open) conn.send({ type: 'timerControl', action: action });
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<title>Skills Videos · MyNeST</title>
+<!-- iPhone home-screen app -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="MyNeST">
+<meta name="application-name" content="MyNeST">
+<meta name="format-detection" content="telephone=no">
+<meta name="theme-color" content="#0a1628">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="167x167" href="apple-touch-icon-167.png">
+<link rel="apple-touch-icon" sizes="152x152" href="apple-touch-icon-152.png">
+<link rel="apple-touch-startup-image" media="screen and (device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="splash-1290x2796.png">
+<link rel="apple-touch-startup-image" media="screen and (device-width: 440px) and (device-height: 956px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="splash-1320x2868.png">
+<link rel="apple-touch-startup-image" media="screen and (device-width: 402px) and (device-height: 874px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="splash-1206x2622.png">
+<link rel="apple-touch-startup-image" media="screen and (device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="splash-1179x2556.png">
+<link rel="apple-touch-startup-image" media="screen and (device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="splash-1284x2778.png">
+<link rel="apple-touch-startup-image" media="screen and (device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="splash-1170x2532.png">
+<link rel="apple-touch-startup-image" media="screen and (device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="splash-1125x2436.png">
+<link rel="apple-touch-startup-image" media="screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="splash-1242x2688.png">
+<link rel="apple-touch-startup-image" media="screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="splash-828x1792.png">
+<link rel="apple-touch-startup-image" media="screen and (device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="splash-750x1334.png">
+<style>
+:root {
+  --navy: #0a1628; --navy-mid: #122040; --navy-card: #1a2d50;
+  --blue: #3b9eff; --blue-bright: #5db0ff; --teal: #00d4b4;
+  --red: #ff4d6a; --amber: #ffb340; --green: #34d399;
+  --text: #e8f0fe; --text-dim: #8da4c4; --border: #243860;
+  --radius: 16px; --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html, body { height: 100%; background: var(--navy); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+body { overscroll-behavior: none; padding-bottom: calc(24px + var(--safe-bottom)); }
+
+.header { background: var(--navy-mid); padding: 14px 16px; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 20; border-bottom: 1px solid var(--border); }
+.back-btn { background: var(--navy-card); border: 1px solid var(--border); color: var(--text-dim); padding: 6px 12px; border-radius: 20px; font-size: 14px; text-decoration: none; white-space: nowrap; }
+.header h1 { font-size: 17px; font-weight: 700; }
+.header .sub { font-size: 12px; color: var(--text-dim); }
+
+.wrap { max-width: 720px; margin: 0 auto; padding: 16px; }
+
+.block-group { margin-bottom: 22px; }
+.block-title { font-size: 12px; font-weight: 800; color: var(--teal); text-transform: uppercase; letter-spacing: 0.08em; margin: 0 0 10px 4px; display: flex; align-items: center; gap: 8px; }
+.block-title .count { background: var(--navy-card); border: 1px solid var(--border); color: var(--text-dim); border-radius: 10px; padding: 1px 8px; font-size: 10.5px; }
+
+.video-card { background: var(--navy-card); border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 10px; overflow: hidden; }
+.video-thumb { position: relative; width: 100%; aspect-ratio: 16/9; background: linear-gradient(135deg, #0d1f3a, #14284a); background-size: cover; background-position: center; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+.video-thumb.has-video::before { content: ''; position: absolute; inset: 0; background: rgba(0,0,0,0.25); }
+.video-thumb.playing::before { display: none; }
+.video-thumb .play-icon { position: relative; z-index: 1; }
+.play-icon { width: 52px; height: 52px; border-radius: 50%; background: rgba(0,212,180,0.15); border: 2px solid var(--teal); display: flex; align-items: center; justify-content: center; }
+.play-icon::after { content: ''; border-style: solid; border-width: 10px 0 10px 16px; border-color: transparent transparent transparent var(--teal); margin-left: 4px; }
+.coming-soon-badge { position: absolute; bottom: 8px; right: 8px; background: rgba(255,179,64,0.15); border: 1px solid var(--amber); color: var(--amber); font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 10px; }
+.video-info { padding: 10px 14px 12px; }
+.video-title { font-size: 14px; font-weight: 700; margin-bottom: 2px; }
+.video-desc { font-size: 11.5px; color: var(--text-dim); }
+
+.intro-note { background: var(--navy-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; margin-bottom: 18px; font-size: 12.5px; color: var(--text-dim); line-height: 1.5; }
+</style>
+<link rel="stylesheet" href="ios.css">
+<script src="pwa.js" defer></script>
+</head>
+<body>
+
+<div class="header">
+  <a href="index.html" class="back-btn">← Home</a>
+  <div>
+    <h1>🎬 Skills Videos</h1>
+    <div class="sub">MyNeST procedural skill demonstrations</div>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="intro-note">
+    Short procedural demonstrations referenced throughout the MyNeST Workshop Guide. Tap a video to play. Videos marked "Coming soon" are still in production by the Video Production &amp; Simulation team.
+    <span id="offlineVidNote" style="display:none;color:var(--amber);font-weight:700"><br>You are offline — videos need an internet connection to play.</span>
+  </div>
+  <div id="videoGroups"></div>
+</div>
+
+<script>
+// Each video: { title, desc, url }. Leave url empty until the file is hosted —
+// the card will automatically switch from a "Coming soon" placeholder to a
+// playable embedded video the moment a url is added here.
+const VIDEO_GROUPS = [
+  {
+    block: 'Block A · Receiving the Baby & Initial Steps',
+    videos: [
+      { title: 'Delayed Cord Clamping — Vigorous Newborn', desc: 'DCC technique and observation for a vigorous baby at birth.', url: 'https://youtu.be/aQhIzXEccLQ' },
+      { title: 'Immediate Cord Clamping — Non-Vigorous Newborn', desc: 'Clamp and transfer technique when DCC criteria are not met.', url: 'https://youtu.be/_CDdVLggvYU' },
+      { title: 'Initial Steps of Resuscitation (Single Personnel)', desc: 'Warm, dry, stimulate, position — performed by one provider.', url: 'https://youtu.be/XY99XKqN2R8' },
+      { title: 'Initial Steps of Resuscitation (With Assistant)', desc: 'The same sequence coordinated between two providers.', url: 'https://youtu.be/wWxnjNHY4E4' },
+      { title: 'Suctioning Technique', desc: 'Correct depth, sequence (mouth before nose), and technique.', url: 'https://youtu.be/tijDYZpDKnY' },
+      { title: 'Post-Initial Steps Evaluation', desc: 'Assessing HR, breathing, and SpO₂ after initial steps.', url: 'https://youtu.be/jTuGyzTEYLs' },
+    ],
+  },
+  {
+    block: 'Block B · Positive Pressure Ventilation & Airway',
+    videos: [
+      { title: 'Initiating PPV', desc: 'T-piece setup, mask seal, and starting effective ventilation.', url: 'https://youtu.be/AvWjvgpvvQ8' },
+      { title: 'Intubation and Auscultation', desc: 'Laryngoscopy technique and confirming ETT placement.', url: 'https://youtu.be/E2OPRtPyPvM' },
+    ],
+  },
+  {
+    block: 'Block C · Chest Compressions',
+    videos: [
+      { title: 'CPR — Two-Thumb Encircling Technique', desc: 'The preferred technique: placement, depth, rate, and ratio.', url: 'https://youtu.be/2RkQLIFN5-E' },
+      { title: 'CPR — Two-Finger Technique', desc: 'Alternative technique when two-thumb is not possible.', url: 'https://youtu.be/rXNEFsky4Tk' },
+    ],
+  },
+  {
+    block: 'Block D · Medications & UVC',
+    videos: [
+      { title: 'Preparing Adrenaline', desc: 'Diluting 1:1,000 to 1:10,000 and correct labelling.', url: 'https://youtu.be/OYCQr0FaY8A' },
+      { title: 'IV Adrenaline Administration', desc: 'Dose, route, and flush via umbilical venous catheter.', url: 'https://youtu.be/1QH0V-FtFb8' },
+      { title: 'IV Bolus Normal Saline Administration', desc: 'Volume expander preparation, dose, and administration.', url: 'https://youtu.be/Rs5gjsmivW0' },
+    ],
+  },
+  {
+    block: 'Block E · Preterm & Special Conditions',
+    videos: [
+      { title: 'Preterm Stabilisation', desc: 'Golden Hour thermoregulation, oxygen titration, and CPAP.', url: 'https://youtu.be/cnyDlkHgLsE' },
+    ],
+  },
+];
+
+function getYouTubeId(url) {
+  if (!url) return null;
+  const m = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/))([a-zA-Z0-9_-]{6,})/);
+  return m ? m[1] : null;
+}
+
+function renderVideoGroups() {
+  const root = document.getElementById('videoGroups');
+  let html = '';
+  VIDEO_GROUPS.forEach((group, gi) => {
+    const total = group.videos.length;
+    html += `<div class="block-group">
+      <div class="block-title">${group.block} <span class="count">${total} video${total===1?'':'s'}</span></div>`;
+    group.videos.forEach((v, vi) => {
+      const ytId = getYouTubeId(v.url);
+      const hasVideo = !!ytId;
+      const thumbId = `thumb-${gi}-${vi}`;
+      html += `<div class="video-card">
+        <div class="video-thumb${hasVideo?' has-video':''}" id="${thumbId}" ${hasVideo ? `onclick="playVideo('${thumbId}','${ytId}')"` : ''}
+             ${hasVideo ? `style="background-image:url('https://img.youtube.com/vi/${ytId}/hqdefault.jpg')"` : ''}>
+          ${hasVideo
+            ? `<div class="play-icon"></div>`
+            : `<div class="play-icon"></div><div class="coming-soon-badge">Coming soon</div>`}
+        </div>
+        <div class="video-info">
+          <div class="video-title">${v.title}</div>
+          <div class="video-desc">${v.desc}</div>
+        </div>
+      </div>`;
+    });
+    html += `</div>`;
+  });
+  root.innerHTML = html;
+}
+
+function playVideo(thumbId, ytId) {
+  const thumbEl = document.getElementById(thumbId);
+  if (!thumbEl || !ytId) return;
+  thumbEl.style.backgroundImage = '';
+  thumbEl.classList.add('playing');
+  thumbEl.innerHTML = `<iframe width="100%" height="100%" src="https://www.youtube.com/embed/${ytId}?autoplay=1&rel=0" title="MyNeST skill video" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
+}
+
+renderVideoGroups();
+function vidNet(){document.getElementById('offlineVidNote').style.display=navigator.onLine?'none':'inline';}
+window.addEventListener('online',vidNet);window.addEventListener('offline',vidNet);vidNet();
+</script>
+</body>
+</html>
