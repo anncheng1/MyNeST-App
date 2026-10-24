@@ -1,0 +1,1527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<title>Resuscitation Record — MyNeST</title>
+<!-- iPhone home-screen app -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="MyNeST">
+<meta name="application-name" content="MyNeST">
+<meta name="format-detection" content="telephone=no">
+<meta name="theme-color" content="#0a1628">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="167x167" href="icons/apple-touch-icon-167.png">
+<link rel="apple-touch-icon" sizes="152x152" href="icons/apple-touch-icon-152.png">
+<link rel="apple-touch-startup-image" media="screen and (device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="icons/splash-1290x2796.png">
+<link rel="apple-touch-startup-image" media="screen and (device-width: 440px) and (device-height: 956px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="icons/splash-1320x2868.png">
+<link rel="apple-touch-startup-image" media="screen and (device-width: 402px) and (device-height: 874px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="icons/splash-1206x2622.png">
+<link rel="apple-touch-startup-image" media="screen and (device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="icons/splash-1179x2556.png">
+<link rel="apple-touch-startup-image" media="screen and (device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="icons/splash-1284x2778.png">
+<link rel="apple-touch-startup-image" media="screen and (device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="icons/splash-1170x2532.png">
+<link rel="apple-touch-startup-image" media="screen and (device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="icons/splash-1125x2436.png">
+<link rel="apple-touch-startup-image" media="screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="icons/splash-1242x2688.png">
+<link rel="apple-touch-startup-image" media="screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="icons/splash-828x1792.png">
+<link rel="apple-touch-startup-image" media="screen and (device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="icons/splash-750x1334.png">
+<style>
+:root {
+  --navy: #0a1628;
+  --navy-mid: #122040;
+  --navy-card: #1a2d50;
+  --blue: #3b9eff;
+  --blue-bright: #5db0ff;
+  --teal: #00d4b4;
+  --red: #ff4d6a;
+  --amber: #ffb340;
+  --amber-bg: #2a1f00;
+  --green: #34d399;
+  --green-bg: #0d2018;
+  --text: #e8f0fe;
+  --text-dim: #8da4c4;
+  --text-dim2: #5a6f8a;
+  --border: #243860;
+  --radius: 16px;
+  --radius-sm: 10px;
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html, body { background: var(--navy); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 15px; min-height: 100dvh; }
+body { padding-bottom: calc(24px + var(--safe-bottom)); }
+
+.header { background: var(--navy-mid); border-bottom: 1px solid var(--border); padding: 12px 16px; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 100; }
+.new-patient-btn { margin-left: auto; background: var(--red); color: #fff; border: none; font-weight: 700; font-size: 12px; padding: 8px 12px; border-radius: 16px; cursor: pointer; white-space: nowrap; }
+.back-btn { background: var(--navy-card); border: 1px solid var(--border); color: var(--text-dim); padding: 6px 12px; border-radius: 20px; font-size: 14px; text-decoration: none; white-space: nowrap; }
+.header h1 { font-size: 16px; font-weight: 700; }
+.header .sub { font-size: 12px; color: var(--text-dim); }
+
+.jump-nav { display: flex; gap: 6px; overflow-x: auto; padding: 10px 16px; background: var(--navy-mid); border-bottom: 1px solid var(--border); position: sticky; top: 57px; z-index: 99; -webkit-overflow-scrolling: touch; scroll-behavior: smooth; }
+.jump-nav a { flex-shrink: 0; font-size: 11px; color: var(--text-dim); background: var(--navy-card); border: 1px solid var(--border); border-radius: 14px; padding: 5px 10px; text-decoration: none; white-space: nowrap; transition: background .15s, color .15s, border-color .15s; }
+.jump-nav a.active { background: var(--blue); border-color: var(--blue); color: #fff; font-weight: 700; }
+.section-toolbar { display: flex; gap: 8px; padding: 8px 16px 0; background: var(--navy-mid); border-bottom: 1px solid var(--border); position: sticky; top: 103px; z-index: 98; }
+.section-toolbar button { flex: 1; background: var(--navy-card); border: 1px solid var(--border); color: var(--text-dim); font-size: 11px; font-weight: 700; padding: 7px 8px; border-radius: 8px; cursor: pointer; }
+.section-toolbar button:active { background: var(--blue); border-color: var(--blue); color: #fff; }
+
+.wrap { max-width: 760px; margin: 0 auto; padding: 16px; }
+.card { background: var(--navy-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; margin-bottom: 14px; scroll-margin-top: 145px; }
+.card-title { font-size: 12px; font-weight: 700; color: var(--blue-bright); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; gap: 6px; cursor: pointer; user-select: none; -webkit-user-select: none; }
+.card-title .chevron { font-size: 10px; color: var(--text-dim2); transition: transform .2s ease; flex-shrink: 0; }
+.card.collapsed .card-title { margin-bottom: 0; }
+.card.collapsed .chevron { transform: rotate(-90deg); }
+.card.collapsed .card-body { display: none; }
+.card-note { font-size: 11.5px; color: var(--text-dim2); margin: -6px 0 12px; font-style: italic; }
+.sub-head { font-size: 11px; font-weight: 700; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.05em; margin: 14px 0 8px; padding-top: 10px; border-top: 1px solid var(--border); }
+.sub-head:first-of-type { margin-top: 0; padding-top: 0; border-top: none; }
+
+.field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.field { display: flex; flex-direction: column; gap: 4px; }
+.field.full { grid-column: 1/-1; }
+.field label { font-size: 11px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.05em; }
+.field input, .field select, .field textarea {
+  background: var(--navy); border: 1px solid var(--border); border-radius: 8px; color: var(--text);
+  padding: 9px 10px; font-size: 14px; font-family: inherit; width: 100%;
+}
+.field input:focus, .field select:focus, .field textarea:focus { outline: none; border-color: var(--blue); }
+.time-with-btn { display: flex; gap: 6px; }
+.time-with-btn input { flex: 1; }
+.now-btn { flex-shrink: 0; background: var(--navy-card); border: 1px solid var(--blue); color: var(--blue-bright); border-radius: 8px; padding: 0 10px; font-size: 11px; font-weight: 700; cursor: pointer; }
+
+.chip-group { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { background: var(--navy); border: 1px solid var(--border); color: var(--text-dim); padding: 7px 12px; border-radius: 16px; font-size: 12.5px; cursor: pointer; }
+.chip.on { background: var(--blue); border-color: var(--blue); color: #fff; font-weight: 700; }
+
+.timer-hero { text-align: center; padding: 6px 0 4px; }
+.timer-clock-lg { font-size: 42px; font-weight: 800; font-variant-numeric: tabular-nums; letter-spacing: 0.02em; }
+.timer-clock-lg.idle { color: var(--text-dim2); }
+.timer-clock-lg.running { color: var(--teal); }
+.timer-caption { font-size: 12px; color: var(--text-dim); margin-bottom: 12px; }
+.big-btn { display: block; width: 100%; background: var(--teal); color: #001812; border: none; font-weight: 800; font-size: 15px; padding: 14px; border-radius: 12px; cursor: pointer; }
+.big-btn:active { opacity: .85; }
+.big-btn.set { background: var(--navy); border: 1px solid var(--border); color: var(--text-dim); font-weight: 600; margin-top: 8px; }
+.delivery-time-row { display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 13px; color: var(--text-dim); margin-top: 6px; flex-wrap: wrap; }
+.delivery-time-row input { background: var(--navy); border: 1px solid var(--border); border-radius: 6px; color: var(--text); padding: 4px 8px; font-size: 13px; }
+
+.alert-banner { display: none; background: var(--amber-bg); border: 1px solid var(--amber); border-radius: var(--radius-sm); padding: 12px 14px; margin-bottom: 14px; font-size: 14px; color: #ffd580; font-weight: 700; text-align: center; position: sticky; top: 101px; z-index: 98; }
+.alert-banner.show { display: block; animation: flash 1s ease-in-out 3; }
+.alert-banner.ethics { background: #3a0d16; border: 2px solid var(--red); color: #ffb3c0; animation: none; }
+.ethics-stop-btn { display: block; width: 100%; margin-top: 8px; background: var(--red); color: #fff; border: none; font-weight: 800; font-size: 13px; padding: 10px; border-radius: 8px; cursor: pointer; }
+@keyframes flash { 0%,100%{opacity:1} 50%{opacity:.5} }
+
+.mt-scroll { overflow-x: auto; }
+.mt-table { width: 100%; border-collapse: collapse; font-size: 12px; min-width: 620px; }
+.mt-table th, .mt-table td { border: 1px solid var(--border); padding: 6px 8px; text-align: center; }
+.mt-table th { background: var(--navy); color: var(--text-dim); font-size: 10.5px; text-transform: uppercase; }
+.mt-table td:first-child, .mt-table th:first-child { text-align: left; background: var(--navy); color: var(--text-dim); font-weight: 700; position: sticky; left: 0; }
+.mt-table input { width: 56px; background: transparent; border: none; color: var(--text); text-align: center; font-size: 12.5px; font-family: inherit; }
+.mt-table input:focus { outline: 1px solid var(--blue); border-radius: 4px; }
+.mt-table select { width: 100%; min-width: 78px; background: var(--navy); border: 1px solid var(--border); border-radius: 4px; color: var(--text); text-align: center; text-align-last: center; font-size: 11px; font-family: inherit; padding: 3px 1px; }
+.mt-table select:focus { outline: 1px solid var(--blue); }
+.mt-table select option { background: var(--navy); color: var(--text); }
+.mt-col-due th, .mt-col-due td { background: rgba(255,179,64,0.12); }
+.mt-target { font-size: 11px; color: var(--text-dim2); margin-bottom: 10px; }
+
+.apgar-mini { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin-top: 12px; }
+.apgar-mini-col { background: var(--navy); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 10px; text-align: center; }
+.apgar-mini-col.apgar-due { border-color: var(--amber); box-shadow: 0 0 0 2px var(--amber); animation: apgarPulse 1s ease-in-out 4; }
+@keyframes apgarPulse { 0%,100%{opacity:1} 50%{opacity:.6} }
+.apgar-mini-time { font-size: 11px; color: var(--text-dim); text-transform: uppercase; margin-bottom: 6px; font-weight: 700; }
+.apgar-mini-score { font-size: 26px; font-weight: 800; color: var(--teal); }
+.apgar-mini input { width: 100%; text-align: center; background: var(--navy-card); border: 1px solid var(--border); border-radius: 6px; color: var(--text); padding: 4px; margin-top: 6px; font-size: 13px; }
+
+.apgar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+.apgar-label { width: 110px; flex-shrink: 0; font-size: 12px; color: var(--text-dim); }
+.apgar-btns { display: flex; gap: 6px; flex: 1; }
+.apgar-btn { flex: 1; background: var(--navy); border: 1px solid var(--border); color: var(--text-dim); padding: 7px 0; border-radius: 8px; font-size: 11.5px; font-weight: 700; cursor: pointer; text-align: center; }
+.apgar-btn.sel-0 { background: #3a0d16; border-color: var(--red); color: #ff8fa3; }
+.apgar-btn.sel-1 { background: #2a1f00; border-color: var(--amber); color: #ffd580; }
+.apgar-btn.sel-2 { background: var(--green-bg); border-color: var(--green); color: #6ee7b7; }
+
+.save-row { display: flex; gap: 8px; margin-top: 10px; }
+.save-row button { flex: 1; }
+.btn-secondary { background: var(--navy); border: 1px solid var(--border); color: var(--text-dim); padding: 12px; border-radius: 10px; font-size: 14px; cursor: pointer; }
+
+.notes-table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+.notes-table th { background: var(--navy); color: var(--text-dim); font-size: 10.5px; text-transform: uppercase; padding: 6px; text-align: left; }
+.notes-table td { padding: 4px; border-top: 1px solid var(--border); }
+.notes-table input { width: 100%; background: transparent; border: none; color: var(--text); font-size: 12.5px; font-family: inherit; padding: 4px; }
+.notes-table input:focus { outline: 1px solid var(--blue); border-radius: 4px; }
+.add-row-btn { margin-top: 8px; background: var(--navy); border: 1px dashed var(--border); color: var(--text-dim); padding: 8px; border-radius: 8px; font-size: 12px; cursor: pointer; width: 100%; }
+.del-row-btn { background: none; border: none; color: var(--red); cursor: pointer; font-size: 13px; }
+
+.export-row { display: flex; gap: 8px; }
+.export-btn { flex: 1; background: var(--navy); border: 1px solid var(--border); color: var(--text); padding: 12px; border-radius: 10px; font-size: 13px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; }
+.export-btn.primary { background: var(--blue); border-color: var(--blue); color: #fff; }
+
+.sig-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+
+/* Gate questions (progressive disclosure) */
+.gate-card { background: linear-gradient(135deg, #122040, #0d1830); border: 1px solid var(--blue); border-radius: var(--radius); padding: 18px; margin-bottom: 14px; text-align: center; }
+.gate-question { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 14px; line-height: 1.4; }
+.gate-btns { display: flex; gap: 10px; }
+.gate-btn { flex: 1; padding: 13px; border-radius: 10px; font-size: 13px; font-weight: 700; cursor: pointer; border: 1px solid; }
+.gate-btn.no { background: var(--green-bg); border-color: var(--green); color: #6ee7b7; }
+.gate-btn.yes { background: var(--amber-bg); border-color: var(--amber); color: #ffd580; }
+.gate-btn.picked { outline: 2px solid #fff; }
+.gate-answer { margin-top: 10px; font-size: 12px; color: var(--text-dim); }
+.gate-change-btn { background: none; border: none; color: var(--blue-bright); text-decoration: underline; font-size: 11px; cursor: pointer; margin-left: 8px; }
+
+.escalation-toggle-btn { display: block; width: 100%; background: var(--red); color: #fff; border: none; font-weight: 800; font-size: 13px; padding: 12px; border-radius: 10px; cursor: pointer; margin: 12px 0; }
+.escalation-toggle-btn.active { background: var(--navy); border: 1px solid var(--red); color: var(--red); }
+
+.alert-toggle-btn { display: block; width: 100%; background: var(--navy); border: 1px solid var(--blue); color: var(--blue-bright); font-weight: 700; font-size: 13px; padding: 12px; border-radius: 10px; cursor: pointer; margin: 10px 0; }
+.alert-toggle-btn.active { background: var(--teal); border-color: var(--teal); color: #001812; animation: pulseGlow 2s ease-in-out infinite; }
+@keyframes pulseGlow { 0%,100%{opacity:1} 50%{opacity:.75} }
+
+#printView { display: none; }
+@media print {
+  @page { size: A4; margin: 9mm; }
+  .header, .jump-nav, .wrap { display: none !important; }
+  #printView { display: block !important; }
+  body { background: #fff !important; color: #000 !important; font-size: 9.5px; }
+  .print-page { page-break-after: always; }
+  .print-page:last-child { page-break-after: auto; }
+  .pv-title { font-size: 14px; font-weight: 800; margin-bottom: 1px; }
+  .pv-sub { font-size: 8.5px; color: #555; margin-bottom: 8px; }
+  .pv-page-label { font-size: 8px; color: #999; text-align: right; margin-bottom: 4px; }
+  .pv-body { width: 100%; }
+  .pv-section { width: 100%; margin-bottom: 7px; break-inside: avoid; page-break-inside: avoid;
+    border: 1px solid #888; border-radius: 3px; padding: 0 0 5px; }
+  .pv-section-title { font-size: 10.5px; font-weight: 800; color: #fff; background: #1B3A6B; padding: 3px 8px; border-radius: 2px 2px 0 0; margin-bottom: 4px; }
+  .pv-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 2px 16px; padding: 0 8px; }
+  .pv-fields.cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+  .pv-line { margin: 0; line-height: 1.5; border-bottom: 1px solid #ddd; padding: 1px 0; }
+  .pv-label { font-weight: 700; margin-right: 4px; }
+  .pv-blank { display: inline-block; min-width: 90px; border-bottom: 1px dotted #999; color: transparent; }
+  .pv-table { width: 100%; border-collapse: collapse; margin: 4px 0 2px; font-size: 9px; grid-column: 1 / -1; }
+  .pv-table th, .pv-table td { border: 1px solid #bbb; padding: 2px 5px; text-align: left; }
+  .pv-table th { background: #eee; }
+  .pv-empty-note { font-style: italic; color: #777; padding: 0 8px; }
+  .pv-sig-box { border: 1px solid #888; border-radius: 3px; margin-top: 8px; padding: 0 0 6px; }
+  .pv-sig-title { font-size: 10.5px; font-weight: 800; color: #fff; background: #1B3A6B; padding: 3px 8px; border-radius: 2px 2px 0 0; margin-bottom: 8px; }
+  .pv-sig-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 0 8px; }
+  .pv-sig-cell { border-top: 1px solid #333; padding-top: 3px; margin-top: 26px; font-size: 8.5px; }
+  .pv-stamp-cell { border: 1px dashed #999; border-radius: 3px; min-height: 50px; display: flex; align-items: center; justify-content: center; color: #999; font-size: 8.5px; font-style: italic; }
+  a[href]::after { content: none !important; }
+}
+</style>
+<link rel="stylesheet" href="ios.css">
+<style>
+.jump-nav{top:calc(env(safe-area-inset-top,0px) + 57px)}
+.section-toolbar{top:calc(env(safe-area-inset-top,0px) + 103px)}
+.alert-banner{top:calc(env(safe-area-inset-top,0px) + 101px)}
+.card{scroll-margin-top:calc(env(safe-area-inset-top,0px) + 145px)}
+</style>
+<script src="pwa.js" defer></script>
+</head>
+<body>
+<div id="printView"></div>
+
+<div class="header">
+  <a href="index.html" class="back-btn">← Home</a>
+  <div>
+    <h1>Neonatal Resuscitation Record</h1>
+    <div class="sub">Full MOH record · Auto-timed vitals &amp; Apgar</div>
+  </div>
+  <button class="new-patient-btn" onclick="resetEntireRecord()">🆕 New Patient</button>
+</div>
+
+<div class="jump-nav">
+  <a href="#s1">1 · ID</a><a href="#s2">2 · Antenatal</a><a href="#s5">3 · Team</a><a href="#s3">4 · Prep</a><a href="#s4">5 · Initial Stab.</a>
+  <a href="#s6">6 · Apgar</a><a href="#s7">7 · Monitoring</a><a href="#s8">8 · Airway</a>
+  <a href="#s9">9 · Circulation</a><a href="#s10">10 · Post-Res</a><a href="#s11">11 · Timepoints</a><a href="#s12">12 · Disposition</a><a href="#s13">13 · Notes</a>
+</div>
+<div class="section-toolbar">
+  <button type="button" onclick="setAllSectionsCollapsed(false)">⬇ Expand All</button>
+  <button type="button" onclick="setAllSectionsCollapsed(true)">⬆ Collapse All</button>
+</div>
+
+<div class="wrap">
+
+  <div class="card" id="s1">
+    <div class="card-title">1 · Patient Identification</div>
+    <div class="field-grid">
+      <div class="field"><label>Baby name (B/O)</label><input id="babyName" type="text" placeholder="B/O ..."></div>
+      <div class="field"><label>MRN / MIC</label><input id="mrn" type="text"></div>
+      <div class="field"><label>Sex</label><div class="chip-group" data-field="sex"><span class="chip" onclick="chipPick('sex',this)">Male</span><span class="chip" onclick="chipPick('sex',this)">Female</span><span class="chip" onclick="chipPick('sex',this)">Unknown</span></div></div>
+      <div class="field"><label>Place of birth</label><div class="chip-group" data-field="placeOfBirth"><span class="chip" onclick="chipPick('placeOfBirth',this)">LR</span><span class="chip" onclick="chipPick('placeOfBirth',this)">OT</span><span class="chip" onclick="chipPick('placeOfBirth',this)">ETD</span><span class="chip" onclick="chipPick('placeOfBirth',this)">Other</span></div></div>
+      <div class="field"><label>Date of birth</label><input id="dob" type="date"></div>
+      <div class="field"><label>Time of birth</label><div class="timer-caption" id="timeOfBirthDisplay" style="text-align:left;margin:0;padding:9px 10px;background:var(--navy);border:1px solid var(--border);border-radius:8px;">— recorded automatically on Start below</div></div>
+      <div class="field"><label>Gestation — weeks</label><input id="gestWeeks" type="number" placeholder="e.g. 38"></div>
+      <div class="field"><label>Gestation — days</label><input id="gestDays" type="number" placeholder="0–6"></div>
+      <div class="field"><label>Estimated weight (g)</label><input id="estWeight" type="number"></div>
+      <div class="field"><label>Actual weight (g)</label><input id="actualWeight" type="number"></div>
+    </div>
+  </div>
+
+  <div class="card" id="s2">
+    <div class="card-title">2 · Antenatal &amp; Birth Information</div>
+    <div class="field-grid">
+      <div class="field"><label>Gravida</label><input id="gravida" type="number" placeholder="e.g. 2"></div>
+      <div class="field"><label>Para</label><input id="para" type="number" placeholder="e.g. 1"></div>
+      <div class="field"><label>Abortion</label><input id="abortion" type="number" placeholder="e.g. 0"></div>
+      <div class="field full"><label>Birth type</label><div class="chip-group" data-field="birthType"><span class="chip" onclick="chipPick('birthType',this)">Vaginal</span><span class="chip" onclick="chipPick('birthType',this)">Instrumental</span><span class="chip" onclick="chipPick('birthType',this)">Caesarean</span></div></div>
+      <div class="field"><label>Antenatal steroids</label><div class="chip-group" data-field="steroids"><span class="chip" onclick="chipPick('steroids',this)">Complete</span><span class="chip" onclick="chipPick('steroids',this)">Partial</span><span class="chip" onclick="chipPick('steroids',this)">None</span></div></div>
+      <div class="field"><label>MgSO₄ given</label><div class="chip-group" data-field="mgso4"><span class="chip" onclick="chipPick('mgso4',this)">Yes</span><span class="chip" onclick="chipPick('mgso4',this)">No</span></div></div>
+      <div class="field"><label>Meconium</label><div class="chip-group" data-field="meconium"><span class="chip" onclick="chipPick('meconium',this)">None</span><span class="chip" onclick="chipPick('meconium',this)">Thin</span><span class="chip" onclick="chipPick('meconium',this)">Thick</span></div></div>
+      <div class="field full"><label>Risk factors / indications</label><input id="riskFactors" type="text" placeholder="e.g. prematurity, prolonged ROM, fetal distress, infection"></div>
+    </div>
+  </div>
+
+  <div class="card" id="s5">
+    <div class="card-title">3 · Team Response</div>
+    <div class="field-grid">
+      <div class="field"><label>Time resus called</label><div class="time-with-btn"><input id="timeResusCalled" type="time"><button class="now-btn" onclick="stampNow('timeResusCalled')">Now</button></div></div>
+      <div class="field"><label>Time team leader arrived</label><div class="time-with-btn"><input id="timeTLArrived" type="time"><button class="now-btn" onclick="stampNow('timeTLArrived')">Now</button></div></div>
+    </div>
+    <div class="sub-head">Roles</div>
+    <div class="field-grid">
+      <div class="field"><label>Team Leader — name</label><input id="teamLeader" type="text"></div>
+      <div class="field"><label>Role / designation</label><input id="teamLeaderRole" type="text"></div>
+      <div class="field"><label>Airway person</label><input id="airwayPerson" type="text"></div>
+      <div class="field"><label>Time arrived</label><input id="airwayArrived" type="time"></div>
+      <div class="field"><label>Compressions person</label><input id="compPerson" type="text"></div>
+      <div class="field"><label>Time arrived</label><input id="compArrived" type="time"></div>
+      <div class="field"><label>Medication nurse</label><input id="medPerson" type="text"></div>
+      <div class="field"><label>Time arrived</label><input id="medArrived" type="time"></div>
+      <div class="field"><label>Recorder</label><input id="recorder" type="text"></div>
+      <div class="field"><label>Time arrived</label><input id="recorderArrived" type="time"></div>
+    </div>
+<button class="escalation-toggle-btn" id="escalationToggleBtn" onclick="toggleEscalation()">⚠ Escalation / Code Blue Required — tap if needed</button>
+<div id="escalationPanel" style="display:none">
+    <div class="sub-head">Escalation</div>
+    <div class="field-grid">
+      <div class="field"><label>Escalation triggered</label><div class="chip-group" data-field="escalationTriggered"><span class="chip" onclick="chipPick('escalationTriggered',this)">Yes</span><span class="chip" onclick="chipPick('escalationTriggered',this)">No</span></div></div>
+      <div class="field"><label>Time escalated</label><input id="timeEscalated" type="time"></div>
+      <div class="field full"><label>Escalated to</label><div class="chip-group" data-field="escalatedTo"><span class="chip" onclick="chipPick('escalatedTo',this)">Paediatrician</span><span class="chip" onclick="chipPick('escalatedTo',this)">Neonatologist</span><span class="chip" onclick="chipPick('escalatedTo',this)">Anaesthetist</span><span class="chip" onclick="chipPick('escalatedTo',this)">ENT Specialist</span></div></div>
+      <div class="field"><label>Time specialist arrived</label><input id="specialistArrived" type="time"></div>
+    </div>
+    <div class="sub-head">Code Blue</div>
+    <div class="field-grid">
+      <div class="field"><label>Code blue activated</label><div class="chip-group" data-field="codeBlue"><span class="chip" onclick="chipPick('codeBlue',this)">Yes</span><span class="chip" onclick="chipPick('codeBlue',this)">No</span></div></div>
+      <div class="field"><label>Time of activation</label><input id="codeBlueTime" type="time"></div>
+      <div class="field"><label>Activation method</label><div class="chip-group" data-field="activationMethod"><span class="chip" onclick="chipPick('activationMethod',this)">Phone</span><span class="chip" onclick="chipPick('activationMethod',this)">PA System</span></div></div>
+      <div class="field"><label>Response team</label><div class="chip-group" data-field="responseTeam"><span class="chip" onclick="chipPick('responseTeam',this)">Specialist</span><span class="chip" onclick="chipPick('responseTeam',this)">MO</span><span class="chip" onclick="chipPick('responseTeam',this)">Nurse</span></div></div>
+      <div class="field"><label>Time of response / arrival</label><input id="responseTime" type="time"></div>
+      <div class="field"><label>Response interval (min)</label><input id="responseInterval" type="number"></div>
+      <div class="field full"><label>Reason for code blue</label><div class="chip-group" data-field="codeBlueReason"><span class="chip" onclick="chipPick('codeBlueReason',this)">Respiratory failure</span><span class="chip" onclick="chipPick('codeBlueReason',this)">Cardiopulmonary arrest</span><span class="chip" onclick="chipPick('codeBlueReason',this)">Severe bradycardia</span><span class="chip" onclick="chipPick('codeBlueReason',this)">Other</span></div></div>
+      <div class="field full"><label>Other reason (if applicable)</label><input id="codeBlueOther" type="text"></div>
+    </div>
+</div>
+  </div>
+
+  <div class="card" id="s3">
+    <div class="card-title">4 · Preparation &amp; Briefing</div>
+    <div class="card-note">Complete before delivery when possible</div>
+    <div class="field-grid">
+      <div class="field full"><label>Expected concerns</label><div class="chip-group" data-field="expectedConcerns" data-multi="1"><span class="chip" onclick="chipPick('expectedConcerns',this,true)">Prematurity</span><span class="chip" onclick="chipPick('expectedConcerns',this,true)">Meconium</span><span class="chip" onclick="chipPick('expectedConcerns',this,true)">Congenital anomaly</span><span class="chip" onclick="chipPick('expectedConcerns',this,true)">Multiple birth</span><span class="chip" onclick="chipPick('expectedConcerns',this,true)">Maternal illness</span><span class="chip" onclick="chipPick('expectedConcerns',this,true)">Other</span></div></div>
+      <div class="field"><label>Briefing done</label><div class="chip-group" data-field="briefingDone"><span class="chip" onclick="chipPick('briefingDone',this)">Yes</span><span class="chip" onclick="chipPick('briefingDone',this)">No</span></div></div>
+      <div class="field"><label>Equipment checked</label><div class="chip-group" data-field="equipChecked"><span class="chip" onclick="chipPick('equipChecked',this)">Yes</span><span class="chip" onclick="chipPick('equipChecked',this)">No</span></div></div>
+      <div class="field"><label>Warmer pre-heated</label><div class="chip-group" data-field="warmerPreheated"><span class="chip" onclick="chipPick('warmerPreheated',this)">Yes</span><span class="chip" onclick="chipPick('warmerPreheated',this)">No</span></div></div>
+      <div class="field"><label>Suction ready</label><div class="chip-group" data-field="suctionReady"><span class="chip" onclick="chipPick('suctionReady',this)">Yes</span><span class="chip" onclick="chipPick('suctionReady',this)">No</span></div></div>
+      <div class="field"><label>T-piece / bag-mask ready</label><div class="chip-group" data-field="tpieceReady"><span class="chip" onclick="chipPick('tpieceReady',this)">Yes</span><span class="chip" onclick="chipPick('tpieceReady',this)">No</span></div></div>
+      <div class="field"><label>Resus drug available</label><div class="chip-group" data-field="drugsDrawn"><span class="chip" onclick="chipPick('drugsDrawn',this)">Yes</span><span class="chip" onclick="chipPick('drugsDrawn',this)">No</span></div></div>
+    </div>
+  </div>
+
+  <div class="card" id="deliveryTimeCard">
+    <div class="card-title">Delivery Time</div>
+    <div class="card-note">Tap once the baby is born — this records time of birth everywhere and starts the timer used throughout this record.</div>
+    <div class="timer-hero" style="margin-top:14px">
+      <div class="timer-clock-lg idle" id="clockDisplay">--:--</div>
+      <div class="timer-caption" id="clockCaption">Tap below once — this records time of birth everywhere and starts the timer</div>
+      <button class="big-btn" id="deliveryBtn" onclick="setDeliveryTime()">👶 Baby Delivered — Start</button>
+      <div class="delivery-time-row" id="deliveryTimeRow" style="display:none">
+        Time of birth: <input type="datetime-local" id="deliveryTimeInput" onchange="onDeliveryTimeEdited()">
+      </div>
+      <button class="big-btn set" id="resetBtn" onclick="resetTimer()" style="display:none">↺ Reset Timer (keeps birth time)</button>
+    </div>
+  </div>
+
+  <div class="card" id="s4">
+    <div class="card-title">5 · Initial Stabilisation</div>
+    <div class="field-grid">
+      <div class="field"><label>Delayed cord clamping</label><div class="chip-group" data-field="dcc"><span class="chip" onclick="chipPick('dcc',this)">Yes</span><span class="chip" onclick="chipPick('dcc',this)">No</span></div></div>
+      <div class="field"><label>DCC duration (seconds)</label><input id="dccDuration" type="number"></div>
+      <div class="field full"><label>Thermoregulation</label><div class="chip-group" data-field="thermoreg" data-multi="1"><span class="chip" onclick="chipPick('thermoreg',this,true)">Radiant warmer</span><span class="chip" onclick="chipPick('thermoreg',this,true)">Plastic wrap / bag</span><span class="chip" onclick="chipPick('thermoreg',this,true)">Hat</span><span class="chip" onclick="chipPick('thermoreg',this,true)">Thermal mattress</span><span class="chip" onclick="chipPick('thermoreg',this,true)">Transport incubator</span></div></div>
+      <div class="field"><label>Dry &amp; stimulate</label><div class="chip-group" data-field="dryStim"><span class="chip" onclick="chipPick('dryStim',this)">Yes</span><span class="chip" onclick="chipPick('dryStim',this)">No</span></div></div>
+      <div class="field"><label>Suction</label><div class="chip-group" data-field="suctionType"><span class="chip" onclick="chipPickSuction(this,'None')">None</span><span class="chip" onclick="chipPickSuction(this,'Mouth')">Mouth</span><span class="chip" onclick="chipPickSuction(this,'Nose')">Nose</span><span class="chip" onclick="chipPickSuction(this,'Under vocal cords')">Under vocal cords</span></div></div>
+      <div class="field"><label>Delivery room temp (°C)</label><input id="drTemp" type="number" step="0.1"></div>
+      <div class="field"><label>Temp measurement time</label><input id="drTempTime" type="time"></div>
+    </div>
+  </div>
+
+  <div class="card" id="s6">
+    <div class="card-title">6 · Apgar Score</div>
+    <div class="card-note">Score at 1, 5 and 10 minutes. If the 10-minute score is below 7, continue scoring every 5 minutes.</div>
+
+    <div class="apgar-mini">
+      <div class="apgar-mini-col" id="apgar1Box"><div class="apgar-mini-time">1 min</div><div class="apgar-mini-score" id="apgar1Display">–</div><input id="apgar1" type="number" min="0" max="10" placeholder="0-10" oninput="document.getElementById('apgar1Display').textContent=this.value||'–'"></div>
+      <div class="apgar-mini-col" id="apgar5Box"><div class="apgar-mini-time">5 min</div><div class="apgar-mini-score" id="apgar5Display">–</div><input id="apgar5" type="number" min="0" max="10" placeholder="0-10" oninput="document.getElementById('apgar5Display').textContent=this.value||'–'"></div>
+      <div class="apgar-mini-col" id="apgar10Box"><div class="apgar-mini-time">10 min</div><div class="apgar-mini-score" id="apgar10Display">–</div><input id="apgar10" type="number" min="0" max="10" placeholder="0-10" oninput="onApgar10Input(this.value)"></div>
+    </div>
+    <div class="apgar-mini" id="apgarExtraMini" style="display:none;margin-top:10px">
+      <div class="apgar-mini-col" id="apgar15Box"><div class="apgar-mini-time">15 min</div><div class="apgar-mini-score" id="apgar15Display">–</div><input id="apgar15" type="number" min="0" max="10" placeholder="0-10" oninput="document.getElementById('apgar15Display').textContent=this.value||'–'"></div>
+      <div class="apgar-mini-col" id="apgar20Box"><div class="apgar-mini-time">20 min</div><div class="apgar-mini-score" id="apgar20Display">–</div><input id="apgar20" type="number" min="0" max="10" placeholder="0-10" oninput="document.getElementById('apgar20Display').textContent=this.value||'–'"></div>
+    </div>
+    <div class="card-note">Tip: use the quick scorer below to build the total from its five components, then it auto-fills the box for that minute.</div>
+
+    <div class="field" style="margin:10px 0"><label>Score for minute</label>
+      <div class="chip-group" data-field="apgarQuickMinute"><span class="chip" onclick="chipPick('apgarQuickMinute',this)">1 min</span><span class="chip" onclick="chipPick('apgarQuickMinute',this)">5 min</span><span class="chip" onclick="chipPick('apgarQuickMinute',this)">10 min</span><span class="chip" onclick="chipPick('apgarQuickMinute',this)">15 min</span><span class="chip" onclick="chipPick('apgarQuickMinute',this)">20 min</span></div>
+    </div>
+    <div class="apgar-row"><div class="apgar-label">Heart rate</div><div class="apgar-btns" data-comp="hrScore"><button class="apgar-btn" onclick="pickApgar('hrScore',0,this)">0 Absent</button><button class="apgar-btn" onclick="pickApgar('hrScore',1,this)">1 &lt;100</button><button class="apgar-btn" onclick="pickApgar('hrScore',2,this)">2 ≥100</button></div></div>
+    <div class="apgar-row"><div class="apgar-label">Resp. effort</div><div class="apgar-btns" data-comp="rrScore"><button class="apgar-btn" onclick="pickApgar('rrScore',0,this)">0 Absent</button><button class="apgar-btn" onclick="pickApgar('rrScore',1,this)">1 Weak</button><button class="apgar-btn" onclick="pickApgar('rrScore',2,this)">2 Crying</button></div></div>
+    <div class="apgar-row"><div class="apgar-label">Tone</div><div class="apgar-btns" data-comp="toneScore"><button class="apgar-btn" onclick="pickApgar('toneScore',0,this)">0 Limp</button><button class="apgar-btn" onclick="pickApgar('toneScore',1,this)">1 Some</button><button class="apgar-btn" onclick="pickApgar('toneScore',2,this)">2 Active</button></div></div>
+    <div class="apgar-row"><div class="apgar-label">Grimace (grasp)</div><div class="apgar-btns" data-comp="grimaceScore"><button class="apgar-btn" onclick="pickApgar('grimaceScore',0,this)">0 None</button><button class="apgar-btn" onclick="pickApgar('grimaceScore',1,this)">1 Grimace</button><button class="apgar-btn" onclick="pickApgar('grimaceScore',2,this)">2 Cry</button></div></div>
+    <div class="apgar-row"><div class="apgar-label">Colour</div><div class="apgar-btns" data-comp="colourScore"><button class="apgar-btn" onclick="pickApgar('colourScore',0,this)">0 Blue</button><button class="apgar-btn" onclick="pickApgar('colourScore',1,this)">1 Body pink</button><button class="apgar-btn" onclick="pickApgar('colourScore',2,this)">2 All pink</button></div></div>
+    <div class="save-row">
+      <button class="btn-secondary" onclick="clearApgarQuick()">Clear</button>
+      <button class="big-btn" style="flex:2" onclick="applyApgarQuick()">Apply to selected minute</button>
+    </div>
+    <div class="field" style="margin-top:10px"><label>Assigned by</label><input id="apgarAssignedBy" type="text"></div>
+  </div>
+
+
+
+  <div class="gate-card" id="gate1">
+    <div class="gate-question">Did the baby require initial steps of resuscitation, beyond routine care?</div>
+    <div class="gate-btns">
+      <button class="gate-btn no" onclick="answerGate1(false)">No — routine care only</button>
+      <button class="gate-btn yes" onclick="answerGate1(true)">Yes — needed initial steps</button>
+    </div>
+    <div class="gate-answer" id="gate1Answer"></div>
+  </div>
+
+  <div id="tier1" style="display:none">
+  <div class="card" id="s7">
+    <div class="card-title">7 · Monitoring Timeline</div>
+    <div class="card-note">Gas flow 10 L/min · Apply pulse oximeter (right hand, pre-ductal) · Initiate thermoregulation</div>
+
+    <div id="alertBanner" class="alert-banner"></div>
+
+    <div class="field-grid" style="margin:12px 0">
+      <div class="field"><label>Initial FiO₂</label><div class="chip-group" data-field="initialFio2"><span class="chip" onclick="chipPick('initialFio2',this)">21%</span><span class="chip" onclick="chipPick('initialFio2',this)">30%</span><span class="chip" onclick="chipPick('initialFio2',this)">100%</span></div></div>
+    </div>
+    <div class="mt-target">Target SpO₂ — 1 min 60–65% · 2 min 65–70% · 3 min 70–75% · 4 min 75–80% · 5 min 80–85% · 10 min 85–95%</div>
+
+    <div class="mt-scroll">
+      <table class="mt-table" id="mtTable">
+        <thead><tr>
+          <th>Parameter</th><th>1 min</th><th>3 min</th><th>5 min</th><th>10 min</th><th>15 min</th>
+        </tr></thead>
+        <tbody>
+          <tr><td>HR (bpm)</td><td><input data-col="1" data-row="hr"></td><td><input data-col="3" data-row="hr"></td><td><input data-col="5" data-row="hr"></td><td><input data-col="10" data-row="hr"></td><td><input data-col="15" data-row="hr"></td></tr>
+          <tr><td>SpO₂ (%)</td><td><input data-col="1" data-row="spo2"></td><td><input data-col="3" data-row="spo2"></td><td><input data-col="5" data-row="spo2"></td><td><input data-col="10" data-row="spo2"></td><td><input data-col="15" data-row="spo2"></td></tr>
+          <tr><td>FiO₂ (%)</td><td><input data-col="1" data-row="fio2"></td><td><input data-col="3" data-row="fio2"></td><td><input data-col="5" data-row="fio2"></td><td><input data-col="10" data-row="fio2"></td><td><input data-col="15" data-row="fio2"></td></tr>
+          <tr><td>RR / Effort</td><td><select data-col="1" data-row="rr"><option value="">—</option><option value="Adequate/regular">Adequate/regular</option><option value="Weak/irregular">Weak/irregular</option><option value="Gasping">Gasping</option><option value="Apnoea">Apnoea</option><option value="Laboured (grunt/recession)">Laboured (grunt/recession)</option></select></td><td><select data-col="3" data-row="rr"><option value="">—</option><option value="Adequate/regular">Adequate/regular</option><option value="Weak/irregular">Weak/irregular</option><option value="Gasping">Gasping</option><option value="Apnoea">Apnoea</option><option value="Laboured (grunt/recession)">Laboured (grunt/recession)</option></select></td><td><select data-col="5" data-row="rr"><option value="">—</option><option value="Adequate/regular">Adequate/regular</option><option value="Weak/irregular">Weak/irregular</option><option value="Gasping">Gasping</option><option value="Apnoea">Apnoea</option><option value="Laboured (grunt/recession)">Laboured (grunt/recession)</option></select></td><td><select data-col="10" data-row="rr"><option value="">—</option><option value="Adequate/regular">Adequate/regular</option><option value="Weak/irregular">Weak/irregular</option><option value="Gasping">Gasping</option><option value="Apnoea">Apnoea</option><option value="Laboured (grunt/recession)">Laboured (grunt/recession)</option></select></td><td><select data-col="15" data-row="rr"><option value="">—</option><option value="Adequate/regular">Adequate/regular</option><option value="Weak/irregular">Weak/irregular</option><option value="Gasping">Gasping</option><option value="Apnoea">Apnoea</option><option value="Laboured (grunt/recession)">Laboured (grunt/recession)</option></select></td></tr>
+          <tr><td>Colour</td><td><select data-col="1" data-row="colour"><option value="">—</option><option value="Completely pink">Completely pink</option><option value="Acrocyanosis">Acrocyanosis</option><option value="Central cyanosis">Central cyanosis</option><option value="Pale">Pale</option></select></td><td><select data-col="3" data-row="colour"><option value="">—</option><option value="Completely pink">Completely pink</option><option value="Acrocyanosis">Acrocyanosis</option><option value="Central cyanosis">Central cyanosis</option><option value="Pale">Pale</option></select></td><td><select data-col="5" data-row="colour"><option value="">—</option><option value="Completely pink">Completely pink</option><option value="Acrocyanosis">Acrocyanosis</option><option value="Central cyanosis">Central cyanosis</option><option value="Pale">Pale</option></select></td><td><select data-col="10" data-row="colour"><option value="">—</option><option value="Completely pink">Completely pink</option><option value="Acrocyanosis">Acrocyanosis</option><option value="Central cyanosis">Central cyanosis</option><option value="Pale">Pale</option></select></td><td><select data-col="15" data-row="colour"><option value="">—</option><option value="Completely pink">Completely pink</option><option value="Acrocyanosis">Acrocyanosis</option><option value="Central cyanosis">Central cyanosis</option><option value="Pale">Pale</option></select></td></tr>
+          <tr><td>Notes</td><td><select data-col="1" data-row="notes"><option value="">—</option><option value="On air">On air</option><option value="Oxygen">Oxygen</option><option value="CPAP">CPAP</option><option value="PPV">PPV</option><option value="CPR">CPR</option></select></td><td><select data-col="3" data-row="notes"><option value="">—</option><option value="On air">On air</option><option value="Oxygen">Oxygen</option><option value="CPAP">CPAP</option><option value="PPV">PPV</option><option value="CPR">CPR</option></select></td><td><select data-col="5" data-row="notes"><option value="">—</option><option value="On air">On air</option><option value="Oxygen">Oxygen</option><option value="CPAP">CPAP</option><option value="PPV">PPV</option><option value="CPR">CPR</option></select></td><td><select data-col="10" data-row="notes"><option value="">—</option><option value="On air">On air</option><option value="Oxygen">Oxygen</option><option value="CPAP">CPAP</option><option value="PPV">PPV</option><option value="CPR">CPR</option></select></td><td><select data-col="15" data-row="notes"><option value="">—</option><option value="On air">On air</option><option value="Oxygen">Oxygen</option><option value="CPAP">CPAP</option><option value="PPV">PPV</option><option value="CPR">CPR</option></select></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="card-note" style="margin-top:10px">When an alert fires, that column highlights — tap straight into its cells to record. Every cell remains freely editable at any time.</div>
+  </div>
+
+  <div class="card" id="s8">
+    <div class="card-title">8 · Airway &amp; Breathing</div>
+    <div class="field-grid">
+      <div class="field full"><label>Initial assessment</label><div class="chip-group" data-field="initialAssess"><span class="chip" onclick="chipPick('initialAssess',this)">Breathing adequate</span><span class="chip" onclick="chipPick('initialAssess',this)">Breathing inadequate / apnoea</span><span class="chip" onclick="chipPick('initialAssess',this)">HR &lt;100</span><span class="chip" onclick="chipPick('initialAssess',this)">HR &lt;60</span></div></div>
+    </div>
+
+    <div id="breathingAdequatePanel" style="display:none">
+      <div class="sub-head">Oxygen / NCPAP</div>
+      <div class="field-grid">
+        <div class="field"><label>FiO₂ (%)</label><input id="oxygenFio2" type="number" placeholder="e.g. 21"></div>
+        <div class="field"><label>CPAP interface</label><div class="chip-group" data-field="cpapInterface"><span class="chip" onclick="chipPick('cpapInterface',this)">Mask</span><span class="chip" onclick="chipPick('cpapInterface',this)">Prongs</span><span class="chip" onclick="chipPick('cpapInterface',this)">None — free-flow O₂ only</span></div></div>
+        <div class="field"><label>PEEP (cmH₂O)</label><input id="cpapPeep" type="number" value="5"></div>
+        <div class="field"><label>CPAP start time</label><input id="cpapStart" type="time"></div>
+        <div class="field"><label>CPAP stop time</label><input id="cpapStop" type="time"></div>
+      </div>
+    </div>
+
+    <div id="breathingInadequatePanel" style="display:none">
+    <button class="alert-toggle-btn" onclick="togglePPVAlert(this)">▶ PPV Started — tap to begin 30-sec SpO₂/HR alerts</button>
+    <div class="sub-head">Positive Pressure Ventilation (PPV)</div>
+    <div class="field-grid">
+      <div class="field"><label>PPV interface</label><div class="chip-group" data-field="ppvInterface"><span class="chip" onclick="chipPick('ppvInterface',this)">Mask</span><span class="chip" onclick="chipPick('ppvInterface',this)">LMA</span><span class="chip" onclick="chipPick('ppvInterface',this)">ETT</span></div></div>
+      <div class="field"><label>Device</label><div class="chip-group" data-field="ppvDevice"><span class="chip" onclick="chipPick('ppvDevice',this)">T-piece</span><span class="chip" onclick="chipPick('ppvDevice',this)">Self-inflating bag</span></div></div>
+      <div class="field"><label>PPV start time</label><input id="ppvStart" type="time"></div>
+      <div class="field"><label>PPV stop time</label><input id="ppvStop" type="time"></div>
+      <div class="field"><label>PIP (cmH₂O)</label><input id="pip" type="number" value="20"></div>
+      <div class="field"><label>PEEP (cmH₂O)</label><input id="peep" type="number" value="5"></div>
+      <div class="field"><label>Chest rise achieved</label><div class="chip-group" data-field="chestRiseAch"><span class="chip" onclick="chipPick('chestRiseAch',this)">Yes</span><span class="chip" onclick="chipPick('chestRiseAch',this)">No → MASK</span></div></div>
+      <div class="field"><label>Time to effective PPV</label><div class="time-with-btn"><input id="effectivePpvTime" type="time"><button class="now-btn" onclick="stampNow('effectivePpvTime')">Now</button></div></div>
+      <div class="field"><label>HR response</label><div class="chip-group" data-field="hrResponsePPV"><span class="chip" onclick="chipPick('hrResponsePPV',this)">Improving</span><span class="chip" onclick="chipPick('hrResponsePPV',this)">Not improving</span></div></div>
+      <div class="field"><label>Airway difficulty</label><div class="chip-group" data-field="airwayDifficulty"><span class="chip" onclick="chipPick('airwayDifficulty',this)">None</span><span class="chip" onclick="chipPick('airwayDifficulty',this)">Difficult airway</span></div></div>
+      <div class="field full"><label>Corrective steps (MASK)</label><div class="chip-group" data-field="correctiveMask"><span class="chip" onclick="chipPick('correctiveMask',this)">Applied</span><span class="chip" onclick="chipPick('correctiveMask',this)">Not needed</span></div></div>
+    </div>
+    <div class="sub-head">Endotracheal Tube (ETT)</div>
+    <div class="field-grid">
+      <div class="field"><label>ETT size</label><div class="chip-group" data-field="ettSize"><span class="chip" onclick="chipPick('ettSize',this)">2.0</span><span class="chip" onclick="chipPick('ettSize',this)">2.5</span><span class="chip" onclick="chipPick('ettSize',this)">3.0</span><span class="chip" onclick="chipPick('ettSize',this)">3.5</span></div></div>
+      <div class="field"><label>Depth from lips (cm)</label><input id="ettDepth" type="number" step="0.1"></div>
+      <div class="field"><label>Insertion attempts</label><input id="ettAttempts" type="number"></div>
+      <div class="field"><label>Time ETT confirmed</label><input id="ettConfirmedTime" type="time"></div>
+      <div class="field full"><label>Confirmation method</label><div class="chip-group" data-field="ettConfirmation" data-multi="1"><span class="chip" onclick="chipPick('ettConfirmation',this,true)">Bilateral air entry</span><span class="chip" onclick="chipPick('ettConfirmation',this,true)">CO₂ detector</span><span class="chip" onclick="chipPick('ettConfirmation',this,true)">CXR</span></div></div>
+      <div class="field"><label>Bilateral air entry</label><div class="chip-group" data-field="bilateralAirEntry"><span class="chip" onclick="chipPick('bilateralAirEntry',this)">Yes</span><span class="chip" onclick="chipPick('bilateralAirEntry',this)">No</span></div></div>
+    </div>
+    <div class="sub-head">LMA</div>
+    <div class="field-grid">
+      <div class="field"><label>LMA size</label><input id="lmaSize" type="text"></div>
+      <div class="field"><label>LMA insertion time</label><input id="lmaTime" type="time"></div>
+    </div>
+    </div><!-- /breathingInadequatePanel -->
+
+    <div class="card-note">⚠ When resuscitation is prolonged, consider gastric decompression.</div>
+  </div>
+  </div><!-- /tier1 -->
+
+  <div class="gate-card" id="gate2" style="display:none">
+    <div class="gate-question">Was breathing support (oxygen / CPAP / PPV) sufficient, or is full resuscitation needed?</div>
+    <div class="gate-btns">
+      <button class="gate-btn no" onclick="answerGate2(false)">Sufficient — stop here</button>
+      <button class="gate-btn yes" onclick="answerGate2(true)">Needs full resuscitation</button>
+    </div>
+    <div class="gate-answer" id="gate2Answer"></div>
+  </div>
+
+  <div id="tier2" style="display:none">
+  <div class="card" id="s9">
+    <div class="card-title">9 · Circulation</div>
+    <button class="alert-toggle-btn" onclick="toggleCompressionAlert(this)">▶ Chest Compressions Started — tap to begin 1-min HR alerts</button>
+    <button class="alert-toggle-btn" onclick="toggleAdrenalineAlert(this)">▶ HR &lt;60 — tap to begin 3-min adrenaline alerts</button>
+    <div class="field-grid">
+      <div class="field"><label>Chest compressions start</label><input id="ccStart" type="time"></div>
+      <div class="field"><label>Chest compressions stop</label><input id="ccStop" type="time"></div>
+      <div class="field"><label>FiO₂ increased to 100%</label><div class="chip-group" data-field="fio2At100"><span class="chip" onclick="chipPick('fio2At100',this)">Yes</span><span class="chip" onclick="chipPick('fio2At100',this)">No</span></div></div>
+      <div class="field"><label>Compression : ventilation ratio</label><div class="chip-group" data-field="ccRatio"><span class="chip" onclick="chipPick('ccRatio',this)">3:1</span></div></div>
+    </div>
+    <div class="sub-head">Vascular access</div>
+    <div class="field-grid">
+      <div class="field"><label>Access route</label><div class="chip-group" data-field="accessRoute"><span class="chip" onclick="chipPick('accessRoute',this)">Umbilical venous</span><span class="chip" onclick="chipPick('accessRoute',this)">Peripheral IV</span><span class="chip" onclick="chipPick('accessRoute',this)">IO</span></div></div>
+      <div class="field"><label>Time access achieved</label><input id="accessTime" type="time"></div>
+      <div class="field"><label>Catheter / cannula size</label><input id="catheterSize" type="text"></div>
+      <div class="field"><label>Confirmed position</label><div class="chip-group" data-field="accessConfirmed"><span class="chip" onclick="chipPick('accessConfirmed',this)">Yes</span><span class="chip" onclick="chipPick('accessConfirmed',this)">No</span></div></div>
+    </div>
+    <div class="sub-head">Adrenaline 1:10,000 (0.1–0.3 mL/kg IV · 0.5–1 mL/kg ETT)</div>
+    <div class="field-grid">
+      <div class="field"><label>Dose 1 — volume (mL)</label><input id="adr1vol" type="number" step="0.1"></div>
+      <div class="field"><label>Dose 1 — time</label><input id="adr1time" type="time"></div>
+      <div class="field"><label>Dose 1 — route</label><div class="chip-group" data-field="adr1route"><span class="chip" onclick="chipPick('adr1route',this)">IV</span><span class="chip" onclick="chipPick('adr1route',this)">ETT</span></div></div>
+      <div class="field"></div>
+    </div>
+    <div class="field-grid" id="adrenalineDosesExtra"></div>
+    <button class="add-row-btn" id="addDoseBtn" onclick="addAdrenalineDose()">+ Add Dose (up to 5 total)</button>
+    <div class="sub-head">Volume bolus (10 mL/kg)</div>
+    <div class="field-grid">
+      <div class="field"><label>Fluid used</label><div class="chip-group" data-field="volumeFluid"><span class="chip" onclick="chipPick('volumeFluid',this)">Normal saline 0.9%</span><span class="chip" onclick="chipPick('volumeFluid',this)">O-negative blood</span></div></div>
+      <div class="field"><label>Volume (mL)</label><input id="volumeVol" type="number"></div>
+      <div class="field"><label>Time administered</label><input id="volumeTime" type="time"></div>
+    </div>
+  </div>
+
+  <div class="card" id="s10">
+    <div class="card-title">10 · Post-Resuscitation Care</div>
+    <div class="sub-head">Temperature</div>
+    <div class="field-grid">
+      <div class="field"><label>Delivery room temp (°C)</label><input id="pTemp" type="number" step="0.1"></div>
+      <div class="field"><label>Measurement time</label><input id="pTempTime" type="time"></div>
+      <div class="field"><label>Temp at NICU arrival (°C)</label><input id="nicuTemp" type="number" step="0.1"></div>
+      <div class="field"><label>Time measured at NICU</label><input id="nicuTempTime" type="time"></div>
+      <div class="field full"><label>Temperature classification</label><div class="chip-group" data-field="tempClass"><span class="chip" onclick="chipPick('tempClass',this)">Normothermia (36.5–37.5°C)</span><span class="chip" onclick="chipPick('tempClass',this)">Mild hypothermia (36.0–36.4°C)</span><span class="chip" onclick="chipPick('tempClass',this)">Moderate hypothermia (32–35.9°C)</span><span class="chip" onclick="chipPick('tempClass',this)">Severe hypothermia (&lt;32°C)</span></div></div>
+    </div>
+    <div class="sub-head">Investigations &amp; monitoring</div>
+    <div class="field-grid">
+      <div class="field"><label>Blood glucose (mmol/L)</label><input id="bloodGlucose" type="number" step="0.1"></div>
+      <div class="field"><label>Blood gas</label><div class="chip-group" data-field="bloodGas"><span class="chip" onclick="chipPick('bloodGas',this)">Taken</span><span class="chip" onclick="chipPick('bloodGas',this)">Not taken</span></div></div>
+      <div class="field"><label>Paired cord gases</label><div class="chip-group" data-field="cordGases"><span class="chip" onclick="chipPick('cordGases',this)">Collected</span><span class="chip" onclick="chipPick('cordGases',this)">Not collected</span></div></div>
+      <div class="field"><label>SpO₂ on admission (%)</label><input id="spo2Admission" type="number"></div>
+    </div>
+    <div class="sub-head">Management</div>
+    <div class="field-grid">
+      <div class="field"><label>Therapeutic hypothermia</label><div class="chip-group" data-field="therapHypo"><span class="chip" onclick="chipPick('therapHypo',this)">Pathway commenced</span><span class="chip" onclick="chipPick('therapHypo',this)">Not indicated</span></div></div>
+      <div class="field"><label>NICU admission</label><div class="chip-group" data-field="nicuAdmission"><span class="chip" onclick="chipPick('nicuAdmission',this)">Yes</span><span class="chip" onclick="chipPick('nicuAdmission',this)">No</span></div></div>
+      <div class="field"><label>Surfactant given</label><div class="chip-group" data-field="surfactant"><span class="chip" onclick="chipPick('surfactant',this)">Yes</span><span class="chip" onclick="chipPick('surfactant',this)">No</span></div></div>
+      <div class="field"><label>Time given</label><input id="surfactantTime" type="time"></div>
+    </div>
+  </div>
+  </div><!-- /tier2 -->
+
+  <div class="card" id="s11" style="display:none">
+    <div class="card-title">11 · Resuscitation Key Timepoints</div>
+    <div class="card-note">Times below are captured automatically from the actions taken earlier in this record — edit if needed.</div>
+    <div class="sub-head">Core performance indicators</div>
+    <div class="field-grid">
+      <div class="field"><label>Birth time (T=0)</label><div class="timer-caption" id="birthTimeDisplay" style="text-align:left;margin:0;padding:9px 10px;background:var(--navy);border:1px solid var(--border);border-radius:8px;">Not yet recorded — use the Start button in Section 1</div></div>
+      <div class="field"><label>PPV started</label><div class="timer-caption" id="ppvStartedDisplay" style="text-align:left;margin:0;padding:9px 10px;background:var(--navy);border:1px solid var(--border);border-radius:8px;">Not yet — tap the PPV Started toggle in Section 8</div></div>
+      <div class="field"><label>Effective ventilation achieved</label><div class="time-with-btn"><input id="effVentKT" type="time"><button class="now-btn" onclick="stampNow('effVentKT')">Now</button></div></div>
+      <div class="field"><label>HR &gt;100 bpm achieved</label><div class="time-with-btn"><input id="hr100KT" type="time"><button class="now-btn" onclick="stampNow('hr100KT')">Now</button></div></div>
+      <div class="field"><label>Chest compressions started</label><div class="timer-caption" id="compStartDisplay" style="text-align:left;margin:0;padding:9px 10px;background:var(--navy);border:1px solid var(--border);border-radius:8px;">Not yet — tap the Compressions Started toggle in Section 9</div></div>
+      <div class="field"><label>Chest compressions ceased</label><div class="timer-caption" id="compStopDisplay" style="text-align:left;margin:0;padding:9px 10px;background:var(--navy);border:1px solid var(--border);border-radius:8px;">Not yet — tap the toggle again to stop</div></div>
+      <div class="field"><label>First adrenaline given</label><div class="timer-caption" id="firstAdrDisplay" style="text-align:left;margin:0;padding:9px 10px;background:var(--navy);border:1px solid var(--border);border-radius:8px;">Not yet — tap the HR &lt;60 / Adrenaline toggle in Section 9</div></div>
+      <div class="field"><label>ROSC achieved</label><div class="time-with-btn"><input id="roscKT" type="time"><button class="now-btn" onclick="stampNow('roscKT')">Now</button></div></div>
+      <div class="field"><label>Resuscitation ceased</label><div class="time-with-btn"><input id="resusCeasedKT" type="time"><button class="now-btn" onclick="stampNow('resusCeasedKT')">Now</button></div></div>
+      <div class="field"><label>Ceased by</label><input id="ceasedBy" type="text"></div>
+    </div>
+    <div class="sub-head">DOPE — if any deterioration or no improvement</div>
+    <div class="field-grid">
+      <div class="field"><label>D — Displaced (ETT)</label><div class="chip-group" data-field="dopeD"><span class="chip" onclick="chipPick('dopeD',this)">Yes</span><span class="chip" onclick="chipPick('dopeD',this)">No</span></div></div>
+      <div class="field"><label>O — Obstructed (ETT)</label><div class="chip-group" data-field="dopeO"><span class="chip" onclick="chipPick('dopeO',this)">Yes</span><span class="chip" onclick="chipPick('dopeO',this)">No</span></div></div>
+      <div class="field"><label>P — Pneumothorax</label><div class="chip-group" data-field="dopeP"><span class="chip" onclick="chipPick('dopeP',this)">Yes</span><span class="chip" onclick="chipPick('dopeP',this)">No</span></div></div>
+      <div class="field"><label>E — Equipment failure</label><div class="chip-group" data-field="dopeE"><span class="chip" onclick="chipPick('dopeE',this)">Yes</span><span class="chip" onclick="chipPick('dopeE',this)">No</span></div></div>
+      <div class="field full"><label>Action taken</label><input id="dopeAction" type="text" placeholder="e.g. ETT repositioned, needle decompression performed"></div>
+    </div>
+  </div>
+
+  <div class="card" id="s12">
+    <div class="card-title">12 · Disposition &amp; Signatures</div>
+    <div class="field-grid">
+      <div class="field"><label>Disposition</label><div class="chip-group" data-field="disposition"><span class="chip" onclick="chipPick('disposition',this)">NICU</span><span class="chip" onclick="chipPick('disposition',this)">SCN</span><span class="chip" onclick="chipPick('disposition',this)">Death</span></div></div>
+      <div class="field"><label>Time of disposition</label><input id="dispositionTime" type="time"></div>
+    </div>
+    <div class="card-note">Family support: ensure parents/family are provided appropriate support and an opportunity to debrief.</div>
+
+    <div class="sub-head">Signatures</div>
+    <div class="sig-grid" style="margin-bottom:8px"><div style="font-size:11px;color:var(--text-dim)">Print name</div><div style="font-size:11px;color:var(--text-dim)">Signature</div><div style="font-size:11px;color:var(--text-dim)">Designation</div></div>
+    <div class="sig-grid" style="margin-bottom:8px"><input type="text" id="sig1name"><input type="text" id="sig1sig" placeholder="(sign on print)"><input type="text" id="sig1desig"></div>
+    <div class="sig-grid"><input type="text" id="sig2name"><input type="text" id="sig2sig" placeholder="(sign on print)"><input type="text" id="sig2desig"></div>
+    <div class="field-grid" style="margin-top:10px">
+      <div class="field"><label>Date</label><input id="sigDate" type="date"></div>
+      <div class="field"><label>Time</label><input id="sigTime" type="time"></div>
+    </div>
+  </div>
+
+  <div class="card" id="s13">
+    <div class="card-title">13 · Timeline Notes</div>
+    <div class="card-note">Optional — open only if you need to log free-text events</div>
+    <button class="add-row-btn" id="notesOpenBtn" onclick="openTimelineNotes()">+ Open Timeline Notes for entry</button>
+    <div id="notesContent" style="display:none">
+      <div class="card-note">Free-text log of events, as needed</div>
+      <table class="notes-table" id="notesTable">
+        <thead><tr><th style="width:70px">Time</th><th>Event / Intervention</th><th></th></tr></thead>
+        <tbody id="notesBody"></tbody>
+      </table>
+      <button class="add-row-btn" onclick="addNoteRow()">+ Add Row</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">📤 Export</div>
+    <div class="card-note">Exports only the sections completed above (routine care only, or through to full resuscitation, per your answers).</div>
+    <div class="export-row">
+      <button class="export-btn" onclick="downloadRecord()">⬇ .txt</button>
+      <button class="export-btn" onclick="downloadRecordWord()">⬇ Word (.doc)</button>
+      <button class="export-btn primary" onclick="printCondensed()">🖨 Print / PDF</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+function chipPick(field, el, multi) {
+  if (multi) {
+    el.classList.toggle('on');
+  } else {
+    [...el.parentElement.children].forEach(c => c.classList.remove('on'));
+    el.classList.add('on');
+  }
+  if (field === 'initialAssess') updateBreathingPanels();
+  if (field === 'disposition') onDispositionSet();
+}
+
+function onDispositionSet() {
+  const timeField = document.getElementById('dispositionTime');
+  if (timeField && !timeField.value) timeField.value = toTimeValue(new Date());
+  if (deliveryTime && timerInterval) {
+    clearInterval(timerInterval);
+    timerInterval = null;
+    const clockEl = document.getElementById('clockDisplay');
+    if (clockEl) { clockEl.classList.remove('running'); clockEl.classList.add('idle'); }
+    const captionEl = document.getElementById('clockCaption');
+    if (captionEl) captionEl.textContent = 'Timer paused — disposition recorded';
+    showAlertText('✓ Disposition recorded. Timer from delivery time has been paused.', true);
+  }
+}
+
+function chipPickSuction(el, value) {
+  const group = el.parentElement;
+  if (value === 'None') {
+    [...group.children].forEach(c => c.classList.remove('on'));
+    el.classList.add('on');
+  } else {
+    // deselect "None" if it was on, then toggle this option independently
+    [...group.children].forEach(c => { if (c.textContent === 'None') c.classList.remove('on'); });
+    el.classList.toggle('on');
+  }
+}
+
+function updateBreathingPanels() {
+  const selected = chipValue('initialAssess');
+  const adequate = selected === 'Breathing adequate';
+  const inadequate = selected === 'Breathing inadequate / apnoea' || selected === 'HR <100' || selected === 'HR <60';
+  document.getElementById('breathingAdequatePanel').style.display = adequate ? 'block' : 'none';
+  document.getElementById('breathingInadequatePanel').style.display = inadequate ? 'block' : 'none';
+  // Key Timepoints (Section 11) only relevant once PPV-or-beyond is the pathway
+  const kt = document.getElementById('s11');
+  if (kt) { kt.style.display = inadequate ? 'block' : 'none'; if (inadequate) expandSection('s11'); }
+}
+function chipValue(field) {
+  const group = document.querySelector(`.chip-group[data-field="${field}"]`);
+  if (!group) return '';
+  return [...group.children].filter(c => c.classList.contains('on')).map(c => c.textContent).join(', ');
+}
+
+let deliveryTime = null;
+let timerInterval = null;
+const ALERT_MARKS = [1,3,5,10,15];
+let alertsFired = {};
+let gate1 = null; // null = unanswered, false = no resus, true = needed initial steps
+let gate2 = null; // null = unanswered, false = sufficient, true = needs full resus
+
+function answerGate1(needsResus) {
+  gate1 = needsResus;
+  const card = document.getElementById('gate1');
+  card.querySelectorAll('.gate-btn').forEach((b,i) => b.classList.toggle('picked', (i===1)===needsResus));
+  const ansEl = document.getElementById('gate1Answer');
+  ansEl.innerHTML = needsResus
+    ? 'Recorded: initial steps were required. Airway &amp; Breathing is now open below.'
+    : 'Recorded: routine care only. Skipping straight to Apgar &amp; Outcome.';
+  ansEl.innerHTML += ' <button class="gate-change-btn" onclick="document.getElementById(\'gate1\').querySelectorAll(\'.gate-btn\').forEach(b=>b.classList.remove(\'picked\')); document.getElementById(\'gate1Answer\').textContent=\'\';">change</button>';
+  document.getElementById('tier1').style.display = needsResus ? 'block' : 'none';
+  document.getElementById('gate2').style.display = needsResus ? 'block' : 'none';
+  if (!needsResus) {
+    gate2 = null;
+    document.getElementById('tier2').style.display = 'none';
+    document.getElementById('s11').style.display = 'none';
+    expandSection('s12');
+    document.getElementById('s12').scrollIntoView({behavior:'smooth', block:'start'});
+  } else {
+    expandSection('s7');
+    expandSection('s8');
+    document.getElementById('s8').scrollIntoView({behavior:'smooth', block:'start'});
+  }
+}
+
+function toggleEscalation() {
+  const panel = document.getElementById('escalationPanel');
+  const btn = document.getElementById('escalationToggleBtn');
+  const isOpen = panel.style.display !== 'none';
+  panel.style.display = isOpen ? 'none' : 'block';
+  btn.classList.toggle('active', !isOpen);
+  btn.textContent = isOpen ? '⚠ Escalation / Code Blue Required — tap if needed' : '✓ Escalation panel open — tap to hide';
+}
+
+function answerGate2(needsFull) {
+  gate2 = needsFull;
+  const card = document.getElementById('gate2');
+  card.querySelectorAll('.gate-btn').forEach((b,i) => b.classList.toggle('picked', (i===1)===needsFull));
+  const ansEl = document.getElementById('gate2Answer');
+  ansEl.innerHTML = needsFull
+    ? 'Recorded: full resuscitation needed. Sections 9–10 are now open below.'
+    : 'Recorded: breathing support was sufficient. Skipping to Apgar &amp; Outcome.';
+  ansEl.innerHTML += ' <button class="gate-change-btn" onclick="document.getElementById(\'gate2\').querySelectorAll(\'.gate-btn\').forEach(b=>b.classList.remove(\'picked\')); document.getElementById(\'gate2Answer\').textContent=\'\';">change</button>';
+  document.getElementById('tier2').style.display = needsFull ? 'block' : 'none';
+  if (needsFull) { expandSection('s9'); expandSection('s10'); } else { expandSection('s12'); }
+  document.getElementById(needsFull ? 's9' : 's12').scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+function pad(n) { return String(n).padStart(2,'0'); }
+function fmtClock(totalSec) {
+  totalSec = Math.max(0, Math.round(totalSec));
+  return `${pad(Math.floor(totalSec/60))}:${pad(totalSec%60)}`;
+}
+function toDatetimeLocalValue(d) {
+  const local = new Date(d.getTime() - d.getTimezoneOffset()*60000);
+  return local.toISOString().slice(0,16);
+}
+function toTimeValue(d) {
+  return `${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
+function setDeliveryTime() {
+  deliveryTime = new Date();
+  document.getElementById('deliveryTimeInput').value = toDatetimeLocalValue(deliveryTime);
+  document.getElementById('deliveryTimeRow').style.display = 'flex';
+  document.getElementById('deliveryBtn').textContent = '✓ Delivery Time Recorded';
+  document.getElementById('deliveryBtn').disabled = true;
+  document.getElementById('resetBtn').style.display = 'block';
+  document.getElementById('clockCaption').textContent = 'Time of life — counting up from delivery';
+  document.getElementById('birthTimeDisplay').textContent = toTimeValue(deliveryTime) + ' (24-hr)';
+  document.getElementById('timeOfBirthDisplay').textContent = toTimeValue(deliveryTime) + ' (24-hr)';
+  startTicking();
+}
+
+function onDeliveryTimeEdited() {
+  const v = document.getElementById('deliveryTimeInput').value;
+  if (!v) return;
+  deliveryTime = new Date(v);
+  alertsFired = {};
+  tick();
+}
+
+function startTicking() {
+  clearInterval(timerInterval);
+  timerInterval = setInterval(tick, 1000);
+  tick();
+}
+
+function tick() {
+  if (!deliveryTime) return;
+  const elapsedSec = (Date.now() - deliveryTime.getTime())/1000;
+  const clockEl = document.getElementById('clockDisplay');
+  clockEl.textContent = fmtClock(elapsedSec);
+  clockEl.classList.remove('idle'); clockEl.classList.add('running');
+  ALERT_MARKS.forEach(min => {
+    if (elapsedSec >= min*60 && !alertsFired[min]) {
+      alertsFired[min] = true;
+      fireAlert(min);
+    }
+  });
+  // Apgar highlight at 1/5/10 min always; 15 & 20 min only if extended scoring is active (10-min score <7)
+  [1,5,10].forEach(min => {
+    if (elapsedSec >= min*60 && !alertsFired['apgar'+min]) {
+      alertsFired['apgar'+min] = true;
+      highlightApgarBox(min);
+    }
+  });
+  const extendedApgarActive = document.getElementById('apgarExtraMini').style.display !== 'none';
+  if (elapsedSec >= 900 && !alertsFired['apgar15'] && extendedApgarActive) {
+    alertsFired['apgar15'] = true;
+    highlightApgarBox(15);
+  }
+  if (elapsedSec >= 1200 && !alertsFired['apgar20'] && extendedApgarActive) {
+    alertsFired['apgar20'] = true;
+    highlightApgarBox(20);
+  }
+  if (elapsedSec >= 1200 && !alertsFired['ethics20']) {
+    alertsFired['ethics20'] = true;
+    showEthicsAlert();
+  }
+}
+
+function showEthicsAlert() {
+  const el = document.getElementById('alertBanner');
+  el.innerHTML = '⚠ 20 minutes of continuous resuscitation reached. If there is still no detectable heart rate or only minimal response, this is a reasonable point to discuss redirection or discontinuation of care with the clinical team and family. ' +
+    '<button class="ethics-stop-btn" onclick="stopResuscitationFromAlert()">Stop Resuscitation Now</button>';
+  el.classList.add('show', 'ethics');
+  if (navigator.vibrate) navigator.vibrate([300,150,300,150,300]);
+  expandSection('s11');
+  document.getElementById('s11').scrollIntoView({behavior:'smooth', block:'start'});
+  // No auto-hide — this stays visible until acknowledged or the page state changes
+}
+
+function stopResuscitationFromAlert() {
+  const field = document.getElementById('resusCeasedKT');
+  if (field && !field.value) field.value = toTimeValue(new Date());
+  clearInterval(timerInterval);
+  clearInterval(ppvInterval); clearInterval(compressionInterval); clearInterval(adrenalineInterval);
+  ppvInterval = compressionInterval = adrenalineInterval = null;
+  document.getElementById('clockCaption').textContent = 'Timer stopped — resuscitation ceased recorded';
+  const el = document.getElementById('alertBanner');
+  el.classList.remove('show', 'ethics');
+  expandSection('s11');
+  document.getElementById('s11').scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+function highlightApgarBox(min) {
+  const box = document.getElementById('apgar'+min+'Box');
+  if (!box) return;
+  box.classList.add('apgar-due');
+  showAlertText(`⏰ ${min} minute mark — score Apgar now.`, false);
+  expandSection('s6');
+  document.getElementById('s6').scrollIntoView({behavior:'smooth', block:'start'});
+  setTimeout(() => box.classList.remove('apgar-due'), 8000);
+}
+
+function fireAlert(min) {
+  showAlertText(`⏰ ${min} minute mark — record HR, SpO₂, FiO₂, RR/effort & colour now.`, false);
+  const dueFields = document.querySelectorAll(`#mtTable [data-col="${min}"]`);
+  dueFields.forEach(field => {
+    field.closest('table').querySelectorAll(`[data-col="${min}"]`).forEach(c => c.parentElement.classList.add('mt-col-due'));
+  });
+  expandSection('s7');
+  document.getElementById('s7').scrollIntoView({behavior:'smooth', block:'start'});
+  // Actively prompt entry: focus the first still-empty field in the due column
+  // (rather than just passively highlighting), so the user can start typing immediately.
+  setTimeout(() => {
+    const firstEmpty = [...dueFields].find(f => !f.value);
+    if (firstEmpty) firstEmpty.focus();
+  }, 400); // small delay lets the scroll-into-view settle first
+}
+
+function showAlertText(text, vibrate) {
+  const el = document.getElementById('alertBanner');
+  el.textContent = text;
+  el.classList.remove('show'); void el.offsetWidth; el.classList.add('show');
+  if (navigator.vibrate) navigator.vibrate(vibrate===false ? [200,100,200] : [150,80,150,80,150]);
+  setTimeout(()=> el.classList.remove('show'), 6000);
+}
+
+// ── Conditional recurring alerts: PPV (30s), Compressions (60s), HR<60/adrenaline (3min) ──
+let ppvInterval = null, compressionInterval = null, adrenalineInterval = null;
+let ppvStartedTime = null, compressionsStartedTime = null, compressionsCeasedTime = null, adrenalineFirstTime = null;
+
+function togglePPVAlert(btn) {
+  if (ppvInterval) {
+    clearInterval(ppvInterval); ppvInterval = null;
+    const stopField = document.getElementById('ppvStop');
+    if (stopField && !stopField.value) stopField.value = toTimeValue(new Date());
+    btn.classList.remove('active'); btn.textContent = '▶ PPV Started — tap to begin 30-sec SpO₂/HR alerts';
+  } else {
+    if (!ppvStartedTime) {
+      ppvStartedTime = new Date();
+      const d = document.getElementById('ppvStartedDisplay');
+      if (d) d.textContent = toTimeValue(ppvStartedTime) + ' (24-hr)';
+    }
+    const startField = document.getElementById('ppvStart');
+    if (startField && !startField.value) startField.value = toTimeValue(ppvStartedTime);
+    ppvInterval = setInterval(() => showAlertText('⏰ Check SpO₂ & HR now (PPV in progress — every 30 sec).', true), 30000);
+    showAlertText('⏰ Check SpO₂ & HR now (PPV in progress — every 30 sec).', true);
+    btn.classList.add('active'); btn.textContent = '⏸ PPV alerts running (every 30 sec) — tap to stop';
+  }
+}
+
+function toggleCompressionAlert(btn) {
+  if (compressionInterval) {
+    clearInterval(compressionInterval); compressionInterval = null;
+    compressionsCeasedTime = new Date();
+    const d = document.getElementById('compStopDisplay');
+    if (d) d.textContent = toTimeValue(compressionsCeasedTime) + ' (24-hr)';
+    const stopField = document.getElementById('ccStop');
+    if (stopField && !stopField.value) stopField.value = toTimeValue(compressionsCeasedTime);
+    btn.classList.remove('active'); btn.textContent = '▶ Chest Compressions Started — tap to begin 1-min HR alerts';
+  } else {
+    if (!compressionsStartedTime) {
+      compressionsStartedTime = new Date();
+      const d = document.getElementById('compStartDisplay');
+      if (d) d.textContent = toTimeValue(compressionsStartedTime) + ' (24-hr)';
+    }
+    const startField = document.getElementById('ccStart');
+    if (startField && !startField.value) startField.value = toTimeValue(compressionsStartedTime);
+    compressionInterval = setInterval(() => showAlertText('⏰ Check HR now (compressions in progress — every 1 min).', true), 60000);
+    showAlertText('⏰ Check HR now (compressions in progress — every 1 min).', true);
+    btn.classList.add('active'); btn.textContent = '⏸ Compression alerts running (every 1 min) — tap to stop';
+  }
+}
+
+function toggleAdrenalineAlert(btn) {
+  if (adrenalineInterval) {
+    clearInterval(adrenalineInterval); adrenalineInterval = null;
+    btn.classList.remove('active'); btn.textContent = '▶ HR <60 — tap to begin 3-min adrenaline alerts';
+  } else {
+    if (!adrenalineFirstTime) {
+      adrenalineFirstTime = new Date();
+      const d = document.getElementById('firstAdrDisplay');
+      if (d) d.textContent = toTimeValue(adrenalineFirstTime) + ' (24-hr)';
+    }
+    adrenalineInterval = setInterval(() => showAlertText('💉 HR <60 — consider/give adrenaline now (every 3 min).', true), 180000);
+    showAlertText('💉 HR <60 — consider/give adrenaline now (every 3 min).', true);
+    btn.classList.add('active'); btn.textContent = '⏸ Adrenaline alerts running (every 3 min) — tap to stop';
+  }
+}
+
+function resetTimer() {
+  clearInterval(timerInterval);
+  clearInterval(ppvInterval); clearInterval(compressionInterval); clearInterval(adrenalineInterval);
+  ppvInterval = compressionInterval = adrenalineInterval = null;
+  deliveryTime = null;
+  alertsFired = {};
+  document.getElementById('clockDisplay').textContent = '--:--';
+  document.getElementById('clockDisplay').className = 'timer-clock-lg idle';
+  document.getElementById('clockCaption').textContent = 'Tap below once — this records time of birth everywhere and starts the timer';
+  document.getElementById('deliveryBtn').textContent = '👶 Baby Delivered — Start';
+  document.getElementById('deliveryBtn').disabled = false;
+  document.getElementById('deliveryTimeRow').style.display = 'none';
+  document.getElementById('resetBtn').style.display = 'none';
+  // Birth time displays (Section 1 & Section 6) are intentionally NOT cleared — the birth already happened.
+}
+
+function resetEntireRecord() {
+  if (confirm('Reset the ENTIRE record for a new patient? This clears every field and cannot be undone.')) {
+    location.reload();
+  }
+}
+
+function stampNow(fieldId) {
+  document.getElementById(fieldId).value = toTimeValue(new Date());
+}
+
+let currentApgar = { hrScore: null, rrScore: null, toneScore: null, grimaceScore: null, colourScore: null };
+
+function pickApgar(comp, val, btn) {
+  currentApgar[comp] = val;
+  const group = btn.parentElement;
+  [...group.children].forEach((b,i) => b.className = 'apgar-btn' + (i===val ? ` sel-${val}` : ''));
+}
+function clearApgarQuick() {
+  currentApgar = { hrScore: null, rrScore: null, toneScore: null, grimaceScore: null, colourScore: null };
+  document.querySelectorAll('#s6 .apgar-btns').forEach(g => [...g.children].forEach(b => b.className='apgar-btn'));
+}
+function applyApgarQuick() {
+  const minute = chipValue('apgarQuickMinute');
+  const vals = Object.values(currentApgar);
+  if (vals.some(v => v === null)) { alert('Score all five components first.'); return; }
+  const total = vals.reduce((a,b)=>a+b,0);
+  const map = {'1 min':'apgar1', '5 min':'apgar5', '10 min':'apgar10', '15 min':'apgar15', '20 min':'apgar20'};
+  const targetId = map[minute];
+  if (!targetId) { alert('Choose which minute this score is for.'); return; }
+  document.getElementById(targetId).value = total;
+  document.getElementById(targetId+'Display').textContent = total;
+  if (targetId === 'apgar10') onApgar10Input(total);
+  clearApgarQuick();
+}
+
+function onApgar10Input(value) {
+  document.getElementById('apgar10Display').textContent = value || '–';
+  const score = parseInt(value, 10);
+  if (!isNaN(score) && score < 7) {
+    document.getElementById('apgarExtraMini').style.display = 'flex';
+  }
+}
+
+let adrenalineDoseCount = 1;
+let noteRowId = 0;
+function addAdrenalineDose() {
+  if (adrenalineDoseCount >= 5) return;
+  adrenalineDoseCount++;
+  const n = adrenalineDoseCount;
+  const container = document.getElementById('adrenalineDosesExtra');
+  const wrap = document.createElement('div');
+  wrap.style.display = 'contents';
+  wrap.innerHTML = `
+    <div class="field"><label>Dose ${n} — volume (mL)</label><input id="adr${n}vol" type="number" step="0.1"></div>
+    <div class="field"><label>Dose ${n} — time</label><input id="adr${n}time" type="time"></div>
+    <div class="field"><label>Dose ${n} — route</label><div class="chip-group" data-field="adr${n}route"><span class="chip" onclick="chipPick('adr${n}route',this)">IV</span><span class="chip" onclick="chipPick('adr${n}route',this)">ETT</span></div></div>
+    <div class="field"></div>`;
+  container.appendChild(wrap);
+  if (adrenalineDoseCount >= 5) document.getElementById('addDoseBtn').style.display = 'none';
+}
+
+function addNoteRow() {
+  noteRowId++;
+  const tr = document.createElement('tr');
+  tr.innerHTML = `
+    <td><input type="time" class="note-time"></td>
+    <td><input type="text" class="note-event" placeholder="e.g. PPV started"></td>
+    <td><button class="del-row-btn" onclick="this.closest('tr').remove()">✕</button></td>`;
+  document.getElementById('notesBody').appendChild(tr);
+}
+function openTimelineNotes() {
+  document.getElementById('notesContent').style.display = 'block';
+  document.getElementById('notesOpenBtn').style.display = 'none';
+  if (document.getElementById('notesBody').children.length === 0) addNoteRow();
+}
+
+function val(id) { const e = document.getElementById(id); return e ? (e.value || '—') : '—'; }
+
+function mtCell(row, col) {
+  const el = document.querySelector(`#mtTable [data-row="${row}"][data-col="${col}"]`);
+  return el ? (el.value || '—') : '—';
+}
+
+function buildRecordText() {
+  let t = 'MYNEST — NEONATAL RESUSCITATION RECORD\n' + '='.repeat(60) + '\n\n';
+  t += '1. PATIENT IDENTIFICATION\n' + '-'.repeat(60) + '\n';
+  t += `Baby: ${val('babyName')}   MRN/MIC: ${val('mrn')}   Sex: ${chipValue('sex')||'—'}\n`;
+  t += `Place of birth: ${chipValue('placeOfBirth')||'—'}   DOB: ${val('dob')}   Time of birth: ${deliveryTime ? toTimeValue(deliveryTime) : '—'}\n`;
+  t += `Gestation: ${val('gestWeeks')}w ${val('gestDays')}d   Est weight: ${val('estWeight')}g   Actual: ${val('actualWeight')}g\n\n`;
+
+  t += '2. ANTENATAL & BIRTH INFORMATION\n' + '-'.repeat(60) + '\n';
+  t += `Gravida: ${val('gravida')}   Para: ${val('para')}   Abortion: ${val('abortion')}   Birth type: ${chipValue('birthType')||'—'}\n`;
+  t += `Antenatal steroids: ${chipValue('steroids')||'—'}   MgSO4: ${chipValue('mgso4')||'—'}\n`;
+  t += `Meconium: ${chipValue('meconium')||'—'}\n`;
+  t += `Risk factors: ${val('riskFactors')}\n\n`;
+
+  t += '3. PREPARATION & BRIEFING\n' + '-'.repeat(60) + '\n';
+  t += `Expected concerns: ${chipValue('expectedConcerns')||'—'}\n`;
+  t += `Briefing done: ${chipValue('briefingDone')||'—'}   Equipment checked: ${chipValue('equipChecked')||'—'}\n`;
+  t += `Warmer pre-heated: ${chipValue('warmerPreheated')||'—'}   Suction ready: ${chipValue('suctionReady')||'—'}\n`;
+  t += `T-piece/bag-mask ready: ${chipValue('tpieceReady')||'—'}   Resus drug available: ${chipValue('drugsDrawn')||'—'}\n\n`;
+
+  t += '4. INITIAL STABILISATION\n' + '-'.repeat(60) + '\n';
+  t += `DCC: ${chipValue('dcc')||'—'}   Duration: ${val('dccDuration')}s\n`;
+  t += `Thermoregulation: ${chipValue('thermoreg')||'—'}\n`;
+  t += `Dry & stimulate: ${chipValue('dryStim')||'—'}   Suction: ${chipValue('suctionType')||'—'}\n`;
+  t += `Delivery room temp: ${val('drTemp')}°C at ${val('drTempTime')}\n\n`;
+
+  t += '6. APGAR SCORE\n' + '-'.repeat(60) + '\n' + buildApgarText();
+
+  t += `GATE 1 — Required initial steps of resuscitation? ${gate1===null?'(not answered)':(gate1?'YES':'NO')}\n\n`;
+  if (!gate1) {
+    t += buildKeyTimepointsSection();
+    t += '12. DISPOSITION & SIGNATURES\n' + '-'.repeat(60) + '\n' + buildDispositionText();
+    t += '13. TIMELINE NOTES\n' + '-'.repeat(60) + '\n' + buildNotesText();
+    return t;
+  }
+
+  t += '5. TEAM RESPONSE\n' + '-'.repeat(60) + '\n';
+  t += `Time resus called: ${val('timeResusCalled')}   Team leader arrived: ${val('timeTLArrived')}\n`;
+  t += `Team Leader: ${val('teamLeader')} (${val('teamLeaderRole')})\n`;
+  t += `Airway: ${val('airwayPerson')} @ ${val('airwayArrived')}   Compressions: ${val('compPerson')} @ ${val('compArrived')}\n`;
+  t += `Medications: ${val('medPerson')} @ ${val('medArrived')}   Recorder: ${val('recorder')} @ ${val('recorderArrived')}\n`;
+  t += `Escalation triggered: ${chipValue('escalationTriggered')||'—'} at ${val('timeEscalated')} to ${chipValue('escalatedTo')||'—'} (arrived ${val('specialistArrived')})\n`;
+  t += `Code Blue: ${chipValue('codeBlue')||'—'} at ${val('codeBlueTime')} via ${chipValue('activationMethod')||'—'}; response ${chipValue('responseTeam')||'—'} at ${val('responseTime')} (interval ${val('responseInterval')} min); reason: ${chipValue('codeBlueReason')||'—'} ${val('codeBlueOther')}\n\n`;
+
+  t += '7. MONITORING TIMELINE\n' + '-'.repeat(60) + '\n';
+  t += `Initial FiO2: ${chipValue('initialFio2')||'—'}\n`;
+  t += 'Time     1min    3min    5min    10min   15min\n';
+  ['hr','spo2','fio2','rr','colour','notes'].forEach(row => {
+    const labels = {hr:'HR',spo2:'SpO2',fio2:'FiO2',rr:'RR/Eff',colour:'Colour',notes:'Notes'};
+    t += `${labels[row].padEnd(8)} ${mtCell(row,1).padEnd(7)} ${mtCell(row,3).padEnd(7)} ${mtCell(row,5).padEnd(7)} ${mtCell(row,10).padEnd(7)} ${mtCell(row,15)}\n`;
+  });
+  t += '\n';
+
+  t += '8. AIRWAY & BREATHING\n' + '-'.repeat(60) + '\n';
+  t += `Initial assessment: ${chipValue('initialAssess')||'—'}\n`;
+  if (chipValue('initialAssess') === 'Breathing adequate') {
+    t += `Oxygen/NCPAP: FiO2 ${val('oxygenFio2')}%, ${chipValue('cpapInterface')||'—'}, PEEP ${val('cpapPeep')}, ${val('cpapStart')}–${val('cpapStop')}\n\n`;
+  } else {
+    t += `PPV: ${chipValue('ppvInterface')||'—'} via ${chipValue('ppvDevice')||'—'}, ${val('ppvStart')}–${val('ppvStop')}, PIP ${val('pip')}/PEEP ${val('peep')}\n`;
+    t += `Chest rise: ${chipValue('chestRiseAch')||'—'}; time to effective PPV: ${val('effectivePpvTime')}; HR response: ${chipValue('hrResponsePPV')||'—'}; airway difficulty: ${chipValue('airwayDifficulty')||'—'}; MASK: ${chipValue('correctiveMask')||'—'}\n`;
+    t += `ETT: size ${chipValue('ettSize')||'—'}, depth ${val('ettDepth')}cm, attempts ${val('ettAttempts')}, confirmed ${val('ettConfirmedTime')} via ${chipValue('ettConfirmation')||'—'}; bilateral air entry: ${chipValue('bilateralAirEntry')||'—'}\n`;
+    t += `LMA: size ${val('lmaSize')} at ${val('lmaTime')}\n\n`;
+  }
+
+  t += `GATE 2 — Needed full resuscitation (compressions/medications)? ${gate2===null?'(not answered)':(gate2?'YES':'NO')}\n\n`;
+  if (!gate2) {
+    t += buildKeyTimepointsSection();
+    t += '12. DISPOSITION & SIGNATURES\n' + '-'.repeat(60) + '\n' + buildDispositionText();
+    t += '13. TIMELINE NOTES\n' + '-'.repeat(60) + '\n' + buildNotesText();
+    return t;
+  }
+
+  t += '9. CIRCULATION\n' + '-'.repeat(60) + '\n';
+  t += `Compressions: ${val('ccStart')}–${val('ccStop')}; FiO2 100%: ${chipValue('fio2At100')||'—'}; ratio ${chipValue('ccRatio')||'—'}\n`;
+  t += `Access: ${chipValue('accessRoute')||'—'} at ${val('accessTime')}, size ${val('catheterSize')}, confirmed: ${chipValue('accessConfirmed')||'—'}\n`;
+  t += `Adrenaline 1: ${val('adr1vol')}mL ${chipValue('adr1route')||''} @ ${val('adr1time')}\n`;
+  for (let i=2;i<=adrenalineDoseCount;i++) {
+    t += `Adrenaline ${i}: ${val('adr'+i+'vol')}mL ${chipValue('adr'+i+'route')||''} @ ${val('adr'+i+'time')}\n`;
+  }
+  t += `Volume bolus: ${chipValue('volumeFluid')||'—'}, ${val('volumeVol')}mL @ ${val('volumeTime')}\n\n`;
+
+  t += '10. POST-RESUSCITATION CARE\n' + '-'.repeat(60) + '\n';
+  t += `Delivery room temp: ${val('pTemp')}°C @ ${val('pTempTime')}   NICU arrival temp: ${val('nicuTemp')}°C @ ${val('nicuTempTime')}\n`;
+  t += `Classification: ${chipValue('tempClass')||'—'}\n`;
+  t += `Blood glucose: ${val('bloodGlucose')} mmol/L   Blood gas: ${chipValue('bloodGas')||'—'}   Cord gases: ${chipValue('cordGases')||'—'}   SpO2 on admission: ${val('spo2Admission')}%\n`;
+  t += `Therapeutic hypothermia: ${chipValue('therapHypo')||'—'}   NICU admission: ${chipValue('nicuAdmission')||'—'}   Surfactant: ${chipValue('surfactant')||'—'} @ ${val('surfactantTime')}\n\n`;
+
+  t += buildKeyTimepointsSection();
+  t += '12. DISPOSITION & SIGNATURES\n' + '-'.repeat(60) + '\n' + buildDispositionText();
+  t += '13. TIMELINE NOTES\n' + '-'.repeat(60) + '\n' + buildNotesText();
+  return t;
+}
+
+function buildApgarText() {
+  let t = `1 min: ${val('apgar1')}   5 min: ${val('apgar5')}   10 min: ${val('apgar10')}`;
+  if (document.getElementById('apgarExtraMini').style.display !== 'none') {
+    t += `   15 min: ${val('apgar15')}   20 min: ${val('apgar20')}`;
+  }
+  t += `   Assigned by: ${val('apgarAssignedBy')}\n\n`;
+  return t;
+}
+
+function buildKeyTimepointsSection() {
+  const kt = document.getElementById('s11');
+  const relevant = kt && kt.style.display !== 'none';
+  if (!relevant) return '';
+  return '11. RESUSCITATION KEY TIMEPOINTS\n' + '-'.repeat(60) + '\n' + buildTimepointsText();
+}
+
+function buildTimepointsText() {
+  let t = '';
+  t += `Birth (T=0): ${deliveryTime ? toTimeValue(deliveryTime) : '—'}   PPV started: ${ppvStartedTime ? toTimeValue(ppvStartedTime) : '—'}   Effective ventilation: ${val('effVentKT')}   HR>100: ${val('hr100KT')}\n`;
+  t += `Compressions start/stop: ${compressionsStartedTime ? toTimeValue(compressionsStartedTime) : '—'} / ${compressionsCeasedTime ? toTimeValue(compressionsCeasedTime) : '—'}   First adrenaline: ${adrenalineFirstTime ? toTimeValue(adrenalineFirstTime) : '—'}   ROSC: ${val('roscKT')}\n`;
+  t += `Resuscitation ceased: ${val('resusCeasedKT')} by ${val('ceasedBy')}\n`;
+  t += `DOPE — Displaced: ${chipValue('dopeD')||'—'}, Obstructed: ${chipValue('dopeO')||'—'}, Pneumothorax: ${chipValue('dopeP')||'—'}, Equipment: ${chipValue('dopeE')||'—'}; Action: ${val('dopeAction')}\n\n`;
+  return t;
+}
+
+function buildDispositionText() {
+  let t = '';
+  t += `Disposition: ${chipValue('disposition')||'—'} at ${val('dispositionTime')}\n`;
+  t += `Signatures: ${val('sig1name')} (${val('sig1desig')})   /   ${val('sig2name')} (${val('sig2desig')})   Date: ${val('sigDate')} ${val('sigTime')}\n\n`;
+  return t;
+}
+
+function buildNotesText() {
+  let t = '';
+  document.querySelectorAll('#notesBody tr').forEach(tr => {
+    const time = tr.querySelector('.note-time').value || '—';
+    const event = tr.querySelector('.note-event').value || '';
+    if (event) t += `${time}  ${event}\n`;
+  });
+  return t;
+}
+
+function downloadRecord() {
+  const text = buildRecordText();
+  const blob = new Blob([text], {type: 'text/plain'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const nameSlug = (document.getElementById('babyName').value || 'baby').replace(/[^a-z0-9]+/gi,'_');
+  a.href = url;
+  a.download = `MyNeST_Resus_Record_${nameSlug}.txt`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+// CONDENSED PRINT VIEW — only entered fields, aims for 2–3 pages
+// ══════════════════════════════════════════════════════════════════════════
+function isBlank(v) {
+  if (v === null || v === undefined) return true;
+  v = String(v).trim();
+  return v === '' || v === '—' || v.startsWith('Not yet') || v.startsWith('—');
+}
+function pvEsc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+function pvLine(label, value) {
+  const shown = isBlank(value) ? '<span class="pv-blank">____________</span>' : pvEsc(value);
+  return `<div class="pv-line"><span class="pv-label">${pvEsc(label)}:</span> ${shown}</div>`;
+}
+function pvJoin(...lines) { return lines.filter(l => l).join(''); }
+function pvSection(title, innerHtml) {
+  return `<div class="pv-section"><div class="pv-section-title">${pvEsc(title)}</div><div class="pv-fields">${innerHtml}</div></div>`;
+}
+function displayText(id) {
+  const el = document.getElementById(id);
+  return el ? el.textContent : '';
+}
+
+function buildRecordContent(mode) {
+  // mode: 'grid' (browser print, uses CSS Grid) or 'table' (Word export, uses <table> —
+  // Word's HTML renderer does not support CSS Grid, so table markup is required there).
+  const L = (label, value) => {
+    if (mode === 'table') {
+      const shown = isBlank(value) ? '&nbsp;' : pvEsc(value);
+      return `<tr><td class="wlabel">${pvEsc(label)}:</td><td class="wvalue">${shown}</td></tr>`;
+    }
+    return pvLine(label, value);
+  };
+  const S = (title, innerContent) => {
+    if (mode === 'table') {
+      return `<table class="wsection"><tr><td colspan="2" class="wsection-title">${pvEsc(title)}</td></tr>${innerContent}</table>`;
+    }
+    return pvSection(title, innerContent);
+  };
+  const J = (...parts) => parts.filter(p => p).join('');
+
+  // ── PAGE 1 ──────────────────────────────────────────────────────────
+  let p1 = S('1 · Patient Identification', J(
+    L('Baby name', val('babyName')),
+    L('MRN/MIC', val('mrn')),
+    L('Sex', chipValue('sex')),
+    L('Place of birth', chipValue('placeOfBirth')),
+    L('DOB', val('dob')),
+    L('Time of birth', displayText('timeOfBirthDisplay')),
+    L('Gestation (weeks)', val('gestWeeks')),
+    L('Gestation (days)', val('gestDays')),
+    L('Estimated weight (g)', val('estWeight')),
+    L('Actual weight (g)', val('actualWeight')),
+  ));
+
+  p1 += S('2 · Antenatal & Birth Information', J(
+    L('Gravida', val('gravida')), L('Para', val('para')), L('Abortion', val('abortion')),
+    L('Birth type', chipValue('birthType')),
+    L('Antenatal steroids', chipValue('steroids')), L('MgSO4', chipValue('mgso4')),
+    L('Meconium', chipValue('meconium')),
+    L('Risk factors', val('riskFactors')),
+  ));
+
+  p1 += S('3 · Team Response', J(
+    L('Time resus called', val('timeResusCalled')), L('Team leader arrived', val('timeTLArrived')),
+    L('Team Leader', val('teamLeader')), L('Role/designation', val('teamLeaderRole')),
+    L('Airway person', val('airwayPerson')), L('Airway arrived', val('airwayArrived')),
+    L('Compressions person', val('compPerson')), L('Compressions arrived', val('compArrived')),
+    L('Medication nurse', val('medPerson')), L('Medication arrived', val('medArrived')),
+    L('Recorder', val('recorder')), L('Recorder arrived', val('recorderArrived')),
+    (() => {
+      const escFields = [chipValue('escalationTriggered'), chipValue('escalatedTo'), val('timeEscalated'), val('specialistArrived'),
+        chipValue('codeBlue'), val('codeBlueTime'), chipValue('responseTeam'), val('responseTime'), val('responseInterval'), chipValue('codeBlueReason')];
+      if (escFields.every(isBlank)) return ''; // no escalation/code blue data — omit entirely
+      return J(
+        L('Escalation triggered', chipValue('escalationTriggered')), L('Escalated to', chipValue('escalatedTo')),
+        L('Time escalated', val('timeEscalated')), L('Specialist arrived', val('specialistArrived')),
+        L('Code Blue', chipValue('codeBlue')), L('Code Blue time', val('codeBlueTime')),
+        L('Response team', chipValue('responseTeam')), L('Response time', val('responseTime')),
+        L('Response interval (min)', val('responseInterval')),
+        L('Code Blue reason', chipValue('codeBlueReason')),
+      );
+    })(),
+  ));
+
+  p1 += S('4 · Preparation & Briefing', J(
+    L('Expected concerns', chipValue('expectedConcerns')),
+    L('Briefing done', chipValue('briefingDone')), L('Equipment checked', chipValue('equipChecked')),
+    L('Warmer pre-heated', chipValue('warmerPreheated')), L('Suction ready', chipValue('suctionReady')),
+    L('T-piece/bag-mask ready', chipValue('tpieceReady')), L('Resus drug available', chipValue('drugsDrawn')),
+  ));
+
+  p1 += S('5 · Initial Stabilisation', J(
+    L('DCC', chipValue('dcc')), L('DCC duration (s)', val('dccDuration')),
+    L('Thermoregulation', chipValue('thermoreg')),
+    L('Dry & stimulate', chipValue('dryStim')), L('Suction', chipValue('suctionType')),
+    L('Delivery room temp (°C)', val('drTemp')), L('Temp measurement time', val('drTempTime')),
+  ));
+
+  p1 += S('6 · Apgar Score', J(
+    L('1 min', val('apgar1')), L('5 min', val('apgar5')), L('10 min', val('apgar10')),
+    L('15 min', val('apgar15')), L('20 min', val('apgar20')),
+    L('Assigned by', val('apgarAssignedBy')),
+  ));
+
+  // ── PAGE 2 ──────────────────────────────────────────────────────────
+  const mtTableClass = mode === 'table' ? 'wtable' : 'pv-table';
+  let p2 = S('7 · Monitoring Timeline', J(
+    L('Initial FiO2', chipValue('initialFio2')),
+    (() => {
+      const labels = {hr:'HR',spo2:'SpO2',fio2:'FiO2',rr:'RR/Eff',colour:'Colour',notes:'Notes'};
+      const cols = [1,3,5,10,15];
+      const inner = `<table class="${mtTableClass}"><tr><th>Param</th>` + cols.map(c=>`<th>${c}m</th>`).join('') + '</tr>' +
+        Object.keys(labels).map(row => `<tr><td>${labels[row]}</td>` + cols.map(c => { const v = mtCell(row,c); return `<td>${isBlank(v)?'':pvEsc(v)}</td>`; }).join('') + '</tr>').join('') +
+        '</table>';
+      return mode === 'table' ? `<tr><td colspan="2">${inner}</td></tr>` : inner;
+    })(),
+  ));
+
+  p2 += S('8 · Airway & Breathing', J(
+    L('Initial assessment', chipValue('initialAssess')),
+    L('Oxygen FiO2 (%)', val('oxygenFio2')), L('CPAP interface', chipValue('cpapInterface')), L('CPAP PEEP', val('cpapPeep')),
+    L('CPAP start', val('cpapStart')), L('CPAP stop', val('cpapStop')),
+    L('PPV interface', chipValue('ppvInterface')), L('PPV device', chipValue('ppvDevice')),
+    L('PPV start', val('ppvStart')), L('PPV stop', val('ppvStop')),
+    L('PIP', val('pip')), L('PEEP', val('peep')),
+    L('Chest rise achieved', chipValue('chestRiseAch')), L('Time to effective PPV', val('effectivePpvTime')),
+    L('HR response', chipValue('hrResponsePPV')), L('Airway difficulty', chipValue('airwayDifficulty')),
+    L('MASK applied', chipValue('correctiveMask')),
+    L('ETT size', chipValue('ettSize')), L('ETT depth (cm)', val('ettDepth')), L('ETT attempts', val('ettAttempts')),
+    L('ETT confirmed time', val('ettConfirmedTime')), L('ETT confirmation', chipValue('ettConfirmation')),
+    L('Bilateral air entry', chipValue('bilateralAirEntry')),
+    L('LMA size', val('lmaSize')), L('LMA time', val('lmaTime')),
+  ));
+
+  p2 += S('9 · Circulation', J(
+    L('Compressions start', val('ccStart')), L('Compressions stop', val('ccStop')),
+    L('FiO2 to 100%', chipValue('fio2At100')), L('Ratio', chipValue('ccRatio')),
+    L('Access route', chipValue('accessRoute')), L('Access time', val('accessTime')),
+    L('Catheter size', val('catheterSize')), L('Access confirmed', chipValue('accessConfirmed')),
+    L('Adrenaline 1 (mL)', val('adr1vol')), L('Adrenaline 1 time', val('adr1time')), L('Adrenaline 1 route', chipValue('adr1route')),
+    (() => {
+      let extra = '';
+      for (let i=2;i<=adrenalineDoseCount;i++) {
+        extra += L('Adrenaline '+i+' (mL)', val('adr'+i+'vol')) + L('Adrenaline '+i+' time', val('adr'+i+'time')) + L('Adrenaline '+i+' route', chipValue('adr'+i+'route'));
+      }
+      return extra;
+    })(),
+    L('Volume fluid', chipValue('volumeFluid')), L('Volume (mL)', val('volumeVol')), L('Volume time', val('volumeTime')),
+  ));
+
+  p2 += S('10 · Post-Resuscitation Care', J(
+    L('Delivery room temp (°C)', val('pTemp')), L('Temp time', val('pTempTime')),
+    L('NICU arrival temp (°C)', val('nicuTemp')), L('NICU temp time', val('nicuTempTime')),
+    L('Temp classification', chipValue('tempClass')),
+    L('Blood glucose (mmol/L)', val('bloodGlucose')), L('Blood gas', chipValue('bloodGas')),
+    L('Cord gases', chipValue('cordGases')), L('SpO2 on admission (%)', val('spo2Admission')),
+    L('Therapeutic hypothermia', chipValue('therapHypo')), L('NICU admission', chipValue('nicuAdmission')),
+    L('Surfactant', chipValue('surfactant')), L('Surfactant time', val('surfactantTime')),
+  ));
+
+  p2 += S('11 · Resuscitation Key Timepoints', J(
+    L('Birth (T=0)', displayText('birthTimeDisplay')),
+    L('PPV started', displayText('ppvStartedDisplay')),
+    L('Effective ventilation', val('effVentKT')), L('HR>100 achieved', val('hr100KT')),
+    L('Compressions started', displayText('compStartDisplay')), L('Compressions ceased', displayText('compStopDisplay')),
+    L('First adrenaline', displayText('firstAdrDisplay')),
+    L('ROSC', val('roscKT')), L('Resuscitation ceased', val('resusCeasedKT')), L('Ceased by', val('ceasedBy')),
+    L('DOPE — Displaced', chipValue('dopeD')), L('DOPE — Obstructed', chipValue('dopeO')),
+    L('DOPE — Pneumothorax', chipValue('dopeP')), L('DOPE — Equipment', chipValue('dopeE')),
+    L('DOPE action taken', val('dopeAction')),
+  ));
+
+  p2 += S('12 · Disposition', J(
+    L('Disposition', chipValue('disposition')), L('Time of disposition', val('dispositionTime')),
+  ));
+
+  let notesRows = '';
+  document.querySelectorAll('#notesBody tr').forEach(tr => {
+    const time = tr.querySelector('.note-time').value;
+    const event = tr.querySelector('.note-event').value;
+    if (!isBlank(event)) notesRows += L(time || 'Time', event);
+  });
+  if (notesRows) p2 += S('13 · Timeline Notes', notesRows);
+
+  // ── Signature & Stamp box ──
+  const sig1 = !isBlank(val('sig1name')) ? pvEsc(val('sig1name')) + (!isBlank(val('sig1desig')) ? ' (' + pvEsc(val('sig1desig')) + ')' : '') : '&nbsp;';
+  const sig2 = !isBlank(val('sig2name')) ? pvEsc(val('sig2name')) + (!isBlank(val('sig2desig')) ? ' (' + pvEsc(val('sig2desig')) + ')' : '') : '&nbsp;';
+  const dateVal = isBlank(val('sigDate')) ? '&nbsp;' : pvEsc(val('sigDate'));
+  let sigBox;
+  if (mode === 'table') {
+    sigBox = `<table class="wsection"><tr><td colspan="2" class="wsection-title">Signatures</td></tr>
+      <tr><td class="wsigcell">${sig1}<br><span class="wsigcaption">Print name &amp; designation</span></td><td class="wsigcell">${sig2}<br><span class="wsigcaption">Print name &amp; designation</span></td></tr>
+      <tr><td class="wstampcell">Signature</td><td class="wstampcell">Official Stamp</td></tr>
+      <tr><td colspan="2" class="wlabel">Date: ${dateVal}</td></tr>
+    </table>`;
+  } else {
+    sigBox = `<div class="pv-sig-box">
+      <div class="pv-sig-title">Signatures</div>
+      <div class="pv-sig-grid">
+        <div><div class="pv-sig-cell">${sig1}<br>Print name &amp; designation</div></div>
+        <div><div class="pv-sig-cell">${sig2}<br>Print name &amp; designation</div></div>
+        <div class="pv-stamp-cell">Signature</div>
+        <div class="pv-stamp-cell">Official Stamp</div>
+      </div>
+      <div class="pv-line" style="margin-top:6px">${pvLine('Date', val('sigDate'))}</div>
+    </div>`;
+  }
+
+  return { p1, p2, sigBox };
+}
+
+function buildPrintHTML() {
+  const header = `<div class="pv-title">MyNeST — Neonatal Resuscitation Record</div><div class="pv-sub">Printed ${new Date().toLocaleString()} — full form shown; blank fields left for manual entry</div>`;
+  const { p1, p2, sigBox } = buildRecordContent('grid');
+  return (
+    `<div class="print-page">${header}<div class="pv-page-label">Page 1 of 2</div><div class="pv-body">${p1}</div></div>` +
+    `<div class="print-page"><div class="pv-page-label">Page 2 of 2</div><div class="pv-body">${p2}</div>${sigBox}</div>`
+  );
+}
+
+function buildWordHTML() {
+  const { p1, p2, sigBox } = buildRecordContent('table');
+  const wordStyles = `
+    body { font-family: Calibri, Arial, sans-serif; font-size: 10.5pt; color:#000; }
+    h1.wtitle { color:#0a1628; font-size:16pt; margin-bottom:2px; }
+    p.wsub { color:#555; font-size:9pt; margin-bottom:14px; }
+    table.wsection { width:100%; border-collapse:collapse; border:1px solid #888; margin-bottom:12px; page-break-inside:avoid; }
+    table.wsection td.wsection-title { background:#1B3A6B; color:#fff; font-weight:bold; font-size:11pt; padding:5px 8px; }
+    table.wsection td.wlabel { font-weight:bold; width:32%; padding:4px 8px; border-bottom:1px solid #ddd; vertical-align:top; }
+    table.wsection td.wvalue { width:68%; padding:4px 8px; border-bottom:1px solid #ddd; vertical-align:top; }
+    table.wtable { width:100%; border-collapse:collapse; margin:4px 0; }
+    table.wtable th, table.wtable td { border:1px solid #bbb; padding:3px 6px; font-size:9.5pt; text-align:left; }
+    table.wtable th { background:#eee; }
+    td.wsigcell { width:50%; padding:20px 8px 4px; border-top:1px solid #333; vertical-align:bottom; }
+    .wsigcaption { font-size:8.5pt; color:#555; }
+    td.wstampcell { width:50%; padding:16px 8px; text-align:center; color:#888; font-style:italic; border:1px dashed #999; }
+    .page-break { page-break-before: always; }
+  `;
+  const html = `<!DOCTYPE html>
+<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">
+<head><meta charset="utf-8"><title>MyNeST Resuscitation Record</title>
+<!--[if gte mso 9]><xml><w:WordDocument><w:View>Print</w:View></w:WordDocument></xml><![endif]-->
+<style>${wordStyles}</style>
+</head><body>
+<h1 class="wtitle">MyNeST — Neonatal Resuscitation Record</h1>
+<p class="wsub">Printed ${new Date().toLocaleString()} — full form shown; blank fields left for manual entry</p>
+${p1}
+<div class="page-break"></div>
+${p2}
+${sigBox}
+</body></html>`;
+  return html;
+}
+
+function printCondensed() {
+  document.getElementById('printView').innerHTML = buildPrintHTML();
+  window.print();
+}
+
+function downloadRecordWord() {
+  const html = buildWordHTML();
+  const blob = new Blob(['\ufeff', html], {type: 'application/msword'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const nameSlug = (document.getElementById('babyName').value || 'baby').replace(/[^a-z0-9]+/gi,'_');
+  a.href = url;
+  a.download = `MyNeST_Resus_Record_${nameSlug}.doc`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+// ── Collapsible sections + jump-nav active state (iPhone UX) ──────────────
+const DEFAULT_EXPANDED_SECTIONS = ['deliveryTimeCard']; // stays open — houses the live delivery clock
+
+function initCollapsibleSections() {
+  document.querySelectorAll('.wrap .card').forEach(card => {
+    const title = card.querySelector(':scope > .card-title');
+    if (!title || title.dataset.collapsible) return;
+    title.dataset.collapsible = '1';
+
+    // Move everything after the title into a card-body wrapper
+    const body = document.createElement('div');
+    body.className = 'card-body';
+    let node = title.nextSibling;
+    while (node) {
+      const next = node.nextSibling;
+      body.appendChild(node);
+      node = next;
+    }
+    card.appendChild(body);
+
+    const chevron = document.createElement('span');
+    chevron.className = 'chevron';
+    chevron.textContent = '▾';
+    title.appendChild(chevron);
+
+    title.addEventListener('click', () => card.classList.toggle('collapsed'));
+
+    // Default state: collapsed, except the live delivery-timer card
+    if (!DEFAULT_EXPANDED_SECTIONS.includes(card.id)) {
+      card.classList.add('collapsed');
+    }
+  });
+}
+
+function expandSection(id) {
+  const el = document.getElementById(id);
+  if (el) el.classList.remove('collapsed');
+}
+
+function setAllSectionsCollapsed(collapsed) {
+  document.querySelectorAll('.wrap .card').forEach(card => {
+    // Leave sections currently hidden by branching logic (display:none) alone
+    card.classList.toggle('collapsed', collapsed);
+  });
+}
+
+function initJumpNavActiveState() {
+  const links = [...document.querySelectorAll('.jump-nav a')];
+  const targets = links
+    .map(a => ({ a, el: document.getElementById(a.getAttribute('href').slice(1)) }))
+    .filter(t => t.el);
+
+  // Auto-expand the target section when its nav link is tapped
+  links.forEach(a => {
+    a.addEventListener('click', () => {
+      const el = document.getElementById(a.getAttribute('href').slice(1));
+      if (el && el.classList.contains('collapsed')) el.classList.remove('collapsed');
+    });
+  });
+
+  if (!('IntersectionObserver' in window)) return;
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      const match = targets.find(t => t.el === entry.target);
+      if (!match) return;
+      if (entry.isIntersecting) {
+        links.forEach(l => l.classList.remove('active'));
+        match.a.classList.add('active');
+        match.a.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+      }
+    });
+  }, { rootMargin: '-145px 0px -65% 0px', threshold: 0 });
+
+  targets.forEach(t => obs.observe(t.el));
+}
+
+initCollapsibleSections();
+initJumpNavActiveState();
+</script>
+</body>
+</html>

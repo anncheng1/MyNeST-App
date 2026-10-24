@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover, user-scalable=no">
+<title>Patient Monitor — MyNeST</title>
+<!-- iPhone home-screen app -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="MyNeST">
+<meta name="application-name" content="MyNeST">
+<meta name="format-detection" content="telephone=no">
+<meta name="theme-color" content="#0a1628">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="167x167" href="icons/apple-touch-icon-167.png">
+<link rel="apple-touch-icon" sizes="152x152" href="icons/apple-touch-icon-152.png">
+<link rel="apple-touch-startup-image" media="screen and (device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="icons/splash-1290x2796.png">
+<link rel="apple-touch-startup-image" media="screen and (device-width: 440px) and (device-height: 956px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="icons/splash-1320x2868.png">
+<link rel="apple-touch-startup-image" media="screen and (device-width: 402px) and (device-height: 874px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="icons/splash-1206x2622.png">
+<link rel="apple-touch-startup-image" media="screen and (device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="icons/splash-1179x2556.png">
+<link rel="apple-touch-startup-image" media="screen and (device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="icons/splash-1284x2778.png">
+<link rel="apple-touch-startup-image" media="screen and (device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="icons/splash-1170x2532.png">
+<link rel="apple-touch-startup-image" media="screen and (device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="icons/splash-1125x2436.png">
+<link rel="apple-touch-startup-image" media="screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="icons/splash-1242x2688.png">
+<link rel="apple-touch-startup-image" media="screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="icons/splash-828x1792.png">
+<link rel="apple-touch-startup-image" media="screen and (device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="icons/splash-750x1334.png">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; user-select: none; }
+html, body { background: #000; color: #fff; font-family: -apple-system, 'Helvetica Neue', Arial, sans-serif; height: 100%; overflow: hidden; }
+.topbar { position: fixed; top: 0; left: 0; right: 0; display: flex; align-items: center; justify-content: space-between; padding: 6px 10px; background: #0a0a0a; border-bottom: 1px solid #222; z-index: 50; font-size: 11px; color: #777; }
+.topbar a { color: #777; text-decoration: none; }
+.status-pill { padding: 3px 8px; border-radius: 10px; font-weight: 700; }
+.status-pill.waiting { background: #3a2a00; color: #ffb340; }
+.status-pill.connected { background: #0d2a18; color: #34d399; }
+.room-code { font-variant-numeric: tabular-nums; letter-spacing: 3px; font-weight: 800; color: #5db0ff; }
+
+.monitor-stack { position: absolute; top: 30px; bottom: 0; left: 0; right: 0; display: flex; flex-direction: column; background: #111; gap: 1px; }
+
+.timer-bar { background: #0a0a0a; padding: 8px 14px; text-align: center; cursor: pointer; flex-shrink: 0; }
+.timer-bar .mon-label { font-size: 11px; font-weight: 700; letter-spacing: 1px; color: #ff5c5c; opacity: 0.85; }
+.timer-bar .mon-value { font-size: 42px; font-weight: 800; font-variant-numeric: tabular-nums; color: #ff5c5c; line-height: 1.1; }
+.timer-bar.running .mon-value { color: #ff8080; }
+.timer-hint { font-size: 9.5px; color: #555; margin-top: 2px; }
+
+.vitals-row { display: flex; flex-shrink: 0; gap: 1px; height: 22vh; min-height: 130px; }
+.vital-box { flex: 1; background: #0a0a0a; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; }
+.vital-box .mon-label { font-size: 12px; font-weight: 700; letter-spacing: 1px; position: static; margin-bottom: 4px; }
+.vital-box .mon-value { font-size: 46px; font-weight: 800; font-variant-numeric: tabular-nums; position: static; line-height: 1; }
+.vital-box.hr .mon-label, .vital-box.hr .mon-value { color: #2ee62e; }
+.vital-box.spo2 .mon-label, .vital-box.spo2 .mon-value { color: #29d8d8; }
+.vital-box.temp .mon-label, .vital-box.temp .mon-value { color: #ffd400; }
+.mon-unit { font-size: 15px; font-weight: 400; opacity: 0.7; }
+
+.ecg-row { flex: 2.2; background: #0a0a0a; position: relative; min-height: 140px; }
+.ecg-row .mon-label { position: absolute; top: 6px; left: 12px; font-size: 12px; font-weight: 700; letter-spacing: 1px; color: #2ee62e; z-index: 2; }
+
+.pleth-row { flex: 1.1; background: #0a0a0a; position: relative; min-height: 70px; }
+.pleth-row .mon-label { position: absolute; top: 4px; left: 12px; font-size: 11px; font-weight: 700; letter-spacing: 1px; color: #29d8d8; z-index: 2; }
+
+canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+
+.note-row { background: #0a0a0a; flex-shrink: 0; padding: 6px; text-align: center; color: #666; font-size: 11px; }
+
+.alarm-banner { position: absolute; top: 0; left: 0; right: 0; background: #4a0000; color: #ff8080; text-align: center; font-weight: 800; font-size: 13px; padding: 4px; display: none; z-index: 10; animation: alarmBlink 0.8s infinite; }
+.alarm-banner.show { display: block; }
+@keyframes alarmBlink { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+.waiting-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.92); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 20; text-align: center; padding: 20px; }
+.waiting-overlay h2 { font-size: 16px; color: #aaa; margin-bottom: 14px; font-weight: 500; }
+.waiting-overlay .room-code-big { font-size: 52px; font-weight: 800; letter-spacing: 8px; color: #5db0ff; margin-bottom: 10px; }
+.waiting-overlay p { font-size: 12px; color: #666; max-width: 280px; }
+</style>
+<link rel="stylesheet" href="ios.css">
+<style>
+.topbar{padding-top:calc(env(safe-area-inset-top,0px) + 6px)!important}
+.monitor-stack{top:calc(env(safe-area-inset-top,0px) + 30px)}
+.alarm-banner{top:calc(env(safe-area-inset-top,0px) + 30px)}
+</style>
+<script src="pwa.js" defer></script>
+</head>
+<body>
+
+<div class="topbar">
+  <a href="index.html">← Home</a>
+  <div><span class="status-pill waiting" id="statusPill">Waiting for controller…</span></div>
+  <div>Room: <span class="room-code" id="roomCodeSmall">----</span></div>
+</div>
+
+<div class="alarm-banner" id="alarmBanner">⚠ CHECK PATIENT</div>
+
+<div class="monitor-stack">
+  <div class="timer-bar" id="timerBar" onclick="onTimerTap()">
+    <div class="mon-label">TIME OF LIFE</div>
+    <div class="mon-value" id="timerValue">00:00</div>
+    <div class="timer-hint">Tap to start/stop · double-tap to reset</div>
+  </div>
+
+  <div class="vitals-row">
+    <div class="vital-box hr">
+      <div class="mon-label">HR</div>
+      <div class="mon-value" id="hrValue">--<span class="mon-unit"> bpm</span></div>
+    </div>
+    <div class="vital-box spo2">
+      <div class="mon-label">SpO₂</div>
+      <div class="mon-value" id="spo2Value">--<span class="mon-unit"> %</span></div>
+    </div>
+    <div class="vital-box temp">
+      <div class="mon-label">TEMP</div>
+      <div class="mon-value" id="tempValue">--<span class="mon-unit">°C</span></div>
+    </div>
+  </div>
+
+  <div class="ecg-row">
+    <div class="mon-label">ECG</div>
+    <canvas id="ecgCanvas"></canvas>
+  </div>
+
+  <div class="pleth-row">
+    <div class="mon-label">SpO₂ PLETH</div>
+    <canvas id="plethCanvas"></canvas>
+  </div>
+
+  <div class="note-row" id="noteRow">Case: — &nbsp;·&nbsp; Note: —</div>
+</div>
+
+<div class="waiting-overlay" id="waitingOverlay">
+  <h2>Enter this room code on the controller device</h2>
+  <div class="room-code-big" id="roomCodeBig">----</div>
+  <p>Open <strong>monitor-control.html</strong> on a second phone, enter this code, and tap Connect.</p>
+  <p style="margin-top:8px;color:#ffb340">Both phones need an internet connection to pair.</p>
+</div>
+
+<script src="vendor/peerjs.min.js"></script>
+<script>
+let peer, conn;
+// probes.hrspo2 / probes.temp / probes.ecg each stay false — simulating "probe not yet
+// applied" — until the controller explicitly switches that probe on.
+let state = { hr: null, spo2: null, temp: null, fio2: 21, caseLabel: '', note: '', running: false, elapsed: 0 };
+let probes = { hrspo2: false, temp: false, ecg: false };
+let timerInterval = null;
+
+function makeRoomCode() {
+  return String(Math.floor(1000 + Math.random()*9000));
+}
+const roomCode = makeRoomCode();
+document.getElementById('roomCodeBig').textContent = roomCode;
+document.getElementById('roomCodeSmall').textContent = roomCode;
+
+function initPeer() {
+  peer = new Peer('mynest-monitor-' + roomCode, { debug: 0 });
+  peer.on('open', () => {
+    console.log('Monitor host ready:', roomCode);
+  });
+  peer.on('connection', (c) => {
+    conn = c;
+    document.getElementById('statusPill').textContent = 'Connected';
+    document.getElementById('statusPill').className = 'status-pill connected';
+    document.getElementById('waitingOverlay').style.display = 'none';
+    conn.on('data', handleData);
+    conn.on('close', () => {
+      document.getElementById('statusPill').textContent = 'Disconnected';
+      document.getElementById('statusPill').className = 'status-pill waiting';
+      document.getElementById('waitingOverlay').style.display = 'flex';
+    });
+  });
+  peer.on('error', (err) => {
+    console.warn('Peer error', err.type);
+    if (err.type === 'unavailable-id') {
+      // room code collision (rare) — regenerate and retry
+      setTimeout(() => location.reload(), 500);
+    }
+  });
+}
+
+function handleData(msg) {
+  if (msg.type === 'update') {
+    Object.assign(state, msg.payload);
+    render();
+  } else if (msg.type === 'probeState') {
+    probes[msg.probe] = msg.on;
+    render();
+  } else if (msg.type === 'timerControl') {
+    if (msg.action === 'start') startTimer();
+    else if (msg.action === 'stop') stopTimer();
+    else if (msg.action === 'reset') resetTimer();
+  }
+}
+
+function startTimer() {
+  if (timerInterval) return;
+  state.running = true;
+  timerInterval = setInterval(() => { state.elapsed++; renderTimer(); }, 1000);
+  renderTimer();
+}
+function stopTimer() {
+  state.running = false;
+  clearInterval(timerInterval);
+  timerInterval = null;
+  renderTimer();
+}
+function resetTimer() {
+  stopTimer();
+  state.elapsed = 0;
+  renderTimer();
+}
+function renderTimer() {
+  const m = Math.floor(state.elapsed/60), s = state.elapsed%60;
+  document.getElementById('timerValue').textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  document.getElementById('timerBar').classList.toggle('running', state.running);
+}
+
+// ── Tap-to-control timer directly on the monitor ──
+let tapCount = 0;
+let tapTimeout = null;
+function onTimerTap() {
+  tapCount++;
+  if (tapCount === 1) {
+    tapTimeout = setTimeout(() => {
+      if (tapCount === 1) {
+        if (state.running) stopTimer(); else startTimer();
+      }
+      tapCount = 0;
+    }, 350);
+  } else if (tapCount >= 2) {
+    clearTimeout(tapTimeout);
+    tapCount = 0;
+    resetTimer();
+  }
+}
+
+function render() {
+  document.getElementById('hrValue').innerHTML = (probes.hrspo2 && state.hr != null)
+    ? `${state.hr}<span class="mon-unit"> bpm</span>` : `--<span class="mon-unit"> bpm</span>`;
+  document.getElementById('spo2Value').innerHTML = (probes.hrspo2 && state.spo2 != null)
+    ? `${state.spo2}<span class="mon-unit"> %</span>` : `--<span class="mon-unit"> %</span>`;
+  document.getElementById('tempValue').innerHTML = (probes.temp && state.temp != null)
+    ? `${state.temp.toFixed(1)}<span class="mon-unit">°C</span>` : `--<span class="mon-unit">°C</span>`;
+
+  const anyProbe = probes.hrspo2 || probes.temp || probes.ecg;
+  document.getElementById('noteRow').textContent = anyProbe
+    ? `Case: ${state.caseLabel || '—'}   ·   Note: ${state.note || '—'}`
+    : 'Probes / leads not yet applied';
+
+  const banner = document.getElementById('alarmBanner');
+  if (probes.hrspo2 && state.hr != null) {
+    const alarm = state.hr < 60 || state.hr === 0 || (state.spo2 != null && state.spo2 < 70);
+    banner.classList.toggle('show', alarm);
+    banner.textContent = state.hr === 0 ? '⚠ ASYSTOLE — CHECK PATIENT' : (state.hr < 60 ? '⚠ BRADYCARDIA' : '⚠ LOW SpO₂');
+  } else {
+    banner.classList.remove('show');
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+// Medically-accurate waveform engine.
+// Interval_ms = 60000 / BPM — elapsed time since the last beat is tracked so
+// the P-Q-R-S-T complex (and the pleth's systolic/dicrotic/diastolic phases)
+// are drawn at the exact millisecond offset within that interval, so spacing
+// between waves always matches the displayed heart rate exactly.
+// Waveforms stay blank until probes.ecg is true (ECG leads / pleth not yet applied).
+// ══════════════════════════════════════════════════════════════════════════
+function setupOscilloscope(canvasId, color, isECG) {
+  const canvas = document.getElementById(canvasId);
+  const ctx = canvas.getContext('2d');
+  const dpr = window.devicePixelRatio || 1;
+
+  function resize() {
+    canvas.width = canvas.clientWidth * dpr;
+    canvas.height = canvas.clientHeight * dpr;
+  }
+  window.addEventListener('resize', resize);
+  resize();
+
+  let x = 0;
+  let lastY = null;
+  const speed = 1.1 * dpr; // sweep speed across the screen (slowed to ~quarter of a brisk sweep)
+  let lastBeatTime = performance.now();
+
+  function draw(timestamp) {
+    const w = canvas.width, h = canvas.height;
+    const centerY = h / 2;
+
+    if (!probes.ecg || !state.hr || state.hr <= 0) {
+      // Flat line / blank — ECG/pleth leads not yet applied, or asystole
+      ctx.fillStyle = '#0a0a0a';
+      ctx.fillRect(x, 0, speed*16, h);
+      if (probes.ecg && state.hr === 0) {
+        // asystole: draw a flat baseline so it's clear the monitor IS reading, just flat
+        ctx.beginPath();
+        ctx.strokeStyle = color; ctx.lineWidth = 2*dpr;
+        ctx.moveTo(x > 0 ? x - speed : x, lastY == null ? centerY : lastY);
+        ctx.lineTo(x, centerY);
+        ctx.stroke();
+        lastY = centerY;
+      }
+      x += speed;
+      if (x >= w) { x = 0; ctx.fillRect(0,0,w,h); lastY = null; }
+      requestAnimationFrame(draw);
+      return;
+    }
+
+    const bpm = state.hr;
+    const beatInterval = 60000 / bpm; // ms per beat — clinically accurate spacing
+
+    if (timestamp - lastBeatTime > beatInterval) {
+      lastBeatTime = timestamp - ((timestamp - lastBeatTime) % beatInterval);
+    }
+    const timeInBeat = timestamp - lastBeatTime;
+
+    // Sweeping erase effect just ahead of the draw point
+    ctx.fillStyle = '#0a0a0a';
+    ctx.fillRect(x, 0, speed*16, h);
+
+    let yOffset = 0;
+
+    if (isECG) {
+      // P-Q-R-S-T complex, compressed into ~230ms so it doesn't overlap at high neonatal HR
+      if (timeInBeat >= 0 && timeInBeat < 40) {
+        yOffset = -Math.sin((timeInBeat/40)*Math.PI) * 10;               // P wave
+      } else if (timeInBeat >= 70 && timeInBeat < 90) {
+        yOffset = Math.sin(((timeInBeat-70)/20)*Math.PI) * 12;           // Q wave
+      } else if (timeInBeat >= 90 && timeInBeat < 110) {
+        yOffset = -Math.sin(((timeInBeat-90)/20)*Math.PI) * 90;          // R wave
+      } else if (timeInBeat >= 110 && timeInBeat < 130) {
+        yOffset = Math.sin(((timeInBeat-110)/20)*Math.PI) * 22;          // S wave
+      } else if (timeInBeat >= 170 && timeInBeat < 230) {
+        yOffset = -Math.sin(((timeInBeat-170)/60)*Math.PI) * 16;         // T wave
+      }
+      yOffset += (Math.random()-0.5) * 2; // minimal baseline artifact
+    } else {
+      // SpO2 plethysmograph — systolic upstroke, dicrotic notch, diastolic runoff
+      const phase = timeInBeat / beatInterval;
+      if (phase < 0.25) {
+        yOffset = -Math.sin((phase/0.25)*(Math.PI/2)) * 42;              // systolic upstroke
+      } else if (phase < 0.45) {
+        yOffset = -42 + Math.sin(((phase-0.25)/0.2)*(Math.PI/2)) * 21;   // downstroke to notch
+      } else if (phase < 0.6) {
+        yOffset = -21 - Math.sin(((phase-0.45)/0.15)*Math.PI) * 7;       // dicrotic notch peak
+      } else {
+        yOffset = -21 + Math.sin(((phase-0.6)/0.4)*(Math.PI/2)) * 21;    // diastolic runoff
+      }
+    }
+
+    const y = centerY + yOffset * dpr;
+
+    ctx.beginPath();
+    ctx.strokeStyle = color; ctx.lineWidth = 2*dpr; ctx.lineJoin = 'round';
+    ctx.moveTo(x > 0 ? x - speed : x, lastY == null ? y : lastY);
+    ctx.lineTo(x, y);
+    ctx.stroke();
+    lastY = y;
+
+    x += speed;
+    if (x >= w) { x = 0; ctx.fillRect(0,0,w,h); lastY = null; }
+
+    requestAnimationFrame(draw);
+  }
+  requestAnimationFrame(draw);
+}
+
+initPeer();
+render();
+renderTimer();
+setupOscilloscope('ecgCanvas', '#2ee62e', true);
+setupOscilloscope('plethCanvas', '#29d8d8', false);
+</script>
+</body>
+</html>

@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<title>SpO₂ Targets · MyNeST</title>
+<!-- iPhone home-screen app -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="MyNeST">
+<meta name="application-name" content="MyNeST">
+<meta name="format-detection" content="telephone=no">
+<meta name="theme-color" content="#0a1628">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="167x167" href="icons/apple-touch-icon-167.png">
+<link rel="apple-touch-icon" sizes="152x152" href="icons/apple-touch-icon-152.png">
+<link rel="apple-touch-startup-image" media="screen and (device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="icons/splash-1290x2796.png">
+<link rel="apple-touch-startup-image" media="screen and (device-width: 440px) and (device-height: 956px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="icons/splash-1320x2868.png">
+<link rel="apple-touch-startup-image" media="screen and (device-width: 402px) and (device-height: 874px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="icons/splash-1206x2622.png">
+<link rel="apple-touch-startup-image" media="screen and (device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="icons/splash-1179x2556.png">
+<link rel="apple-touch-startup-image" media="screen and (device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="icons/splash-1284x2778.png">
+<link rel="apple-touch-startup-image" media="screen and (device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="icons/splash-1170x2532.png">
+<link rel="apple-touch-startup-image" media="screen and (device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="icons/splash-1125x2436.png">
+<link rel="apple-touch-startup-image" media="screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="icons/splash-1242x2688.png">
+<link rel="apple-touch-startup-image" media="screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="icons/splash-828x1792.png">
+<link rel="apple-touch-startup-image" media="screen and (device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="icons/splash-750x1334.png">
+<style>
+:root{
+  --navy:#0a1628;--navy-mid:#122040;--navy-card:#1a2d50;
+  --blue:#3b9eff;--teal:#00d4b4;--red:#ff4d6a;--amber:#ffb340;--green:#34d399;
+  --text:#e8f0fe;--text-dim:#8da4c4;--border:#243860;
+  --radius:14px;--safe-bottom:env(safe-area-inset-bottom,0px);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html,body{min-height:100%;background:var(--navy);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;}
+.topbar{display:flex;align-items:center;gap:12px;background:var(--navy-mid);border-bottom:1px solid var(--border);padding:48px 16px 14px;position:sticky;top:0;z-index:100;}
+.back-btn{width:36px;height:36px;border-radius:10px;background:var(--navy-card);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;text-decoration:none;color:var(--blue);font-size:18px;flex-shrink:0;}
+.topbar-title{font-size:17px;font-weight:700;color:#fff;}
+.topbar-sub{font-size:11px;color:var(--text-dim);}
+.content{padding:16px;}
+
+/* Live timer */
+.timer-card{
+  background:var(--navy-card);border:2px solid var(--amber);border-radius:var(--radius);
+  padding:16px;margin-bottom:16px;text-align:center;
+}
+.timer-label{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--amber);margin-bottom:8px;}
+.timer-display{font-size:52px;font-weight:900;color:#fff;font-variant-numeric:tabular-nums;letter-spacing:-2px;line-height:1;}
+.timer-min{font-size:14px;color:var(--text-dim);margin-top:4px;}
+.timer-btns{display:flex;gap:8px;margin-top:12px;}
+.tbtn{
+  flex:1;padding:10px;border-radius:10px;border:1px solid var(--border);
+  font-size:13px;font-weight:700;cursor:pointer;background:var(--navy-mid);color:var(--text);
+  transition:all .15s;
+}
+.tbtn.start{background:var(--green);color:#0a1628;border-color:var(--green);}
+.tbtn.stop{background:var(--red);color:#fff;border-color:var(--red);}
+
+/* Current target highlight */
+.current-target{
+  background:linear-gradient(135deg, rgba(0,212,180,.15), rgba(59,158,255,.1));
+  border:2px solid var(--teal);border-radius:var(--radius);
+  padding:16px;margin-bottom:16px;text-align:center;
+}
+.ct-label{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--teal);margin-bottom:6px;}
+.ct-range{font-size:40px;font-weight:900;color:#fff;line-height:1;}
+.ct-pct{font-size:16px;color:var(--text-dim);}
+.ct-status{margin-top:8px;font-size:13px;color:var(--text-dim);}
+
+/* Gauge bar */
+.gauge-wrap{margin-bottom:16px;}
+.gauge-label{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text-dim);margin-bottom:8px;}
+.gauge-bar{
+  height:32px;border-radius:16px;
+  background:linear-gradient(90deg,
+    var(--red) 0%,
+    var(--red) 40%,
+    var(--amber) 40%,
+    var(--amber) 60%,
+    var(--green) 60%,
+    var(--green) 85%,
+    var(--amber) 85%,
+    var(--amber) 100%
+  );
+  position:relative;margin-bottom:8px;
+}
+.gauge-marker{
+  position:absolute;top:-4px;transform:translateX(-50%);
+  width:4px;height:40px;background:#fff;border-radius:2px;
+  transition:left .4s cubic-bezier(.4,0,.2,1);
+  box-shadow:0 0 8px rgba(255,255,255,.6);
+}
+.gauge-ticks{display:flex;justify-content:space-between;font-size:10px;color:var(--text-dim);padding:0 2px;}
+
+/* Timeline table */
+.timeline-card{
+  background:var(--navy-card);border:1px solid var(--border);border-radius:var(--radius);
+  overflow:hidden;margin-bottom:16px;
+}
+.timeline-head{
+  display:grid;grid-template-columns:70px 1fr 1fr;
+  background:var(--navy-mid);border-bottom:1px solid var(--border);
+  font-size:11px;font-weight:700;color:var(--text-dim);letter-spacing:.05em;text-transform:uppercase;
+}
+.timeline-head div,.timeline-row div{padding:10px 12px;}
+.timeline-row{
+  display:grid;grid-template-columns:70px 1fr 1fr;
+  border-bottom:1px solid rgba(36,56,96,.5);
+  transition:background .2s;
+}
+.timeline-row:last-child{border-bottom:none;}
+.timeline-row.current{background:rgba(0,212,180,.1);}
+.timeline-row.past{opacity:.45;}
+.time-cell{font-size:14px;font-weight:700;color:var(--text);}
+.range-cell{font-size:16px;font-weight:800;}
+.range-cell.ok{color:var(--green);}
+.range-cell.warn{color:var(--amber);}
+.key-cell{font-size:12px;color:var(--text-dim);}
+
+/* Input SpO2 */
+.spo2-input-card{
+  background:var(--navy-card);border:1px solid var(--border);border-radius:var(--radius);
+  padding:14px;margin-bottom:16px;
+}
+.spo2-row{display:flex;gap:10px;align-items:center;}
+.spo2-num{
+  width:80px;background:var(--navy-mid);border:1px solid var(--border);border-radius:8px;
+  padding:8px 12px;font-size:24px;font-weight:800;color:#fff;outline:none;
+  -moz-appearance:textfield;text-align:center;
+}
+.spo2-num::-webkit-inner-spin-button,.spo2-num::-webkit-outer-spin-button{-webkit-appearance:none;}
+.spo2-feedback{flex:1;padding:10px 12px;border-radius:10px;font-size:14px;font-weight:700;text-align:center;}
+.fb-low{background:rgba(255,77,106,.15);color:var(--red);border:1px solid rgba(255,77,106,.3);}
+.fb-ok{background:rgba(52,211,153,.15);color:var(--green);border:1px solid rgba(52,211,153,.3);}
+.fb-high{background:rgba(255,179,64,.15);color:var(--amber);border:1px solid rgba(255,179,64,.3);}
+.fb-none{background:var(--navy-mid);color:var(--text-dim);border:1px solid var(--border);}
+
+.info-box{
+  background:var(--navy-mid);border:1px solid var(--border);border-radius:10px;
+  padding:10px 12px;font-size:12.5px;color:var(--text-dim);line-height:1.6;margin-top:10px;
+}
+.info-box strong{color:var(--text);}
+.bottom-safe{height:calc(20px + var(--safe-bottom));}
+</style>
+<link rel="stylesheet" href="ios.css">
+<script src="pwa.js" defer></script>
+</head>
+<body>
+<div class="topbar">
+  <a class="back-btn" href="index.html">←</a>
+  <div>
+    <div class="topbar-title">SpO₂ Targets</div>
+    <div class="topbar-sub">Pre-ductal · Right hand · Birth timer · MyNeST</div>
+  </div>
+</div>
+
+<div class="content">
+
+  <!-- BIRTH TIMER -->
+  <div class="timer-card">
+    <div class="timer-label">⏱ Time Since Birth</div>
+    <div class="timer-display" id="timerDisp">00:00</div>
+    <div class="timer-min" id="timerMin">Tap Start at moment of birth</div>
+    <div class="timer-btns">
+      <div class="tbtn start" id="startBtn" onclick="startTimer()">▶ Start at Birth</div>
+      <div class="tbtn" onclick="resetTimer()">↺ Reset</div>
+    </div>
+  </div>
+
+  <!-- CURRENT TARGET -->
+  <div class="current-target" id="currentTarget">
+    <div class="ct-label">📊 Current SpO₂ Target</div>
+    <div class="ct-range" id="ctRange">—</div>
+    <div class="ct-pct" id="ctPct">Start timer to see target</div>
+    <div class="ct-status" id="ctStatus"></div>
+  </div>
+
+  <!-- LIVE SpO2 CHECK -->
+  <div class="spo2-input-card">
+    <div class="gauge-label">Check current SpO₂ reading</div>
+    <div class="spo2-row">
+      <input class="spo2-num" type="number" id="spo2In" placeholder="—" min="0" max="100" oninput="checkSpo2()" inputmode="numeric">
+      <div class="spo2-feedback fb-none" id="spo2Fb">Enter SpO₂ %</div>
+    </div>
+  </div>
+
+  <!-- VISUAL GAUGE -->
+  <div class="gauge-wrap">
+    <div class="gauge-label">Pre-ductal SpO₂ range</div>
+    <div class="gauge-bar">
+      <div class="gauge-marker" id="gaugeM" style="left:50%"></div>
+    </div>
+    <div class="gauge-ticks">
+      <span>50%</span><span>60%</span><span>70%</span><span>80%</span><span>90%</span><span>100%</span>
+    </div>
+  </div>
+
+  <!-- TIMELINE TABLE -->
+  <div class="timeline-card" id="timelineTable">
+    <div class="timeline-head">
+      <div>Time</div><div>SpO₂ target</div><div>Key value</div>
+    </div>
+    <div class="timeline-row" data-min="2" data-lo="65" data-hi="70">
+      <div class="time-cell">2 min</div>
+      <div class="range-cell ok">65–70%</div>
+      <div class="key-cell">—</div>
+    </div>
+    <div class="timeline-row" data-min="3" data-lo="70" data-hi="75">
+      <div class="time-cell">3 min</div>
+      <div class="range-cell ok">70–75%</div>
+      <div class="key-cell" style="color:var(--blue);font-weight:700;">≥ 70%</div>
+    </div>
+    <div class="timeline-row" data-min="4" data-lo="75" data-hi="80">
+      <div class="time-cell">4 min</div>
+      <div class="range-cell ok">75–80%</div>
+      <div class="key-cell">—</div>
+    </div>
+    <div class="timeline-row" data-min="5" data-lo="80" data-hi="85">
+      <div class="time-cell">5 min</div>
+      <div class="range-cell ok">80–85%</div>
+      <div class="key-cell" style="color:var(--blue);font-weight:700;">≥ 80%</div>
+    </div>
+    <div class="timeline-row" data-min="10" data-lo="85" data-hi="95">
+      <div class="time-cell">10 min</div>
+      <div class="range-cell warn">85–95%</div>
+      <div class="key-cell" style="color:var(--blue);font-weight:700;">≥ 90%</div>
+    </div>
+  </div>
+
+  <div class="info-box">
+    <strong>SpO₂ probe placement:</strong> RIGHT hand or RIGHT wrist (pre-ductal — reflects O₂ reaching brain and heart BEFORE ductus arteriosus).<br>
+    <strong>Reading accuracy:</strong> Allow 60–90 seconds after probe application for stable signal.<br>
+    <strong>Preterm &lt;32w:</strong> Avoid SpO₂ &gt;95% — hyperoxia causes retinopathy. Reduce FiO₂ immediately.<br>
+    <strong>Free-flow O₂:</strong> Cup hand around nose/mouth. Do NOT use BVM for free-flow.<br>
+    <strong>CPAP:</strong> For spontaneous breathing with increased work — PEEP 5–7 cmH₂O.
+  </div>
+
+</div>
+<div class="bottom-safe"></div>
+
+<script>
+let timerInterval=null, startTime=null, running=false;
+
+const targets=[
+  {minFrom:0,minTo:2,lo:60,hi:65},
+  {minFrom:2,minTo:3,lo:65,hi:70},
+  {minFrom:3,minTo:4,lo:70,hi:75},
+  {minFrom:4,minTo:5,lo:75,hi:80},
+  {minFrom:5,minTo:10,lo:80,hi:85},
+  {minFrom:10,minTo:999,lo:85,hi:95},
+];
+
+function getTarget(sec){
+  const min=sec/60;
+  return targets.find(t=>min>=t.minFrom&&min<t.minTo)||targets[targets.length-1];
+}
+
+function startTimer(){
+  if(running)return;
+  startTime=Date.now();
+  running=true;
+  document.getElementById('startBtn').textContent='● Running';
+  document.getElementById('startBtn').classList.remove('start');
+  document.getElementById('startBtn').style.background='var(--text-dim)';
+  document.getElementById('startBtn').style.color='var(--navy)';
+  timerInterval=setInterval(tick,500);
+  tick();
+}
+
+function resetTimer(){
+  clearInterval(timerInterval);
+  running=false;
+  startTime=null;
+  document.getElementById('timerDisp').textContent='00:00';
+  document.getElementById('timerMin').textContent='Tap Start at moment of birth';
+  document.getElementById('ctRange').textContent='—';
+  document.getElementById('ctPct').textContent='Start timer to see target';
+  document.getElementById('ctStatus').textContent='';
+  document.getElementById('startBtn').textContent='▶ Start at Birth';
+  document.getElementById('startBtn').style.background='';
+  document.getElementById('startBtn').style.color='';
+  document.getElementById('startBtn').classList.add('start');
+  updateRows(-1);
+  checkSpo2();
+}
+
+function tick(){
+  if(!running)return;
+  const elapsed=Math.floor((Date.now()-startTime)/1000);
+  const m=Math.floor(elapsed/60),s=elapsed%60;
+  document.getElementById('timerDisp').textContent=`${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  const mins=elapsed/60;
+  document.getElementById('timerMin').textContent=`${mins.toFixed(1)} min since birth`;
+  
+  const t=getTarget(elapsed);
+  document.getElementById('ctRange').textContent=`${t.lo}–${t.hi}%`;
+  document.getElementById('ctPct').textContent='% pre-ductal (right hand)';
+  
+  updateRows(elapsed);
+  checkSpo2();
+}
+
+function updateRows(elapsed){
+  const rows=document.querySelectorAll('.timeline-row');
+  rows.forEach(row=>{
+    const minRow=parseFloat(row.dataset.min);
+    row.classList.remove('current','past');
+    if(elapsed<0){return;}
+    const minE=elapsed/60;
+    if(minE>=minRow){row.classList.add('past');}
+  });
+  // highlight current bracket
+  if(elapsed>=0){
+    const t=getTarget(elapsed);
+    rows.forEach(row=>{
+      const lo=parseFloat(row.dataset.lo),hi=parseFloat(row.dataset.hi);
+      if(lo===t.lo&&hi===t.hi){
+        row.classList.remove('past');
+        row.classList.add('current');
+      }
+    });
+  }
+}
+
+function checkSpo2(){
+  const v=parseFloat(document.getElementById('spo2In').value);
+  const fb=document.getElementById('spo2Fb');
+  const gm=document.getElementById('gaugeM');
+  
+  if(isNaN(v)||v===0){
+    fb.className='spo2-feedback fb-none';
+    fb.textContent='Enter SpO₂ %';
+    gm.style.left='50%';
+    return;
+  }
+  
+  // Move gauge marker: 50–100% maps to 0–100% of bar
+  const pct=Math.max(0,Math.min(100,(v-50)/50*100));
+  gm.style.left=pct+'%';
+  
+  if(!running||!startTime){
+    fb.className='spo2-feedback fb-none';
+    fb.textContent=`SpO₂ ${v}% — start timer for assessment`;
+    return;
+  }
+  
+  const elapsed=Math.floor((Date.now()-startTime)/1000);
+  const t=getTarget(elapsed);
+  
+  if(v<t.lo){
+    fb.className='spo2-feedback fb-low';
+    fb.textContent=`⚠ LOW — target ${t.lo}–${t.hi}%`;
+  }else if(v>95){
+    fb.className='spo2-feedback fb-high';
+    fb.textContent=`⚠ HIGH — reduce FiO₂ (risk in preterm)`;
+  }else if(v>t.hi&&v<=95){
+    fb.className='spo2-feedback fb-high';
+    fb.textContent=`↑ Above target — consider reducing O₂`;
+  }else{
+    fb.className='spo2-feedback fb-ok';
+    fb.textContent=`✓ Within target ${t.lo}–${t.hi}%`;
+  }
+}
+</script>
+</body>
+</html>

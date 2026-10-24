@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<title>Equipment Check · MyNeST</title>
+<!-- iPhone home-screen app -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="MyNeST">
+<meta name="application-name" content="MyNeST">
+<meta name="format-detection" content="telephone=no">
+<meta name="theme-color" content="#0a1628">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="167x167" href="icons/apple-touch-icon-167.png">
+<link rel="apple-touch-icon" sizes="152x152" href="icons/apple-touch-icon-152.png">
+<link rel="apple-touch-startup-image" media="screen and (device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="icons/splash-1290x2796.png">
+<link rel="apple-touch-startup-image" media="screen and (device-width: 440px) and (device-height: 956px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="icons/splash-1320x2868.png">
+<link rel="apple-touch-startup-image" media="screen and (device-width: 402px) and (device-height: 874px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="icons/splash-1206x2622.png">
+<link rel="apple-touch-startup-image" media="screen and (device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="icons/splash-1179x2556.png">
+<link rel="apple-touch-startup-image" media="screen and (device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="icons/splash-1284x2778.png">
+<link rel="apple-touch-startup-image" media="screen and (device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="icons/splash-1170x2532.png">
+<link rel="apple-touch-startup-image" media="screen and (device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="icons/splash-1125x2436.png">
+<link rel="apple-touch-startup-image" media="screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="icons/splash-1242x2688.png">
+<link rel="apple-touch-startup-image" media="screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="icons/splash-828x1792.png">
+<link rel="apple-touch-startup-image" media="screen and (device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="icons/splash-750x1334.png">
+<style>
+:root{
+  --navy:#0a1628;--navy-mid:#122040;--navy-card:#1a2d50;
+  --blue:#3b9eff;--teal:#00d4b4;--red:#ff4d6a;--amber:#ffb340;--green:#34d399;
+  --text:#e8f0fe;--text-dim:#8da4c4;--border:#243860;
+  --radius:14px;--safe-bottom:env(safe-area-inset-bottom,0px);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html,body{min-height:100%;background:var(--navy);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;}
+.topbar{display:flex;align-items:center;gap:12px;background:var(--navy-mid);border-bottom:1px solid var(--border);padding:48px 16px 14px;position:sticky;top:0;z-index:100;}
+.back-btn{width:36px;height:36px;border-radius:10px;background:var(--navy-card);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;text-decoration:none;color:var(--blue);font-size:18px;flex-shrink:0;}
+.topbar-title{font-size:17px;font-weight:700;color:#fff;}
+.topbar-sub{font-size:11px;color:var(--text-dim);}
+
+/* Progress bar */
+.progress-bar{height:4px;background:var(--border);}
+.progress-fill{height:100%;background:var(--green);transition:width .3s;width:0%;}
+
+.content{padding:16px;}
+
+/* Tab */
+.tabs{display:flex;gap:6px;margin-bottom:16px;}
+.tab{flex:1;padding:9px 6px;border-radius:10px;border:1px solid var(--border);background:var(--navy-card);color:var(--text-dim);font-size:12px;font-weight:600;text-align:center;cursor:pointer;transition:all .15s;}
+.tab.active{background:var(--green);color:#0a1628;border-color:var(--green);}
+
+.tab-panel{display:none;}
+.tab-panel.active{display:block;}
+
+/* Progress summary */
+.summary-card{
+  background:var(--navy-card);border:1px solid var(--border);border-radius:var(--radius);
+  padding:14px 16px;margin-bottom:14px;display:flex;align-items:center;gap:14px;
+}
+.summary-circle{
+  width:56px;height:56px;border-radius:50%;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  font-size:18px;font-weight:800;
+  background:conic-gradient(var(--green) 0%, var(--border) 0%);
+  transition:background .3s;
+  position:relative;
+}
+.summary-circle::before{
+  content:'';position:absolute;width:44px;height:44px;border-radius:50%;background:var(--navy-card);
+}
+.summary-pct{position:relative;z-index:1;font-size:13px;font-weight:800;color:#fff;}
+.summary-text{flex:1;}
+.summary-done{font-size:20px;font-weight:800;color:#fff;}
+.summary-total{font-size:13px;color:var(--text-dim);}
+
+/* Section */
+.section{margin-bottom:14px;}
+.section-header{
+  display:flex;align-items:center;gap:10px;
+  background:var(--navy-card);border:1px solid var(--border);border-radius:12px 12px 0 0;
+  padding:11px 14px;
+  border-bottom:1px solid var(--border);
+}
+.section-icon{font-size:18px;}
+.section-name{font-size:14px;font-weight:700;color:#fff;}
+.section-count{margin-left:auto;font-size:12px;color:var(--text-dim);}
+
+/* Check items */
+.check-list{background:var(--navy-card);border:1px solid var(--border);border-top:none;border-radius:0 0 12px 12px;overflow:hidden;}
+.check-item{
+  display:flex;align-items:flex-start;gap:12px;padding:12px 14px;
+  border-bottom:1px solid rgba(36,56,96,.5);cursor:pointer;
+  transition:background .1s;
+}
+.check-item:last-child{border-bottom:none;}
+.check-item:active{background:rgba(255,255,255,.03);}
+.check-item.done{background:rgba(52,211,153,.05);}
+.checkbox{
+  width:24px;height:24px;border-radius:6px;border:2px solid var(--border);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;
+  transition:all .15s;
+}
+.check-item.done .checkbox{background:var(--green);border-color:var(--green);}
+.check-tick{font-size:14px;color:#0a1628;opacity:0;}
+.check-item.done .check-tick{opacity:1;}
+.check-text{flex:1;}
+.check-main{font-size:13.5px;color:var(--text);line-height:1.4;}
+.check-item.done .check-main{color:var(--text-dim);text-decoration:line-through;}
+.check-sub{font-size:11.5px;color:var(--text-dim);margin-top:2px;line-height:1.4;}
+
+/* TABCDM */
+.tabcdm-card{background:var(--navy-card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:10px;}
+.tc-row{display:flex;gap:0;align-items:stretch;border-bottom:1px solid var(--border);cursor:pointer;transition:background .1s;}
+.tc-row:last-child{border-bottom:none;}
+.tc-row:active{background:rgba(255,255,255,.03);}
+.tc-row.done{background:rgba(52,211,153,.05);}
+.tc-letter{
+  width:44px;min-height:54px;display:flex;align-items:center;justify-content:center;
+  font-size:20px;font-weight:900;flex-shrink:0;
+  border-right:1px solid var(--border);
+}
+.tc-body{flex:1;padding:10px 12px;}
+.tc-name{font-size:13px;font-weight:700;color:#fff;margin-bottom:2px;}
+.tc-row.done .tc-name{color:var(--text-dim);text-decoration:line-through;}
+.tc-detail{font-size:11.5px;color:var(--text-dim);line-height:1.5;}
+.tc-check{width:44px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.tc-box{width:24px;height:24px;border-radius:6px;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;transition:all .15s;}
+.tc-row.done .tc-box{background:var(--green);border-color:var(--green);}
+.tc-tick{font-size:13px;color:#0a1628;opacity:0;}
+.tc-row.done .tc-tick{opacity:1;}
+
+/* Action bar */
+.action-bar{display:flex;gap:8px;margin-top:16px;}
+.abtn{flex:1;padding:12px 8px;border-radius:12px;border:1px solid var(--border);font-size:13px;font-weight:700;text-align:center;cursor:pointer;background:var(--navy-card);color:var(--text);}
+.abtn.primary{background:var(--blue);color:#fff;border-color:var(--blue);}
+.abtn.danger{background:rgba(255,77,106,.1);color:var(--red);border-color:rgba(255,77,106,.3);}
+
+.bottom-safe{height:calc(20px + var(--safe-bottom));}
+</style>
+<link rel="stylesheet" href="ios.css">
+<script src="pwa.js" defer></script>
+</head>
+<body>
+<div class="topbar">
+  <a class="back-btn" href="index.html">←</a>
+  <div>
+    <div class="topbar-title">Equipment Checklist</div>
+    <div class="topbar-sub">WARM→MEDICATE · TABCDM · MyNeST</div>
+  </div>
+</div>
+<div class="progress-bar"><div class="progress-fill" id="progFill"></div></div>
+
+<div class="content">
+  <div class="tabs">
+    <div class="tab active" onclick="showTab('warm')">WARM→<br>MEDICATE</div>
+    <div class="tab" onclick="showTab('tabcdm')">TABCDM<br>Verify</div>
+  </div>
+
+  <!-- WARM → MEDICATE -->
+  <div class="tab-panel active" id="tab-warm">
+    <div class="summary-card">
+      <div class="summary-circle" id="warmCircle">
+        <div class="summary-pct" id="warmPct">0%</div>
+      </div>
+      <div class="summary-text">
+        <div class="summary-done"><span id="warmDone">0</span> / <span id="warmTotal">0</span> checked</div>
+        <div class="summary-total">Equipment preparation complete</div>
+      </div>
+    </div>
+
+    <div id="warmList"><!-- built by JS --></div>
+
+    <div class="action-bar">
+      <div class="abtn primary" onclick="checkAll('warm')">✓ Check All</div>
+      <div class="abtn danger" onclick="resetAll('warm')">↺ Reset</div>
+    </div>
+  </div>
+
+  <!-- TABCDM -->
+  <div class="tab-panel" id="tab-tabcdm">
+    <div class="summary-card">
+      <div class="summary-circle" id="tabcdmCircle">
+        <div class="summary-pct" id="tabcdmPct">0%</div>
+      </div>
+      <div class="summary-text">
+        <div class="summary-done"><span id="tabcdmDone">0</span> / <span id="tabcdmTotal">0</span> verified</div>
+        <div class="summary-total">Functional verification complete</div>
+      </div>
+    </div>
+
+    <div class="tabcdm-card" id="tabcdmList"><!-- built by JS --></div>
+
+    <div class="action-bar">
+      <div class="abtn primary" onclick="checkAll('tabcdm')">✓ Verify All</div>
+      <div class="abtn danger" onclick="resetAll('tabcdm')">↺ Reset</div>
+    </div>
+  </div>
+</div>
+<div class="bottom-safe"></div>
+
+<script>
+const WARM_DATA=[
+  {section:'🌡️ WARM',items:[
+    {main:'Radiant warmer ON and pre-heated',sub:'Confirm surface warm to touch'},
+    {main:'Warm towels ×2 ready',sub:'Pre-heated if possible'},
+    {main:'Hat available at warmer',sub:''},
+    {main:'Plastic wrap (if <32 weeks)',sub:'Polyethylene bag or wrap — do not dry first'},
+    {main:'Thermal mattress activated',sub:'If available · placed under linen'},
+  ]},
+  {section:'🫁 CLEAR AIRWAY',items:[
+    {main:'10F suction catheter (term) / 8F (preterm)',sub:'Connected to wall suction'},
+    {main:'Suction pressure 80–100 mmHg confirmed',sub:'Occlude catheter to test'},
+  ]},
+  {section:'🩺 AUSCULTATE / MONITOR',items:[
+    {main:'Stethoscope at warmer',sub:''},
+    {main:'Pulse oximeter + neonatal probe',sub:'Pre-ductal application: right hand'},
+    {main:'Cardiac monitor + leads + electrodes',sub:'Apply when PPV starts'},
+    {main:'Resuscitation timer reset to zero',sub:''},
+  ]},
+  {section:'💨 VENTILATE',items:[
+    {main:'Flowmeter connected at 10 L/min',sub:''},
+    {main:'O₂ blender set: 21% term / 21–30% preterm',sub:''},
+    {main:'Correct mask size selected',sub:'Size 0 (preterm) and Size 1 (term) both present'},
+    {main:'T-piece: PIP 20–25 cmH₂O, PEEP 5–6 cmH₂O',sub:'Verified on manometer gauge'},
+    {main:'BVM available as backup',sub:''},
+  ]},
+  {section:'🫀 INTUBATE',items:[
+    {main:'Laryngoscope tested — fresh battery',sub:'Light bright and steady'},
+    {main:'Blades: 00, 0, 1 available',sub:''},
+    {main:'ETT 2.5 / 3.0 / 3.5 mm × 2 each',sub:'On warmer surface'},
+    {main:'CO₂ detector ready',sub:'If available'},
+    {main:'Securing tape and scissors',sub:'12–15 cm strip pre-cut'},
+    {main:'LMA size 1 available',sub:'For ≥34 weeks + >1500 g if intubation fails'},
+  ]},
+  {section:'💊 MEDICATE',items:[
+    {main:'Adrenaline 1:10,000 drawn up and labelled',sub:'If anticipated · "Adrenaline 1:10,000 — 0.1 mg/mL"'},
+    {main:'Normal saline 0.9% available',sub:'For flush and volume'},
+    {main:'UVC catheter 3.5F + 5F',sub:''},
+    {main:'Cord tie / umbilical tape',sub:''},
+    {main:'Antiseptic solution + sterile drape',sub:''},
+    {main:'Syringes: 1/2/5/10/20 mL + needles',sub:''},
+    {main:'3-way stopcock',sub:''},
+  ]},
+];
+
+const TABCDM_DATA=[
+  {letter:'T',color:'#3b9eff',name:'Thermal',detail:'Warmer set to Manual/Pre-heat? Surface temperature confirmed warm to touch?'},
+  {letter:'A',color:'#00d4b4',name:'Airway',detail:'Suction catheter occluded to confirm pressure reaches 80–100 mmHg?'},
+  {letter:'B',color:'#a78bfa',name:'Breathing',detail:'T-piece PIP and PEEP ports occluded and pressure verified on manometer gauge?'},
+  {letter:'C',color:'#34d399',name:'Circulation',detail:'Umbilical line tray and UVC equipment verified? (3.5F/5F catheter, cord tie, antiseptic, drape, syringes, 3-way stopcock)'},
+  {letter:'D',color:'#ff4d6a',name:'Drugs / Fluids',detail:'Adrenaline concentration confirmed 1:10,000? Label verified? Normal saline 0.9% available?'},
+  {letter:'M',color:'#ffb340',name:'Monitoring',detail:'O₂ blender set to correct starting FiO₂? Resuscitation timer reset to zero?'},
+];
+
+let state={warm:{},tabcdm:{}};
+
+function buildWarm(){
+  const el=document.getElementById('warmList');
+  let html='';
+  let totalItems=0;
+  WARM_DATA.forEach((s,si)=>{
+    html+=`<div class="section">
+      <div class="section-header">
+        <span class="section-icon">${s.section.split(' ')[0]}</span>
+        <span class="section-name">${s.section.split(' ').slice(1).join(' ')}</span>
+        <span class="section-count" id="sc-${si}"></span>
+      </div>
+      <div class="check-list">`;
+    s.items.forEach((item,ii)=>{
+      const id=`w-${si}-${ii}`;
+      totalItems++;
+      html+=`<div class="check-item" id="${id}" onclick="toggle('warm','${id}')">
+        <div class="checkbox"><span class="check-tick">✓</span></div>
+        <div class="check-text">
+          <div class="check-main">${item.main}</div>
+          ${item.sub?`<div class="check-sub">${item.sub}</div>`:''}
+        </div>
+      </div>`;
+    });
+    html+='</div></div>';
+  });
+  el.innerHTML=html;
+  document.getElementById('warmTotal').textContent=totalItems;
+  updateProgress('warm');
+}
+
+function buildTabcdm(){
+  const el=document.getElementById('tabcdmList');
+  let html='';
+  TABCDM_DATA.forEach((t,i)=>{
+    const id=`tc-${i}`;
+    html+=`<div class="tc-row" id="${id}" onclick="toggle('tabcdm','${id}')">
+      <div class="tc-letter" style="color:${t.color}">${t.letter}</div>
+      <div class="tc-body">
+        <div class="tc-name">${t.name}</div>
+        <div class="tc-detail">${t.detail}</div>
+      </div>
+      <div class="tc-check">
+        <div class="tc-box"><span class="tc-tick">✓</span></div>
+      </div>
+    </div>`;
+  });
+  el.innerHTML=html;
+  document.getElementById('tabcdmTotal').textContent=TABCDM_DATA.length;
+  updateProgress('tabcdm');
+}
+
+function toggle(list,id){
+  state[list][id]=!state[list][id];
+  const el=document.getElementById(id);
+  if(state[list][id])el.classList.add('done');
+  else el.classList.remove('done');
+  updateProgress(list);
+}
+
+function checkAll(list){
+  if(list==='warm'){
+    document.querySelectorAll('[id^="w-"]').forEach(el=>{
+      state.warm[el.id]=true;
+      el.classList.add('done');
+    });
+  }else{
+    document.querySelectorAll('[id^="tc-"]').forEach(el=>{
+      state.tabcdm[el.id]=true;
+      el.classList.add('done');
+    });
+  }
+  updateProgress(list);
+}
+
+function resetAll(list){
+  state[list]={};
+  if(list==='warm'){
+    document.querySelectorAll('[id^="w-"]').forEach(el=>el.classList.remove('done'));
+  }else{
+    document.querySelectorAll('[id^="tc-"]').forEach(el=>el.classList.remove('done'));
+  }
+  updateProgress(list);
+}
+
+function updateProgress(list){
+  const total=list==='warm'
+    ?document.querySelectorAll('[id^="w-"]').length
+    :TABCDM_DATA.length;
+  const done=Object.values(state[list]).filter(Boolean).length;
+  const pct=total?Math.round(done/total*100):0;
+  
+  document.getElementById(list+'Done').textContent=done;
+  document.getElementById(list+'Pct').textContent=pct+'%';
+  
+  // Update conic gradient circle
+  const circle=document.getElementById(list+'Circle');
+  const color=pct===100?'var(--green)':'var(--blue)';
+  circle.style.background=`conic-gradient(${color} ${pct}%, var(--border) ${pct}%)`;
+  
+  // Global progress bar
+  const wDone=Object.values(state.warm).filter(Boolean).length;
+  const wTotal=document.querySelectorAll('[id^="w-"]').length||1;
+  const tDone=Object.values(state.tabcdm).filter(Boolean).length;
+  const tTotal=TABCDM_DATA.length;
+  const overall=Math.round((wDone+tDone)/(wTotal+tTotal)*100);
+  document.getElementById('progFill').style.width=overall+'%';
+  
+  // Section counts for WARM
+  if(list==='warm'){
+    WARM_DATA.forEach((s,si)=>{
+      const sc=document.getElementById('sc-'+si);
+      if(!sc)return;
+      const items=document.querySelectorAll(`[id^="w-${si}-"]`);
+      const secDone=Array.from(items).filter(el=>el.classList.contains('done')).length;
+      sc.textContent=`${secDone}/${items.length}`;
+    });
+  }
+}
+
+function showTab(id){
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  event.currentTarget.classList.add('active');
+}
+
+buildWarm();
+buildTabcdm();
+</script>
+</body>
+</html>

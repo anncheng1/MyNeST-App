@@ -1,0 +1,43 @@
+/* MyNeST — shared iPhone / home-screen app tuning.
+   Loaded after each page's own <style>, so these rules win where they overlap. */
+
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+
+/* Faster taps: no double-tap-to-zoom delay on controls (pinch-zoom still works). */
+a, button, input, select, textarea, label,
+[onclick], .card, .chip, .tab, .tab-btn, .preset, .branch, .check-item, .tc-row {
+  touch-action: manipulation;
+}
+
+/* Stop iOS rubber-band from dragging the whole app shell around. */
+body { overscroll-behavior-y: none; }
+
+/* Keep long words / drug names inside narrow screens. */
+body { overflow-wrap: anywhere; }
+
+/* ── Status bar / notch / Dynamic Island ─────────────────────────────────
+   Pages use status-bar-style "black-translucent", so content runs under the
+   status bar in the home-screen app. These pad the top bars by the real safe
+   area (0 in a normal Safari tab, ~47–62px in the installed app). */
+.topbar  { padding-top: calc(env(safe-area-inset-top, 0px) + 14px) !important; }
+.header  { padding-top: calc(env(safe-area-inset-top, 0px) + 12px) !important; }
+
+/* Landscape on notched iPhones: keep content clear of the side cut-outs. */
+@media (orientation: landscape) {
+  .topbar, .header, .content, .wrap, .grid, .section-label, .case-grid, .case-view {
+    padding-left: max(16px, env(safe-area-inset-left, 0px)) !important;
+    padding-right: max(16px, env(safe-area-inset-right, 0px)) !important;
+  }
+}
+
+/* Offline badge (shown by pwa.js when the phone has no connection). */
+.mynest-offline-pill {
+  position: fixed; left: 50%; transform: translateX(-50%);
+  bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+  z-index: 9999; pointer-events: none;
+  background: rgba(10,22,40,.92); color: #ffb340;
+  border: 1px solid rgba(255,179,64,.45); border-radius: 20px;
+  padding: 6px 14px; font: 600 12px -apple-system, BlinkMacSystemFont, sans-serif;
+  white-space: nowrap; opacity: 0; transition: opacity .25s;
+}
+.mynest-offline-pill.show { opacity: 1; }
