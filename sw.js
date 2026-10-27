@@ -1,6 +1,6 @@
 // MyNeST service worker — full offline support.
 // Bump CACHE whenever any file changes so phones pick up the new version.
-const CACHE = 'mynest-v31';
+const CACHE = 'mynest-v32';
 
 const ASSETS = [
   './',
