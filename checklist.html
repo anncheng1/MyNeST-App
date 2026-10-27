@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<title>Equipment Check · MyNeST</title>
+<!-- iPhone home-screen app -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="MyNeST">
+<meta name="application-name" content="MyNeST">
+<meta name="format-detection" content="telephone=no">
+<meta name="theme-color" content="#0a1628">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="167x167" href="apple-touch-icon-167.png">
+<link rel="apple-touch-icon" sizes="152x152" href="apple-touch-icon-152.png">
+<link rel="apple-touch-startup-image" media="screen and (device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="splash-1290x2796.png">
+<link rel="apple-touch-startup-image" media="screen and (device-width: 440px) and (device-height: 956px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="splash-1320x2868.png">
+<link rel="apple-touch-startup-image" media="screen and (device-width: 402px) and (device-height: 874px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="splash-1206x2622.png">
+<link rel="apple-touch-startup-image" media="screen and (device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="splash-1179x2556.png">
+<link rel="apple-touch-startup-image" media="screen and (device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="splash-1284x2778.png">
+<link rel="apple-touch-startup-image" media="screen and (device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="splash-1170x2532.png">
+<link rel="apple-touch-startup-image" media="screen and (device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="splash-1125x2436.png">
+<link rel="apple-touch-startup-image" media="screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="splash-1242x2688.png">
+<link rel="apple-touch-startup-image" media="screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="splash-828x1792.png">
+<link rel="apple-touch-startup-image" media="screen and (device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="splash-750x1334.png">
+<style>
+:root{
+  --navy:#0a1628;--navy-mid:#122040;--navy-card:#1a2d50;
+  --blue:#3b9eff;--teal:#00d4b4;--red:#ff4d6a;--amber:#ffb340;--green:#34d399;
+  --text:#e8f0fe;--text-dim:#8da4c4;--border:#243860;
+  --radius:14px;--safe-bottom:env(safe-area-inset-bottom,0px);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html,body{min-height:100%;background:var(--navy);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;}
+.topbar{display:flex;align-items:center;gap:12px;background:var(--navy-mid);border-bottom:1px solid var(--border);padding:48px 16px 14px;position:sticky;top:0;z-index:100;}
+.back-btn{width:36px;height:36px;border-radius:10px;background:var(--navy-card);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;text-decoration:none;color:var(--blue);font-size:18px;flex-shrink:0;}
+.topbar-title{font-size:17px;font-weight:700;color:#fff;}
+.topbar-sub{font-size:11px;color:var(--text-dim);}
+
+/* Progress bar */
+.progress-bar{height:4px;background:var(--border);}
+.progress-fill{height:100%;background:var(--green);transition:width .3s;width:0%;}
+
+.content{padding:16px;}
+
+/* Progress summary */
+.summary-card{
+  background:var(--navy-card);border:1px solid var(--border);border-radius:var(--radius);
+  padding:14px 16px;margin-bottom:14px;display:flex;align-items:center;gap:14px;
+}
+.summary-circle{
+  width:56px;height:56px;border-radius:50%;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  background:conic-gradient(var(--blue) 0%, var(--border) 0%);
+  transition:background .3s;position:relative;
+}
+.summary-circle::before{content:'';position:absolute;width:44px;height:44px;border-radius:50%;background:var(--navy-card);}
+.summary-pct{position:relative;z-index:1;font-size:13px;font-weight:800;color:#fff;}
+.summary-text{flex:1;}
+.summary-done{font-size:20px;font-weight:800;color:#fff;}
+.summary-total{font-size:13px;color:var(--text-dim);}
+.summary-verify{font-size:11.5px;color:var(--amber);margin-top:3px;}
+
+/* TABCDM legend strip */
+.legend{display:flex;gap:6px;margin-bottom:14px;}
+.legend-chip{flex:1;text-align:center;padding:7px 0;border-radius:10px;background:var(--navy-card);border:1px solid var(--border);font-size:16px;font-weight:900;text-decoration:none;transition:all .15s;}
+.legend-chip.complete{background:rgba(52,211,153,.12);border-color:var(--green);}
+
+/* Section */
+.section{margin-bottom:14px;scroll-margin-top:110px;}
+.section-header{
+  display:flex;align-items:center;gap:12px;
+  background:var(--navy-card);border:1px solid var(--border);border-radius:12px 12px 0 0;
+  padding:10px 14px;border-bottom:1px solid var(--border);
+}
+.section-letter{
+  width:34px;height:34px;border-radius:9px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  font-size:19px;font-weight:900;background:rgba(255,255,255,.04);border:1px solid var(--border);
+}
+.section-titles{flex:1;min-width:0;}
+.section-name{font-size:14px;font-weight:700;color:#fff;}
+.section-warm{font-size:10.5px;color:var(--text-dim);letter-spacing:.3px;margin-top:1px;}
+.section-count{font-size:12px;color:var(--text-dim);font-weight:600;}
+.section.complete .section-count{color:var(--green);}
+
+/* Check items */
+.check-list{background:var(--navy-card);border:1px solid var(--border);border-top:none;border-radius:0 0 12px 12px;overflow:hidden;}
+.check-item{
+  display:flex;align-items:flex-start;gap:12px;padding:12px 14px;
+  border-bottom:1px solid rgba(36,56,96,.5);cursor:pointer;transition:background .1s;
+}
+.check-item:last-child{border-bottom:none;}
+.check-item:active{background:rgba(255,255,255,.03);}
+.check-item.done{background:rgba(52,211,153,.05);}
+.checkbox{
+  width:24px;height:24px;border-radius:6px;border:2px solid var(--border);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;transition:all .15s;
+}
+.check-item.done .checkbox{background:var(--green);border-color:var(--green);}
+.check-tick{font-size:14px;color:#0a1628;opacity:0;}
+.check-item.done .check-tick{opacity:1;}
+.check-text{flex:1;}
+.check-main{font-size:13.5px;color:var(--text);line-height:1.4;}
+.check-item.done .check-main{color:var(--text-dim);text-decoration:line-through;}
+.check-sub{font-size:11.5px;color:var(--text-dim);margin-top:2px;line-height:1.4;}
+.verify-tag{
+  display:inline-block;font-size:9.5px;font-weight:800;letter-spacing:.6px;
+  color:var(--amber);border:1px solid rgba(255,179,64,.45);background:rgba(255,179,64,.08);
+  border-radius:5px;padding:1px 5px;margin-right:6px;vertical-align:1px;
+}
+.check-item.done .verify-tag{opacity:.55;}
+
+/* Action bar */
+.action-bar{display:flex;gap:8px;margin-top:16px;}
+.abtn{flex:1;padding:12px 8px;border-radius:12px;border:1px solid var(--border);font-size:13px;font-weight:700;text-align:center;cursor:pointer;background:var(--navy-card);color:var(--text);}
+.abtn.primary{background:var(--blue);color:#fff;border-color:var(--blue);}
+.abtn.danger{background:rgba(255,77,106,.1);color:var(--red);border-color:rgba(255,77,106,.3);}
+
+.bottom-safe{height:calc(20px + var(--safe-bottom));}
+</style>
+<link rel="stylesheet" href="ios.css">
+<script src="pwa.js" defer></script>
+</head>
+<body>
+<div class="topbar">
+  <a class="back-btn" href="index.html">←</a>
+  <div>
+    <div class="topbar-title">Equipment Checklist</div>
+    <div class="topbar-sub">TABCDM · Preparation &amp; verification · MyNeST</div>
+  </div>
+</div>
+<div class="progress-bar"><div class="progress-fill" id="progFill"></div></div>
+
+<div class="content">
+  <div class="summary-card">
+    <div class="summary-circle" id="sumCircle">
+      <div class="summary-pct" id="sumPct">0%</div>
+    </div>
+    <div class="summary-text">
+      <div class="summary-done"><span id="sumDone">0</span> / <span id="sumTotal">0</span> checked</div>
+      <div class="summary-total">Equipment ready &amp; verified</div>
+      <div class="summary-verify"><span id="verDone">0</span> / <span id="verTotal">0</span> functional checks</div>
+    </div>
+  </div>
+
+  <div class="legend" id="legend"><!-- built by JS --></div>
+
+  <div id="checkList"><!-- built by JS --></div>
+
+  <div class="action-bar">
+    <div class="abtn primary" onclick="checkAll()">✓ Check All</div>
+    <div class="abtn danger" onclick="resetAll()">↺ Reset</div>
+  </div>
+</div>
+<div class="bottom-safe"></div>
+
+<script>
+// Single checklist: WARM→MEDICATE equipment items grouped under TABCDM.
+// verify:true = functional check (formerly the separate TABCDM Verify tab).
+const CHECKLIST=[
+  {letter:'T',color:'#3b9eff',name:'Thermal',warm:'WARM',items:[
+    {main:'Radiant warmer ON and pre-heated',sub:'Set to Manual/Pre-heat · confirm surface warm to touch',verify:true},
+    {main:'Warm towels ×2 ready',sub:'Pre-heated if possible'},
+    {main:'Hat available at warmer',sub:''},
+    {main:'Plastic wrap (if <32 weeks)',sub:'Polyethylene bag or wrap — do not dry first'},
+    {main:'Thermal mattress activated',sub:'If available · placed under linen'},
+  ]},
+  {letter:'A',color:'#00d4b4',name:'Airway',warm:'CLEAR AIRWAY · INTUBATE',items:[
+    {main:'10F suction catheter (term) / 8F (preterm)',sub:'Connected to wall suction'},
+    {main:'Suction pressure 80–100 mmHg confirmed',sub:'Occlude catheter to test',verify:true},
+    {main:'Laryngoscope tested — fresh battery',sub:'Light bright and steady',verify:true},
+    {main:'Blades: 00, 0, 1 available',sub:''},
+    {main:'ETT 2.5 / 3.0 / 3.5 mm × 2 each',sub:'On warmer surface'},
+    {main:'CO₂ detector ready',sub:'If available'},
+    {main:'Securing tape and scissors',sub:'12–15 cm strip pre-cut'},
+    {main:'LMA size 1 available',sub:'For ≥34 weeks + >1500 g if intubation fails'},
+  ]},
+  {letter:'B',color:'#a78bfa',name:'Breathing',warm:'VENTILATE',items:[
+    {main:'Flowmeter connected at 10 L/min',sub:''},
+    {main:'Correct mask size selected',sub:'Size 0 (preterm) and Size 1 (term) both present'},
+    {main:'T-piece: PIP 20–25 cmH₂O, PEEP 5–6 cmH₂O',sub:'Occlude PIP and PEEP ports · verify pressure on manometer gauge',verify:true},
+    {main:'Self-inflating bag available as backup',sub:''},
+  ]},
+  {letter:'C',color:'#34d399',name:'Circulation',warm:'MEDICATE · ACCESS',items:[
+    {main:'UVC catheter 3.5F + 5F',sub:''},
+    {main:'Cord tie / umbilical tape',sub:''},
+    {main:'Antiseptic solution + sterile drape',sub:''},
+    {main:'Syringes: 1/2/5/10/20 mL + needles',sub:''},
+    {main:'3-way stopcock',sub:''},
+  ]},
+  {letter:'D',color:'#ff4d6a',name:'Drugs / Fluids',warm:'MEDICATE',items:[
+    {main:'Adrenaline 1:10,000 drawn up and labelled',sub:'If anticipated · concentration confirmed 1:10,000 · label verified "Adrenaline 1:10,000 — 0.1 mg/mL"',verify:true},
+    {main:'Normal saline 0.9% available',sub:'For flush and volume'},
+  ]},
+  {letter:'M',color:'#ffb340',name:'Monitoring',warm:'AUSCULTATE / MONITOR',items:[
+    {main:'Stethoscope at warmer',sub:''},
+    {main:'Pulse oximeter + neonatal probe',sub:'Pre-ductal application: right hand'},
+    {main:'Cardiac monitor + leads + electrodes',sub:'Apply when PPV starts'},
+    {main:'O₂ blender set: 21% term / 21–30% preterm',sub:'Correct starting FiO₂ confirmed',verify:true},
+    {main:'Resuscitation timer reset to zero',sub:'',verify:true},
+  ]},
+];
+
+let state={};
+
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+function build(){
+  let html='',legend='',total=0,vTotal=0;
+  CHECKLIST.forEach((s,si)=>{
+    legend+=`<a class="legend-chip" id="lg-${si}" href="#sec-${si}" style="color:${s.color}">${s.letter}</a>`;
+    html+=`<div class="section" id="sec-${si}">
+      <div class="section-header">
+        <div class="section-letter" style="color:${s.color}">${s.letter}</div>
+        <div class="section-titles">
+          <div class="section-name">${esc(s.name)}</div>
+          <div class="section-warm">${esc(s.warm)}</div>
+        </div>
+        <span class="section-count" id="sc-${si}"></span>
+      </div>
+      <div class="check-list">`;
+    s.items.forEach((item,ii)=>{
+      const id=`i-${si}-${ii}`;
+      total++; if(item.verify)vTotal++;
+      html+=`<div class="check-item" id="${id}" data-verify="${item.verify?1:0}" onclick="toggle('${id}')">
+        <div class="checkbox"><span class="check-tick">✓</span></div>
+        <div class="check-text">
+          <div class="check-main">${item.verify?'<span class="verify-tag">VERIFY</span>':''}${esc(item.main)}</div>
+          ${item.sub?`<div class="check-sub">${esc(item.sub)}</div>`:''}
+        </div>
+      </div>`;
+    });
+    html+='</div></div>';
+  });
+  document.getElementById('checkList').innerHTML=html;
+  document.getElementById('legend').innerHTML=legend;
+  document.getElementById('sumTotal').textContent=total;
+  document.getElementById('verTotal').textContent=vTotal;
+  updateProgress();
+}
+
+function setItem(el,on){
+  state[el.id]=on;
+  el.classList.toggle('done',on);
+}
+
+function toggle(id){
+  setItem(document.getElementById(id),!state[id]);
+  updateProgress();
+}
+
+function checkAll(){
+  document.querySelectorAll('.check-item').forEach(el=>setItem(el,true));
+  updateProgress();
+}
+
+function resetAll(){
+  state={};
+  document.querySelectorAll('.check-item').forEach(el=>el.classList.remove('done'));
+  updateProgress();
+}
+
+function updateProgress(){
+  const items=document.querySelectorAll('.check-item');
+  const total=items.length;
+  const done=Array.from(items).filter(el=>el.classList.contains('done')).length;
+  const vItems=document.querySelectorAll('.check-item[data-verify="1"]');
+  const vDone=Array.from(vItems).filter(el=>el.classList.contains('done')).length;
+  const pct=total?Math.round(done/total*100):0;
+
+  document.getElementById('sumDone').textContent=done;
+  document.getElementById('sumPct').textContent=pct+'%';
+  document.getElementById('verDone').textContent=vDone;
+  const color=pct===100?'var(--green)':'var(--blue)';
+  document.getElementById('sumCircle').style.background=`conic-gradient(${color} ${pct}%, var(--border) ${pct}%)`;
+  document.getElementById('progFill').style.width=pct+'%';
+
+  CHECKLIST.forEach((s,si)=>{
+    const sItems=document.querySelectorAll(`[id^="i-${si}-"]`);
+    const sDone=Array.from(sItems).filter(el=>el.classList.contains('done')).length;
+    const complete=sDone===sItems.length;
+    document.getElementById('sc-'+si).textContent=`${sDone}/${sItems.length}`;
+    document.getElementById('sec-'+si).classList.toggle('complete',complete);
+    document.getElementById('lg-'+si).classList.toggle('complete',complete);
+  });
+}
+
+build();
+</script>
+</body>
+</html>
