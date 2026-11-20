@@ -24,7 +24,7 @@ body{padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bot
 .alarm-strip{display:none;align-items:center;justify-content:center;gap:8px;padding:5px 8px;background:#3b1118;border:1px solid #ff5263;color:#ff8791;font:900 11px -apple-system,sans-serif;letter-spacing:1px;animation:alarmPulse 1s infinite}
 .alarm-strip.active{display:flex}
 @keyframes alarmPulse{50%{background:#641520}}
-.monitor{height:calc(100dvh - 34px - env(safe-area-inset-top) - env(safe-area-inset-bottom));display:grid;grid-template-rows:auto minmax(112px,22%) minmax(0,1fr) minmax(76px,19%) auto;gap:3px;padding:4px;background:#03070c}
+.monitor{height:calc(100dvh - 34px - env(safe-area-inset-top) - env(safe-area-inset-bottom));display:grid;grid-template-rows:auto auto minmax(112px,22%) minmax(0,1fr) minmax(76px,19%) auto;gap:3px;padding:4px;background:#03070c}
 .patientbar{display:flex;align-items:center;justify-content:space-between;padding:5px 9px;background:var(--panel);border:1px solid var(--line);font:10px -apple-system,sans-serif;color:#9bb0c2;min-width:0}
 .patientbar strong{color:#e4f2ff;font-size:11px}.room{color:var(--cyan);font-weight:900;letter-spacing:2px}
 .vitals{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:3px;min-height:0}
@@ -52,8 +52,8 @@ body{padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bot
 .code{font-size:clamp(48px,15vw,64px);font-weight:900;letter-spacing:9px;color:var(--cyan);margin:13px 0}
 .overlay p{font:12px/1.6 -apple-system,sans-serif;color:#91a6b8}
 .overlay .warning{color:#ffd166;margin-top:12px}
-@media (orientation:landscape){.monitor{grid-template-rows:auto minmax(90px,23%) minmax(0,1fr) minmax(55px,15%) auto}.vital .number{font-size:clamp(30px,8vh,58px)}}
-@media (max-height:620px){.monitor{grid-template-rows:auto minmax(84px,21%) minmax(0,1fr) minmax(52px,14%) auto}.vital .number{font-size:clamp(28px,8vh,48px)}}
+@media (orientation:landscape){.monitor{grid-template-rows:auto auto minmax(90px,23%) minmax(0,1fr) minmax(55px,15%) auto}.vital .number{font-size:clamp(30px,8vh,58px)}}
+@media (max-height:620px){.monitor{grid-template-rows:auto auto minmax(84px,21%) minmax(0,1fr) minmax(52px,14%) auto}.vital .number{font-size:clamp(28px,8vh,48px)}}
 </style>
 <script src="pwa.js" defer></script>
 </head>
@@ -109,7 +109,7 @@ let timerInterval=null;
 let ecgSoundEnabled=false;
 let ecgAudioContext=null;
 let ecgVolume=0.35;
-let alarmSoundEnabled=true;
+let alarmSoundEnabled=false;
 let alarmSilencedUntil=0;
 let activeAlarm="";
 let lastAlarmSoundAt=0;
