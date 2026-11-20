@@ -255,10 +255,13 @@ function setupWave(id,color,isECG){
     const period=60000/bpm;
     if(now-beatOrigin>period*2)beatOrigin=now-((now-beatOrigin)%period);
     const timeInBeat=(now-beatOrigin)%period;
-    if(isECG&&ecgSoundEnabled){
+    if(isECG){
       const rWaveTime=period*.235;
       const beatIndex=Math.floor((now-beatOrigin-rWaveTime)/period);
-      if(beatIndex>=0&&beatIndex!==lastAudioBeat){lastAudioBeat=beatIndex;playECGBeep()}
+      if(beatIndex>=0&&beatIndex!==lastAudioBeat){
+        if(lastAudioBeat>=0&&ecgSoundEnabled)playECGBeep();
+        lastAudioBeat=beatIndex;
+      }
     }
     const y=isECG?ecgAt(timeInBeat,period,h):plethAt(timeInBeat,period,h);
     // Small, subtle trace noise; avoid implying diagnostic-grade signal fidelity.
