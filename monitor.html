@@ -21,6 +21,9 @@ body{padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bot
 .topbar a{color:#9cb0c2;text-decoration:none}.brand{font-weight:800;letter-spacing:1.4px;color:#d8e8f6}
 .status{border:1px solid #6c4c18;color:var(--amber);background:#211a0b;border-radius:20px;padding:4px 8px;font-weight:800}
 .status.connected{border-color:#176b42;color:var(--green);background:#092519}
+.alarm-strip{display:none;align-items:center;justify-content:center;gap:8px;padding:5px 8px;background:#3b1118;border:1px solid #ff5263;color:#ff8791;font:900 11px -apple-system,sans-serif;letter-spacing:1px;animation:alarmPulse 1s infinite}
+.alarm-strip.active{display:flex}
+@keyframes alarmPulse{50%{background:#641520}}
 .monitor{height:calc(100dvh - 34px - env(safe-area-inset-top) - env(safe-area-inset-bottom));display:grid;grid-template-rows:auto minmax(112px,22%) minmax(0,1fr) minmax(76px,19%) auto;gap:3px;padding:4px;background:#03070c}
 .patientbar{display:flex;align-items:center;justify-content:space-between;padding:5px 9px;background:var(--panel);border:1px solid var(--line);font:10px -apple-system,sans-serif;color:#9bb0c2;min-width:0}
 .patientbar strong{color:#e4f2ff;font-size:11px}.room{color:var(--cyan);font-weight:900;letter-spacing:2px}
@@ -68,6 +71,11 @@ body{padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bot
   <label style="display:block;color:#9bb1c2;margin:10px 0 5px">BEEP VOLUME</label>
   <input id="ecgVolume" type="range" min="0" max="100" value="35" style="width:100%;accent-color:#42f58d">
   <div style="height:1px;background:#29445a;margin:14px 0"></div>
+  <b style="color:#e8f5ff">MONITOR ALARMS</b>
+  <button id="alarmSoundToggle" type="button" aria-pressed="true" style="display:block;width:100%;margin-top:9px;padding:10px;background:#102235;color:#ff8791;border:1px solid #7b3440;border-radius:7px;font:700 12px -apple-system,sans-serif">ALARMS ENABLED · TAP TO DISABLE</button>
+  <button id="silenceAlarm" type="button" style="display:block;width:100%;margin-top:7px;padding:10px;background:#102235;color:#ffd166;border:1px solid #705a2c;border-radius:7px;font:700 12px -apple-system,sans-serif">SILENCE ALARM · 60 SECONDS</button>
+  <p id="alarmSettingsStatus" style="color:#8199aa;line-height:1.45;margin-top:7px;font-size:10px">Bradycardia and low SpO₂ alarms use the training limits below.</p>
+  <div style="height:1px;background:#29445a;margin:14px 0"></div>
   <b style="color:#e8f5ff">ALARM LIMITS <span style="color:#ffcf70;font-weight:400">(training defaults)</span></b>
   <div class="limit-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:9px">
     <label style="color:#9bb1c2">HR LOW (bpm)<input id="hrLow" type="number" min="0" max="220" value="100" style="display:block;width:100%;margin-top:4px;padding:8px;background:#07111c;color:#e8f5ff;border:1px solid #29445a;border-radius:6px"></label>
@@ -80,6 +88,7 @@ body{padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bot
 </aside>
 <main class="monitor">
   <section class="patientbar"><span>SIMULATION <strong id="caseLabel">—</strong></span><span>ROOM <b class="room" id="roomCodeSmall">----</b></span><span id="leadState">LEADS OFF</span></section>
+  <div class="alarm-strip" id="alarmStrip" role="status" aria-live="assertive">⚠ <span id="alarmText">ALARM</span></div>
   <section class="vitals">
     <div class="vital hr"><div class="label">♥ HEART RATE</div><div class="number" id="hrValue">--<span class="unit">bpm</span></div></div>
     <div class="vital spo2"><div class="label">◉ SpO₂</div><div class="number" id="spo2Value">--<span class="unit">%</span></div></div>
@@ -100,6 +109,10 @@ let timerInterval=null;
 let ecgSoundEnabled=false;
 let ecgAudioContext=null;
 let ecgVolume=0.35;
+let alarmSoundEnabled=true;
+let alarmSilencedUntil=0;
+let activeAlarm="";
+let lastAlarmSoundAt=0;
 function playECGBeep(){
   if(!ecgSoundEnabled||!ecgAudioContext||ecgAudioContext.state!=="running")return;
   const now=ecgAudioContext.currentTime;
@@ -119,6 +132,48 @@ function updateECGSoundButton(){
   btn.setAttribute("aria-pressed",String(ecgSoundEnabled));
   btn.style.borderColor=ecgSoundEnabled?"#42f58d":"#31516a";
   btn.style.color=ecgSoundEnabled?"#42f58d":"#d9ecfa";
+}
+function playTone(frequency,duration=0.13,volume=0.22){
+  if(!ecgAudioContext||ecgAudioContext.state!=="running")return;
+  const now=ecgAudioContext.currentTime;
+  const osc=ecgAudioContext.createOscillator(),gain=ecgAudioContext.createGain();
+  osc.type="sine";osc.frequency.setValueAtTime(frequency,now);
+  gain.gain.setValueAtTime(0.0001,now);
+  gain.gain.exponentialRampToValueAtTime(Math.max(0.0002,volume*ecgVolume),now+0.008);
+  gain.gain.setValueAtTime(Math.max(0.0002,volume*ecgVolume),now+duration*.55);
+  gain.gain.exponentialRampToValueAtTime(0.0001,now+duration);
+  osc.connect(gain);gain.connect(ecgAudioContext.destination);
+  osc.start(now);osc.stop(now+duration+.01);
+}
+function currentAlarm(){
+  if(probes.ecg&&state.hr!=null&&Number(state.hr)>0&&Number(state.hr)<alarmLimits.hrLow)return "BRADYCARDIA";
+  if(probes.hrspo2&&state.spo2!=null&&Number(state.spo2)<alarmLimits.spo2Low)return "LOW SpO2";
+  if(probes.ecg&&state.hr!=null&&Number(state.hr)>alarmLimits.hrHigh)return "HIGH HEART RATE";
+  if(probes.temp&&state.temp!=null&&(Number(state.temp)<alarmLimits.tempLow||Number(state.temp)>alarmLimits.tempHigh))return "TEMPERATURE";
+  return "";
+}
+function updateAlarmDisplay(){
+  activeAlarm=currentAlarm();
+  document.getElementById("alarmStrip").classList.toggle("active",!!activeAlarm);
+  document.getElementById("alarmText").textContent=activeAlarm;
+  const b=document.getElementById("alarmSoundToggle");
+  b.textContent=alarmSoundEnabled?"ALARMS ENABLED · TAP TO DISABLE":"ALARMS MUTED · TAP TO ENABLE";
+  b.setAttribute("aria-pressed",String(alarmSoundEnabled));
+  document.getElementById("alarmSettingsStatus").textContent=activeAlarm?("ACTIVE: "+activeAlarm+(Date.now()<alarmSilencedUntil?" · SOUND SILENCED":" · CHECK SIMULATION")):"No active alarms";
+}
+function alarmSoundTick(){
+  updateAlarmDisplay();
+  if(!activeAlarm||!alarmSoundEnabled||Date.now()<alarmSilencedUntil)return;
+  const now=Date.now();
+  if(now-lastAlarmSoundAt<1800)return;
+  lastAlarmSoundAt=now;
+  if(activeAlarm==="BRADYCARDIA"){
+    playTone(420,.20,.32);setTimeout(()=>playTone(420,.20,.32),260);
+  }else if(activeAlarm==="LOW SpO2"){
+    playTone(1040,.10,.28);setTimeout(()=>playTone(1040,.10,.28),170);setTimeout(()=>playTone(1040,.10,.28),340);
+  }else{
+    playTone(720,.16,.25);setTimeout(()=>playTone(560,.16,.25),230);
+  }
 }
 function makeRoomCode(){return String(Math.floor(1000+Math.random()*9000))}
 const roomCode=makeRoomCode();
@@ -186,6 +241,7 @@ function render(){
   document.getElementById('leadState').textContent=probes.ecg?'ECG ON':'LEADS OFF';
   document.getElementById('ecgMeta').textContent=probes.ecg?'SIMULATED TRACE':'NO SIGNAL';
   document.getElementById('plethMeta').textContent=probes.ecg?'SIMULATED TRACE':'NO SIGNAL';
+  updateAlarmDisplay();
 }
 function setupWave(id,color,isECG){
   const canvas=document.getElementById(id),ctx=canvas.getContext('2d');
@@ -259,7 +315,7 @@ function setupWave(id,color,isECG){
       const rWaveTime=period*.235;
       const beatIndex=Math.floor((now-beatOrigin-rWaveTime)/period);
       if(beatIndex>=0&&beatIndex!==lastAudioBeat){
-        if(lastAudioBeat>=0&&ecgSoundEnabled)playECGBeep();
+        if(lastAudioBeat>=0&&ecgSoundEnabled&&!activeAlarm)playECGBeep();
         lastAudioBeat=beatIndex;
       }
     }
@@ -302,8 +358,20 @@ document.getElementById("ecgSoundToggle").addEventListener("click",async()=>{
   }catch(e){console.warn("ECG audio unavailable",e);alert("Unable to start ECG audio. Check your device sound settings.")}
 });
 document.getElementById("ecgVolume").addEventListener("input",e=>{ecgVolume=Number(e.target.value)/100});
+document.getElementById("alarmSoundToggle").addEventListener("click",async()=>{
+  try{
+    if(!ecgAudioContext){const AudioCtx=window.AudioContext||window.webkitAudioContext;if(!AudioCtx){alert("Audio is not supported on this device.");return}ecgAudioContext=new AudioCtx()}
+    await ecgAudioContext.resume();
+    alarmSoundEnabled=!alarmSoundEnabled;updateAlarmDisplay();
+  }catch(e){alert("Unable to start monitor alarm audio.")}
+});
+document.getElementById("silenceAlarm").addEventListener("click",()=>{
+  alarmSilencedUntil=Date.now()+60000;
+  updateAlarmDisplay();
+});
 
 initPeer();render();renderTimer();
+setInterval(alarmSoundTick,250);
 setupWave('ecgCanvas','#42f58d',true);
 setupWave('plethCanvas','#42d9f5',false);
 </script>
