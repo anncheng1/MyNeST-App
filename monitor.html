@@ -63,6 +63,11 @@ body{padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bot
   <label style="display:block;color:#9bb1c2;margin:10px 0 5px">ECG GAIN</label>
   <select id="ecgGain" style="width:100%;padding:9px;background:#07111c;color:#e8f5ff;border:1px solid #29445a;border-radius:7px"><option value=".5">5 mm/mV · ×0.5</option><option value="1" selected>10 mm/mV · ×1</option><option value="2">20 mm/mV · ×2</option></select>
   <div style="height:1px;background:#29445a;margin:14px 0"></div>
+  <b style="color:#e8f5ff">ECG HEARTBEAT SOUND</b>
+  <button id="ecgSoundToggle" type="button" aria-pressed="false" style="display:block;width:100%;margin-top:9px;padding:10px;background:#102235;color:#d9ecfa;border:1px solid #31516a;border-radius:7px;font:700 12px -apple-system,sans-serif">ENABLE ECG BEEP</button>
+  <label style="display:block;color:#9bb1c2;margin:10px 0 5px">BEEP VOLUME</label>
+  <input id="ecgVolume" type="range" min="0" max="100" value="35" style="width:100%;accent-color:#42f58d">
+  <div style="height:1px;background:#29445a;margin:14px 0"></div>
   <b style="color:#e8f5ff">ALARM LIMITS <span style="color:#ffcf70;font-weight:400">(training defaults)</span></b>
   <div class="limit-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:9px">
     <label style="color:#9bb1c2">HR LOW (bpm)<input id="hrLow" type="number" min="0" max="220" value="100" style="display:block;width:100%;margin-top:4px;padding:8px;background:#07111c;color:#e8f5ff;border:1px solid #29445a;border-radius:6px"></label>
@@ -92,6 +97,29 @@ let peer,conn;
 let state={hr:null,spo2:null,temp:null,caseLabel:'',note:'',running:false,elapsed:0};
 let probes={hrspo2:false,temp:false,ecg:false};
 let timerInterval=null;
+let ecgSoundEnabled=false;
+let ecgAudioContext=null;
+let ecgVolume=0.35;
+function playECGBeep(){
+  if(!ecgSoundEnabled||!ecgAudioContext||ecgAudioContext.state!=="running")return;
+  const now=ecgAudioContext.currentTime;
+  const osc=ecgAudioContext.createOscillator();
+  const gain=ecgAudioContext.createGain();
+  osc.type="sine";
+  osc.frequency.setValueAtTime(880,now);
+  gain.gain.setValueAtTime(0.0001,now);
+  gain.gain.exponentialRampToValueAtTime(Math.max(0.0002,ecgVolume*0.12),now+0.006);
+  gain.gain.exponentialRampToValueAtTime(0.0001,now+0.075);
+  osc.connect(gain);gain.connect(ecgAudioContext.destination);
+  osc.start(now);osc.stop(now+0.08);
+}
+function updateECGSoundButton(){
+  const btn=document.getElementById("ecgSoundToggle");
+  btn.textContent=ecgSoundEnabled?"ECG BEEP ON · TAP TO MUTE":"ENABLE ECG BEEP";
+  btn.setAttribute("aria-pressed",String(ecgSoundEnabled));
+  btn.style.borderColor=ecgSoundEnabled?"#42f58d":"#31516a";
+  btn.style.color=ecgSoundEnabled?"#42f58d":"#d9ecfa";
+}
 function makeRoomCode(){return String(Math.floor(1000+Math.random()*9000))}
 const roomCode=makeRoomCode();
 document.getElementById('roomCodeBig').textContent=roomCode;
@@ -161,7 +189,7 @@ function render(){
 }
 function setupWave(id,color,isECG){
   const canvas=document.getElementById(id),ctx=canvas.getContext('2d');
-  let x=0,lastY=null,lastFrame=0,beatOrigin=performance.now(),raf=0,dpr=1;
+  let x=0,lastY=null,lastFrame=0,beatOrigin=performance.now(),lastAudioBeat=-1,raf=0,dpr=1;
   let pixelsPerMm=4;
   function resize(){
     dpr=Math.min(window.devicePixelRatio||1,2);
@@ -227,6 +255,11 @@ function setupWave(id,color,isECG){
     const period=60000/bpm;
     if(now-beatOrigin>period*2)beatOrigin=now-((now-beatOrigin)%period);
     const timeInBeat=(now-beatOrigin)%period;
+    if(isECG&&ecgSoundEnabled){
+      const rWaveTime=period*.235;
+      const beatIndex=Math.floor((now-beatOrigin-rWaveTime)/period);
+      if(beatIndex>=0&&beatIndex!==lastAudioBeat){lastAudioBeat=beatIndex;playECGBeep()}
+    }
     const y=isECG?ecgAt(timeInBeat,period,h):plethAt(timeInBeat,period,h);
     // Small, subtle trace noise; avoid implying diagnostic-grade signal fidelity.
     const noisyY=y+(Math.random()-.5)*(isECG?1.1:.7);
@@ -257,6 +290,15 @@ document.getElementById('closeSettings').addEventListener('click',()=>settingsPa
 });
 document.getElementById('sweepSpeed').addEventListener('change',()=>{});
 document.getElementById('ecgGain').addEventListener('change',()=>{});
+document.getElementById("ecgSoundToggle").addEventListener("click",async()=>{
+  try{
+    if(!ecgAudioContext){const AudioCtx=window.AudioContext||window.webkitAudioContext;if(!AudioCtx){alert("Audio is not supported on this device.");return}ecgAudioContext=new AudioCtx()}
+    await ecgAudioContext.resume();
+    ecgSoundEnabled=!ecgSoundEnabled;
+    updateECGSoundButton();
+  }catch(e){console.warn("ECG audio unavailable",e);alert("Unable to start ECG audio. Check your device sound settings.")}
+});
+document.getElementById("ecgVolume").addEventListener("input",e=>{ecgVolume=Number(e.target.value)/100});
 
 initPeer();render();renderTimer();
 setupWave('ecgCanvas','#42f58d',true);
