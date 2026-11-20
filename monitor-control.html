@@ -178,6 +178,7 @@ let lastPongAt = 0;
 let requestedRoom = "";
 let manuallyDisconnected = false;
 let retryDelay = 2000;
+let pendingReset = false;
 
 const PROBE_BTN_ID = { hrspo2: 'hrSpo2ToggleBtn', temp: 'tempToggleBtn', ecg: 'ecgToggleBtn' };
 const PROBE_LABEL = { hrspo2: 'HR &amp; SpO₂ Probe', temp: 'Temperature Probe', ecg: 'ECG &amp; Pleth' };
@@ -247,6 +248,7 @@ function openRoomConnection(){
       opened=true;clearTimeout(timeout);retryDelay=2000;
       setConnectionStatus('Connected',true);startHeartbeat();
       // Re-send full controller state after every reconnection.
+      if(pendingReset){next.send({type:'resetAll'});pendingReset=false;}
       next.send({type:'restoreState',payload:{hr:state.hr,spo2:state.spo2,temp:state.temp,caseLabel:document.getElementById('caseLabelInput').value,note:document.getElementById('noteInput').value},probes:{...probes}});
       sendUpdate(true);
       Object.keys(probes).forEach(k=>next.send({type:'probeState',probe:k,on:probes[k]}));
@@ -308,8 +310,9 @@ function resetController(){
   document.getElementById('caseLabelInput').value='';
   document.getElementById('noteInput').value='';
   sendTimer('reset');
-  if(conn&&conn.open)conn.send({type:'resetAll'});
-  setConnectionStatus(conn&&conn.open?'Reset sent':'Reset locally · reconnecting',!!(conn&&conn.open));
+  if(conn&&conn.open){conn.send({type:'resetAll'});pendingReset=false;}
+  else pendingReset=true;
+  setConnectionStatus(conn&&conn.open?'Reset sent':'Reset queued · reconnecting',!!(conn&&conn.open));
 }
 function toggleProbe(probe) {
   probes[probe] = !probes[probe];
