@@ -188,7 +188,15 @@ function setConnectionStatus(label,online){
 }
 function initPeer() {
   peer = new Peer(undefined, { debug: 0, pingInterval: 5000 });
-  peer.on('open',()=>{});
+  peer.on('open',()=>{
+    let saved='';
+    try{saved=localStorage.getItem('mynestMonitorRoom')||''}catch(e){}
+    if(!requestedRoom&&/^\d{4}$/.test(saved)){
+      requestedRoom=saved;
+      document.getElementById('roomInput').value=saved;
+    }
+    if(requestedRoom&&!manuallyDisconnected&&!conn)openRoomConnection();
+  });
   peer.on('disconnected',()=>{
     setConnectionStatus('Reconnecting…',false);
     if(peer&&!peer.destroyed)peer.reconnect();
@@ -263,6 +271,7 @@ function connectToRoom() {
   const code=document.getElementById('roomInput').value.trim();
   if(!/^\d{4}$/.test(code)){alert('Enter the 4-digit room code shown on the monitor.');return}
   requestedRoom=code;manuallyDisconnected=false;
+  try{localStorage.setItem('mynestMonitorRoom',code)}catch(e){}
   if(conn){try{conn.close()}catch(e){}conn=null}
   clearTimeout(reconnectTimer);reconnectTimer=null;
   if(!peer||peer.destroyed)initPeer();
