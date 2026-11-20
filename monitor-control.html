@@ -261,7 +261,7 @@ function openRoomConnection(){
 }
 function connectToRoom() {
   const code=document.getElementById('roomInput').value.trim();
-  if(!/^\\d{4}$/.test(code)){alert('Enter the 4-digit room code shown on the monitor.');return}
+  if(!/^\d{4}$/.test(code)){alert('Enter the 4-digit room code shown on the monitor.');return}
   requestedRoom=code;manuallyDisconnected=false;
   if(conn){try{conn.close()}catch(e){}conn=null}
   clearTimeout(reconnectTimer);reconnectTimer=null;
