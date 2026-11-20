@@ -182,6 +182,10 @@ document.getElementById('roomCodeSmall').textContent=roomCode;
 function initPeer(){
   peer=new Peer('mynest-monitor-'+roomCode,{debug:0});
   peer.on('open',()=>{});
+  peer.on('disconnected',()=>{
+    setStatus('SIGNALING RECONNECT',false);
+    if(peer&&!peer.destroyed)peer.reconnect();
+  });
   peer.on('connection',c=>{
     conn=c;
     setStatus('CONNECTED',true);
@@ -203,7 +207,20 @@ function setStatus(label,connected){
   el.textContent=label;el.classList.toggle('connected',connected);
 }
 function handleData(msg){
-  if(msg.type==='update'){Object.assign(state,msg.payload);render()}
+  if(!msg)return;
+  if(msg.type==='heartbeat'){if(conn&&conn.open)conn.send({type:'heartbeatAck',receivedAt:Date.now()})}
+  else if(msg.type==='restoreState'){
+    Object.assign(state,msg.payload||{});
+    Object.assign(probes,msg.probes||{});
+    render();
+  }
+  else if(msg.type==='resetAll'){
+    state={hr:null,spo2:null,temp:null,caseLabel:'',note:'',running:false,elapsed:0};
+    probes={hrspo2:false,temp:false,ecg:false};
+    resetTimer();render();
+    if(conn&&conn.open)conn.send({type:'resetAck'});
+  }
+  else if(msg.type==='update'){Object.assign(state,msg.payload);render()}
   else if(msg.type==='probeState'){if(probes.hasOwnProperty(msg.probe))probes[msg.probe]=!!msg.on;render()}
   else if(msg.type==='timerControl'){
     if(msg.action==='start')startTimer();
